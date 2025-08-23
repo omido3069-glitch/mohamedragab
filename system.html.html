@@ -17,17 +17,30 @@
     .adminOnly {
       display: none;
     }
-    /* ✅ تكبير الجدول */
-    .table td, 
-    .table th {
-      font-size: 1.4rem;
-      font-weight: 500;
-      padding: 1rem;
-      vertical-align: middle;
-    }
-    .table th {
-      font-size: 1.5rem;
+    #loading {
+      display: none;
+      text-align: center;
       font-weight: bold;
+      color: #0d6efd;
+    }
+    #loading span {
+      display: inline-block;
+      animation: bounce 1s infinite;
+    }
+    #loading span:nth-child(2) { animation-delay: 0.2s; }
+    #loading span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.8); }
+      40% { transform: scale(1.2); }
+    }
+    table {
+      font-size: 1.3rem; /* تكبير خط الجدول */
+    }
+    #onlineUpdate {
+      font-size: 0.9rem;
+      color: green;
+      margin-right: 10px;
     }
   </style>
 </head>
@@ -93,18 +106,17 @@
   <!-- عرض السيارات -->
   <div class="card shadow">
     <div class="card-body">
-      <h1 class="text-center mb-3 fw-bold display-3">📋 السيارات المسجلة</h1>
-      <div id="countBox" class="fw-bold text-primary mb-2">عدد السيارات الموجودة: 0</div>
-
-      <!-- ✅ Spinner التحميل -->
-      <div id="loadingBox" class="text-center my-3">
-        <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;">
-          <span class="visually-hidden">جاري التحميل...</span>
-        </div>
-        <div class="fw-bold mt-2">⏳ جاري تحميل البيانات...</div>
+      <h2 class="text-center mb-3">📋 السيارات المسجلة</h2>
+      <div class="mb-2">
+        <span id="countBox" class="fw-bold text-primary">عدد السيارات الموجودة: 0</span>
+        <span id="onlineUpdate">📡 الموقع محدث أون لاين ويعمل بالإنترنت باستمرار</span>
       </div>
-
       <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو جهة الدخول أو الشركة" onkeyup="filterTable()">
+
+      <div id="loading">
+        جاري تحميل البيانات 
+        <span>.</span><span>.</span><span>.</span>
+      </div>
 
       <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle text-center">
@@ -242,42 +254,34 @@
       }
     }
 
-    // تحميل السيارات (الأحدث يظهر الأول)
+    // تحميل السيارات
     function loadCars() {
-      document.getElementById("loadingBox").style.display = "block"; // ✅ إظهار التحميل
-
       const carsRef = ref(db, "cars");
+      const loading = document.getElementById("loading");
+      loading.style.display = "block";
       onValue(carsRef, (snapshot) => {
         const cars = snapshot.val();
         let table = "";
         let count = 0;
-
-        const carsArray = [];
         for (let id in cars) {
-          carsArray.push({ id, ...cars[id] });
-        }
-        carsArray.sort((a, b) => b.timestamp - a.timestamp);
-
-        carsArray.forEach(car => {
           count++;
           table += `
-            <tr id="row-${car.id}">
-              <td>${car.name}</td>
-              <td>${car.number}</td>
-              <td>${car.college}</td>
-              <td>${car.company}</td>
+            <tr id="row-${id}">
+              <td>${cars[id].name}</td>
+              <td>${cars[id].number}</td>
+              <td>${cars[id].college}</td>
+              <td>${cars[id].company}</td>
               <td class="adminOnly" style="display:${isAdmin ? 'table-cell':'none'}">
                 <div class="d-flex justify-content-center gap-1">
-                  <button class="btn btn-sm btn-primary" onclick="editCar('${car.id}','${car.name}','${car.number}','${car.college}','${car.company}')">✏ تعديل</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteCar('${car.id}')">🗑 حذف</button>
+                  <button class="btn btn-sm btn-primary" onclick="editCar('${id}','${cars[id].name}','${cars[id].number}','${cars[id].college}','${cars[id].company}')">✏ تعديل</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteCar('${id}')">🗑 حذف</button>
                 </div>
               </td>
             </tr>`;
-        });
-
+        }
         document.getElementById("carsTableBody").innerHTML = table;
         document.getElementById("countBox").innerText = "عدد السيارات الموجودة: " + count;
-        document.getElementById("loadingBox").style.display = "none"; // ✅ إخفاء بعد التحميل
+        loading.style.display = "none";
       });
     }
 
