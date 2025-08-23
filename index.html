@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>تسجيل الدخول - نظام السيارات</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+      font-family: Tahoma, Arial, sans-serif;
       margin: 0;
       padding: 0;
       min-height: 100vh;
@@ -15,28 +14,16 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      position: relative;
     }
 
-    /* 🎥 الفيديو كخلفية */
-    video.bg-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      min-width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      z-index: -2;
-    }
-
-    /* طبقة شفافة فوق الفيديو */
-    .overlay {
+    /* خلفية الفيديو */
+    #bg-video {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.4);
+      object-fit: cover;
       z-index: -1;
     }
 
@@ -46,132 +33,72 @@
       padding: 40px;
       border-radius: 20px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      width: 95%;
-      max-width: 500px;
-      animation: fadeIn 1s ease-in-out;
-      z-index: 1;
+      width: 90%;
+      max-width: 400px; /* مش عريض أوي */
     }
+
     .login-box img {
-      width: 400px;   /* 🔹 تكبير اللوجو */
-      height: 400px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 30px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4); /* ظل أوضح */
+      width: 350px; /* اللوجو أكبر */
+      margin-bottom: 25px;
     }
+
     h2 {
       margin-bottom: 20px;
       color: #333;
       font-size: 28px;
     }
-    .input-group {
-      position: relative;
-      margin: 15px auto;
-      width: 80%;
-    }
-    .input-group input {
-      width: 100%;
-      padding: 12px 40px 12px 12px;
+
+    input {
+      display: block;
+      margin: 12px auto;
+      padding: 15px;
+      width: 85%;
       border: 1px solid #ccc;
       border-radius: 10px;
       font-size: 18px;
     }
-    .input-group i {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #888;
-      font-size: 20px;
-    }
+
     button {
       background: #007bff;
       color: white;
       border: none;
       padding: 15px;
-      width: 85%;
+      width: 90%;
       border-radius: 10px;
       cursor: pointer;
       font-size: 18px;
       margin-top: 15px;
       transition: 0.3s ease-in-out;
     }
+
     button:hover {
       opacity: 0.9;
       transform: scale(1.05);
     }
+
     footer {
       text-align: center;
       margin-top: 20px;
-      font-size: 22px;
+      font-size: 20px; /* أكبر */
       font-weight: bold;
-      color: #fff;
-      text-shadow: 2px 2px 5px #000;
-      z-index: 1;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    /* 📱 النسخة للموبايل */
-    @media (max-width: 600px) {
-      .login-box {
-        padding: 25px;
-        border-radius: 15px;
-      }
-      .login-box img {
-        width: 250px;  /* 🔹 كبير بس مناسب للموبايل */
-        height: 250px;
-        margin-bottom: 20px;
-      }
-      h2 {
-        font-size: 22px;
-      }
-      .input-group {
-        width: 90%;
-      }
-      .input-group input {
-        font-size: 16px;
-        padding: 12px 35px 12px 12px;
-      }
-      .input-group i {
-        font-size: 18px;
-      }
-      button {
-        width: 90%;
-        font-size: 16px;
-        padding: 12px;
-      }
-      footer {
-        font-size: 18px;
-      }
+      color: white;
+      text-shadow: 1px 1px 2px black;
     }
   </style>
-  <script src="https://kit.fontawesome.com/4b3e6fd870.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-  <!-- 🎥 الفيديو كخلفية -->
-  <video autoplay muted loop class="bg-video">
+  <!-- خلفية الفيديو -->
+  <video autoplay muted loop id="bg-video">
     <source src="background.mp4" type="video/mp4">
-    متصفحك لا يدعم تشغيل الفيديو.
+    متصفحك لا يدعم الفيديو
   </video>
-  <div class="overlay"></div>
 
   <div class="login-box">
     <img src="logo.png" alt="شعار النظام">
     <h2>تسجيل الدخول</h2>
-    
-    <div class="input-group">
-      <input type="text" id="username" placeholder="اسم المستخدم">
-      <i class="fas fa-user"></i>
-    </div>
-    <div class="input-group">
-      <input type="password" id="password" placeholder="كلمة المرور">
-      <i class="fas fa-lock"></i>
-    </div>
-    
+    <input type="text" id="username" placeholder="اسم المستخدم">
+    <input type="password" id="password" placeholder="كلمة المرور">
     <button onclick="login()">دخول</button>
   </div>
 
@@ -180,16 +107,27 @@
   </footer>
 
   <script>
+    const video = document.getElementById("bg-video");
+
+    // أول ضغطة على الصفحة -> شغل الصوت
+    document.body.addEventListener("click", () => {
+      video.muted = false;
+      video.play();
+    }, { once: true });
+
     function login() {
       const user = document.getElementById("username").value;
       const pass = document.getElementById("password").value;
       if (user === "admin" && pass === "1234") {
+        // عند تسجيل الدخول -> كتم الصوت
+        video.muted = true;
         window.location.href = "system.html";
       } else {
-        alert("⚠ اسم المستخدم أو كلمة المرور غير صحيحة");
+        alert("⚠️ اسم المستخدم أو كلمة المرور غير صحيحة");
       }
     }
 
+    // السماح بالضغط على Enter لتسجيل الدخول
     document.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         login();
