@@ -95,6 +95,15 @@
     <div class="card-body">
       <h1 class="text-center mb-3 fw-bold display-3">📋 السيارات المسجلة</h1>
       <div id="countBox" class="fw-bold text-primary mb-2">عدد السيارات الموجودة: 0</div>
+
+      <!-- ✅ Spinner التحميل -->
+      <div id="loadingBox" class="text-center my-3">
+        <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;">
+          <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <div class="fw-bold mt-2">⏳ جاري تحميل البيانات...</div>
+      </div>
+
       <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو جهة الدخول أو الشركة" onkeyup="filterTable()">
 
       <div class="table-responsive">
@@ -235,6 +244,8 @@
 
     // تحميل السيارات (الأحدث يظهر الأول)
     function loadCars() {
+      document.getElementById("loadingBox").style.display = "block"; // ✅ إظهار التحميل
+
       const carsRef = ref(db, "cars");
       onValue(carsRef, (snapshot) => {
         const cars = snapshot.val();
@@ -266,6 +277,7 @@
 
         document.getElementById("carsTableBody").innerHTML = table;
         document.getElementById("countBox").innerText = "عدد السيارات الموجودة: " + count;
+        document.getElementById("loadingBox").style.display = "none"; // ✅ إخفاء بعد التحميل
       });
     }
 
