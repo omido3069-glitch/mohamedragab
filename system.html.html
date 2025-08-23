@@ -17,6 +17,18 @@
     .adminOnly {
       display: none;
     }
+    /* ✅ تكبير الجدول */
+    .table td, 
+    .table th {
+      font-size: 1.4rem;
+      font-weight: 500;
+      padding: 1rem;
+      vertical-align: middle;
+    }
+    .table th {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body class="container py-4">
@@ -81,7 +93,7 @@
   <!-- عرض السيارات -->
   <div class="card shadow">
     <div class="card-body">
-      <h2 class="text-center mb-3">📋 السيارات المسجلة</h2>
+      <h1 class="text-center mb-3 fw-bold display-3">📋 السيارات المسجلة</h1>
       <div id="countBox" class="fw-bold text-primary mb-2">عدد السيارات الموجودة: 0</div>
       <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو جهة الدخول أو الشركة" onkeyup="filterTable()">
 
@@ -221,29 +233,37 @@
       }
     }
 
-    // تحميل السيارات
+    // تحميل السيارات (الأحدث يظهر الأول)
     function loadCars() {
       const carsRef = ref(db, "cars");
       onValue(carsRef, (snapshot) => {
         const cars = snapshot.val();
         let table = "";
         let count = 0;
+
+        const carsArray = [];
         for (let id in cars) {
+          carsArray.push({ id, ...cars[id] });
+        }
+        carsArray.sort((a, b) => b.timestamp - a.timestamp);
+
+        carsArray.forEach(car => {
           count++;
           table += `
-            <tr id="row-${id}">
-              <td>${cars[id].name}</td>
-              <td>${cars[id].number}</td>
-              <td>${cars[id].college}</td>
-              <td>${cars[id].company}</td>
+            <tr id="row-${car.id}">
+              <td>${car.name}</td>
+              <td>${car.number}</td>
+              <td>${car.college}</td>
+              <td>${car.company}</td>
               <td class="adminOnly" style="display:${isAdmin ? 'table-cell':'none'}">
                 <div class="d-flex justify-content-center gap-1">
-                  <button class="btn btn-sm btn-primary" onclick="editCar('${id}','${cars[id].name}','${cars[id].number}','${cars[id].college}','${cars[id].company}')">✏ تعديل</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteCar('${id}')">🗑 حذف</button>
+                  <button class="btn btn-sm btn-primary" onclick="editCar('${car.id}','${car.name}','${car.number}','${car.college}','${car.company}')">✏ تعديل</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteCar('${car.id}')">🗑 حذف</button>
                 </div>
               </td>
             </tr>`;
-        }
+        });
+
         document.getElementById("carsTableBody").innerHTML = table;
         document.getElementById("countBox").innerText = "عدد السيارات الموجودة: " + count;
       });
