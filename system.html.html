@@ -11,39 +11,37 @@
       direction: rtl;
       background: #f8f9fa;
     }
-    h2 { font-weight: bold; }
-
-    .adminOnly { display: none; }
-
-    /* ✅ تكبير وتغميق الخط في الجدول */
-    .table td{
-      font-size: 1.4rem;
+    h2 {
       font-weight: bold;
-      color: #000;
-      padding: 1rem;
-      vertical-align: middle;
     }
-    .table th{
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #000;
-      padding: 1rem;
+    .adminOnly {
+      display: none;
+    }
+    #loading {
+      display: none;
       text-align: center;
-      vertical-align: middle;
+      font-weight: bold;
+      color: #0d6efd;
     }
+    #loading span {
+      display: inline-block;
+      animation: bounce 1s infinite;
+    }
+    #loading span:nth-child(2) { animation-delay: 0.2s; }
+    #loading span:nth-child(3) { animation-delay: 0.4s; }
 
-    /* العداد + رسالة الأونلاين */
-    #countRow { gap: 12px; align-items: baseline; }
-    #countBox { font-size: 1.6rem; font-weight: 800; color: #0d6efd; }
-    #onlineUpdate { font-size: 1.4rem; font-weight: 800; color: #198754; white-space: nowrap; }
-
-    /* Spinner التحميل */
-    #loadingBox { text-align:center; margin: 12px 0; }
-    #loadingBox .spinner-border { width:3rem; height:3rem; }
-    #loadingBox .txt { font-weight:bold; margin-top: .5rem; }
-
-    /* تحسين أزرار الإجراءات */
-    .table .btn { font-size: 1.1rem; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.8); }
+      40% { transform: scale(1.2); }
+    }
+    table {
+      font-size: 1.3rem; /* تكبير خط الجدول */
+    }
+    #onlineUpdate {
+      font-size: 0.9rem;
+      color: green;
+      margin-right: 10px;
+    }
   </style>
 </head>
 <body class="container py-4">
@@ -69,17 +67,33 @@
 
       <select id="college" class="form-select mb-2">
         <option value="">-- اختر جهة الدخول --</option>
-        <option>كليه هندسه</option><option>كليه علوم</option><option>كليه تجاره</option>
-        <option>كليه اداب</option><option>كليه فنون</option><option>كليه حسابات ومعلومات</option>
-        <option>كليه حقوق</option><option>كليه طب اسنان</option><option>كليه طب بشري</option>
-        <option>كليه علاج طبيعي</option><option>كليه علوم صحيه</option>
-        <option>موظف</option><option>مدير امن</option><option>نائب مدير الامن</option><option>مشرف الشركه</option>
+        <option>كليه هندسه</option>
+        <option>كليه علوم</option>
+        <option>كليه تجاره</option>
+        <option>كليه اداب</option>
+        <option>كليه فنون</option>
+        <option>كليه حسابات ومعلومات</option>
+        <option>كليه حقوق</option>
+        <option>كليه طب اسنان</option>
+        <option>كليه طب بشري</option>
+        <option>كليه علاج طبيعي</option>
+        <option>كليه علوم صحيه</option>
+        <option>موظف</option>
+        <option>مدير امن</option>
+        <option>نائب مدير الامن</option>
+        <option>مشرف الشركه</option>
       </select>
 
       <select id="company" class="form-select mb-3">
         <option value="لا يوجد">لا يوجد</option>
-        <option>العالميه</option><option>ابو شلوع</option><option>ايمكو</option><option>الوادي</option>
-        <option>ساشكو</option><option>ايماك</option><option>تليكوم</option><option>كوليتي</option>
+        <option>العالميه</option>
+        <option>ابو شلوع</option>
+        <option>ايمكو</option>
+        <option>الوادي</option>
+        <option>ساشكو</option>
+        <option>ايماك</option>
+        <option>تليكوم</option>
+        <option>كوليتي</option>
       </select>
 
       <div class="d-flex gap-2">
@@ -92,20 +106,17 @@
   <!-- عرض السيارات -->
   <div class="card shadow">
     <div class="card-body">
-      <h1 class="text-center mb-3 fw-bold display-3">📋 السيارات المسجلة</h1>
-
-      <div id="countRow" class="d-flex flex-wrap mb-2">
-        <div id="countBox" class="fw-bold text-primary">عدد السيارات الموجودة: 0</div>
-        <div id="onlineUpdate">📡 الموقع محدث أونلاين ويعمل بالإنترنت باستمرار</div>
+      <h2 class="text-center mb-3">📋 السيارات المسجلة</h2>
+      <div class="mb-2">
+        <span id="countBox" class="fw-bold text-primary">عدد السيارات الموجودة: 0</span>
+        <span id="onlineUpdate">📡 الموقع محدث أون لاين ويعمل بالإنترنت باستمرار</span>
       </div>
-
-      <!-- ✅ Spinner التحميل -->
-      <div id="loadingBox" class="my-2">
-        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">جاري التحميل...</span></div>
-        <div class="txt">⏳ جاري تحميل البيانات...</div>
-      </div>
-
       <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو جهة الدخول أو الشركة" onkeyup="filterTable()">
+
+      <div id="loading">
+        جاري تحميل البيانات 
+        <span>.</span><span>.</span><span>.</span>
+      </div>
 
       <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle text-center">
@@ -124,7 +135,7 @@
     </div>
   </div>
 
-  <!-- Firebase (نفس النسخة اللي كانت شغّالة) -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import { getDatabase, ref, push, set, update, remove, onValue } 
@@ -152,7 +163,6 @@
 
     function showMsg(text){
       const msgBox = document.getElementById("msgBox");
-      if(!msgBox) return;
       msgBox.innerHTML = text;
       msgBox.classList.remove("d-none");
       setTimeout(()=> msgBox.classList.add("d-none"), 3000);
@@ -160,14 +170,16 @@
 
     // تسجيل الدخول
     window.login = function(){
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       signInWithEmailAndPassword(auth, email, password)
         .catch(() => alert("❌ خطأ في تسجيل الدخول"));
     }
 
     // تسجيل الخروج
-    window.logout = function(){ signOut(auth); }
+    window.logout = function(){
+      signOut(auth);
+    }
 
     // متابعة حالة تسجيل الدخول
     onAuthStateChanged(auth, (user) => {
@@ -190,31 +202,37 @@
       const name = document.getElementById("name").value.trim();
       const number = document.getElementById("number").value.trim();
       const college = document.getElementById("college").value;
-      let company = document.getElementById("company").value || "لا يوجد";
+      let company = document.getElementById("company").value;
+
+      if(!company) company = "لا يوجد"; 
 
       if(name && number && college && company){
         const carsRef = ref(db, "cars");
-
         onValue(carsRef, (snapshot) => {
-          const cars = snapshot.val() || {};
+          const cars = snapshot.val();
           let duplicateId = null;
 
           const normalizedNumber = number.replace(/\s+/g, '').toUpperCase();
 
           for (let id in cars) {
-            const dbNumber = String(cars[id].number || "").replace(/\s+/g, '').toUpperCase();
-            if (dbNumber === normalizedNumber) { duplicateId = id; break; }
+            const dbNumber = cars[id].number.replace(/\s+/g, '').toUpperCase();
+
+            if (dbNumber === normalizedNumber) {
+              duplicateId = id;
+              break;
+            }
           }
 
           if (duplicateId && !editingId) {
             const msgBox = document.getElementById("msgBox");
-            msgBox.innerHTML = `⚠ البيانات موجودة بالفعل!
+            msgBox.innerHTML = `⚠ البيانات موجودة بالفعل! 
               <button class="btn btn-warning btn-sm mt-2" onclick="goToCar('${duplicateId}')">اذهب إلى البيانات</button>`;
             msgBox.classList.remove("d-none");
             return;
           } else {
             if(editingId){
-              update(ref(db, "cars/" + editingId), { name, number, college, company });
+              const carRef = ref(db, "cars/" + editingId);
+              update(carRef, { name, number, college, company });
               showMsg("✅ تم تحديث السيارة");
               editingId = null;
               document.getElementById("saveBtn").innerText = "➕ إضافة";
@@ -224,11 +242,10 @@
               showMsg("✅ تمت إضافة السيارة");
             }
 
-            // تفريغ الحقول
             document.getElementById("name").value = "";
             document.getElementById("number").value = "";
             document.getElementById("college").value = "";
-            document.getElementById("company").value = "لا يوجد";
+            document.getElementById("company").value = "لا يوجد"; 
           }
         }, { onlyOnce: true });
 
@@ -237,42 +254,34 @@
       }
     }
 
-    // تحميل السيارات (ويشيل السبينر حتى لو مفيش بيانات)
+    // تحميل السيارات
     function loadCars() {
-      const loadingEl = document.getElementById("loadingBox");
-      if (loadingEl) loadingEl.style.display = "block";
-
       const carsRef = ref(db, "cars");
+      const loading = document.getElementById("loading");
+      loading.style.display = "block";
       onValue(carsRef, (snapshot) => {
-        const cars = snapshot.val() || {};
+        const cars = snapshot.val();
         let table = "";
         let count = 0;
-
-        // ترتيب حسب الأحدث
-        const carsArray = Object.keys(cars).map(id => ({ id, ...cars[id] }));
-        carsArray.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
-
-        carsArray.forEach(car => {
+        for (let id in cars) {
           count++;
           table += `
-            <tr id="row-${car.id}">
-              <td>${car.name || ""}</td>
-              <td>${car.number || ""}</td>
-              <td>${car.college || ""}</td>
-              <td>${car.company || ""}</td>
+            <tr id="row-${id}">
+              <td>${cars[id].name}</td>
+              <td>${cars[id].number}</td>
+              <td>${cars[id].college}</td>
+              <td>${cars[id].company}</td>
               <td class="adminOnly" style="display:${isAdmin ? 'table-cell':'none'}">
                 <div class="d-flex justify-content-center gap-1">
-                  <button class="btn btn-sm btn-primary" onclick="editCar('${car.id}','${car.name||""}','${car.number||""}','${car.college||""}','${car.company||""}')">✏ تعديل</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteCar('${car.id}')">🗑 حذف</button>
+                  <button class="btn btn-sm btn-primary" onclick="editCar('${id}','${cars[id].name}','${cars[id].number}','${cars[id].college}','${cars[id].company}')">✏ تعديل</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteCar('${id}')">🗑 حذف</button>
                 </div>
               </td>
             </tr>`;
-        });
-
+        }
         document.getElementById("carsTableBody").innerHTML = table;
         document.getElementById("countBox").innerText = "عدد السيارات الموجودة: " + count;
-
-        if (loadingEl) loadingEl.style.display = "none";
+        loading.style.display = "none";
       });
     }
 
@@ -286,20 +295,21 @@
       }
     }
 
-    // تعديل / حذف
+    // تعديل سيارة
     window.editCar = function(id, name, number, college, company){
       editingId = id;
       document.getElementById("name").value = name;
       document.getElementById("number").value = number;
       document.getElementById("college").value = college;
-      document.getElementById("company").value = company || "لا يوجد";
+      document.getElementById("company").value = company;
       document.getElementById("saveBtn").innerText = "💾 تحديث";
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    // حذف سيارة
     window.deleteCar = function(id){
       if(confirm("هل تريد حذف السيارة بالتأكيد؟")){
-        remove(ref(db, "cars/" + id));
+        const carRef = ref(db, "cars/" + id);
+        remove(carRef);
         showMsg("🗑 تم حذف السيارة");
       }
     }
