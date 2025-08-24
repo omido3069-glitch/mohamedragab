@@ -5,47 +5,59 @@
   <title>تسجيل الدخول - نظام السيارات</title>
   <style>
     body {
-      font-family: Tahoma, Arial, sans-serif;
+      font-family: 'Cairo', Tahoma, Arial, sans-serif;
       margin: 0;
       padding: 0;
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      background: linear-gradient(-45deg, #007bff, #00c6ff, #6610f2, #20c997);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
     }
 
-    /* خلفية الفيديو */
-    #bg-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
+    /* حركة الخلفية */
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .login-box {
       text-align: center;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(15px);
       padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      border-radius: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
       width: 90%;
-      max-width: 400px; /* مش عريض أوي */
+      max-width: 450px;
+      color: white;
     }
 
+    /* لوجو كبير جدًا */
     .login-box img {
-      width: 350px; /* اللوجو أكبر */
+      width: 300px;
+      margin-bottom: 15px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      padding: 15px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.5);
+    }
+
+    /* نص التحديث */
+    .update-text {
+      font-size: 16px;
+      color: #f0f0f0;
       margin-bottom: 25px;
+      font-weight: bold;
     }
 
     h2 {
-      margin-bottom: 20px;
-      color: #333;
-      font-size: 28px;
+      margin-bottom: 25px;
+      font-size: 30px;
+      font-weight: bold;
     }
 
     input {
@@ -53,81 +65,83 @@
       margin: 12px auto;
       padding: 15px;
       width: 85%;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+      border: none;
+      border-radius: 12px;
       font-size: 18px;
+      outline: none;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    input:focus {
+      box-shadow: 0 0 10px #00c6ff;
     }
 
     button {
-      background: #007bff;
+      background: linear-gradient(45deg, #007bff, #00c6ff);
       color: white;
       border: none;
       padding: 15px;
       width: 90%;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
       font-size: 18px;
-      margin-top: 15px;
+      margin-top: 20px;
+      font-weight: bold;
       transition: 0.3s ease-in-out;
     }
 
     button:hover {
-      opacity: 0.9;
       transform: scale(1.05);
+      box-shadow: 0 0 20px #00c6ff;
+    }
+
+    #error {
+      margin-top: 15px;
+      color: #ff4d4d;
+      font-size: 16px;
+      font-weight: bold;
     }
 
     footer {
-      text-align: center;
       margin-top: 20px;
-      font-size: 20px; /* أكبر */
+      font-size: 16px;
       font-weight: bold;
       color: white;
-      text-shadow: 1px 1px 2px black;
+      text-shadow: 1px 1px 3px black;
     }
   </style>
 </head>
 <body>
 
-  <!-- خلفية الفيديو -->
-  <video autoplay muted loop id="bg-video">
-    <source src="background.mp4" type="video/mp4">
-    متصفحك لا يدعم الفيديو
-  </video>
-
   <div class="login-box">
     <img src="logo.png" alt="شعار النظام">
+    <p class="update-text">تم التحديث بتاريخ 25/8/2025</p>
     <h2>تسجيل الدخول</h2>
-    <input type="text" id="username" placeholder="اسم المستخدم">
-    <input type="password" id="password" placeholder="كلمة المرور">
+    <input type="text" id="username" placeholder="اسم المستخدم" required>
+    <input type="password" id="password" placeholder="كلمة المرور" required>
     <button onclick="login()">دخول</button>
+    <p id="error"></p>
+    <footer>
+      تم التصميم بواسطة / محمد رجب
+    </footer>
   </div>
 
-  <footer>
-    تم التصميم بواسطة / محمد رجب
-  </footer>
-
   <script>
-    const video = document.getElementById("bg-video");
-
-    // أول ضغطة على الصفحة -> شغل الصوت
-    document.body.addEventListener("click", () => {
-      video.muted = false;
-      video.play();
-    }, { once: true });
-
     function login() {
       const user = document.getElementById("username").value;
       const pass = document.getElementById("password").value;
+      const errorMsg = document.getElementById("error");
+
       if (user === "admin" && pass === "1234") {
-        // عند تسجيل الدخول -> كتم الصوت
-        video.muted = true;
         window.location.href = "system.html";
       } else {
-        alert("⚠️ اسم المستخدم أو كلمة المرور غير صحيحة");
+        errorMsg.textContent = "⚠️ اسم المستخدم أو كلمة المرور غير صحيحة";
       }
     }
 
-    // السماح بالضغط على Enter لتسجيل الدخول
     document.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         login();
