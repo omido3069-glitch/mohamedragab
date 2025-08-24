@@ -1,141 +1,268 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>📋 نظام السيارات</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <title>سيستم السيارات</title>
+  <!-- ✅ Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      font-family: "Cairo", sans-serif;
-      background-color: #f8f9fa;
+      font-family: 'Tajawal', Arial, sans-serif;
+      direction: rtl;
+      background: #f8f9fa;
     }
+    h2 { font-weight: bold; }
 
-    h1 {
-      font-size: 2.5rem;
+    .adminOnly { display: none; }
+
+    /* ✅ تكبير وتغميق الخط في الجدول */
+    .table td{
+      font-size: 1.4rem;
       font-weight: bold;
-      margin: 20px 0;
-      text-align: center;
-    }
-
-    /* تكبير وتغميق الخط في الجدول */
-    .table td {
-      font-size: 1.4rem;   /* حجم كبير للبيانات */
-      font-weight: bold;   /* خط عريض */
-      color: #000;         /* أسود */
+      color: #000;
       padding: 1rem;
       vertical-align: middle;
     }
-
-    .table th {
-      font-size: 1.6rem;   /* أكبر من البيانات */
-      font-weight: bold;   /* عريض */
+    .table th{
+      font-size: 1.6rem;
+      font-weight: bold;
       color: #000;
       padding: 1rem;
       text-align: center;
+      vertical-align: middle;
     }
 
-    /* العداد + النص */
-    #countBox {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #0d6efd;
-    }
-    #onlineBox {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #198754;
-    }
+    /* العداد + رسالة الأونلاين */
+    #countRow { gap: 12px; align-items: baseline; }
+    #countBox { font-size: 1.6rem; font-weight: 800; color: #0d6efd; }
+    #onlineUpdate { font-size: 1.4rem; font-weight: 800; color: #198754; white-space: nowrap; }
 
-    /* التحميل */
-    #loadingBox {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
+    /* Spinner التحميل */
+    #loadingBox { text-align:center; margin: 12px 0; }
+    #loadingBox .spinner-border { width:3rem; height:3rem; }
+    #loadingBox .txt { font-weight:bold; margin-top: .5rem; }
+
+    /* تحسين أزرار الإجراءات */
+    .table .btn { font-size: 1.1rem; }
   </style>
 </head>
 <body class="container py-4">
 
-  <h1>📋 السيارات المسجلة</h1>
-
-  <!-- عداد السيارات + رسالة الموقع -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div id="countBox">عدد السيارات الموجودة: 0</div>
-    <div id="onlineBox">🌐 الموقع محدث أونلاين ويعمل بإنترنت</div>
-  </div>
-
-  <!-- التحميل المتحرك -->
-  <div id="loadingBox" class="text-center my-3">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">جاري التحميل...</span>
+  <!-- تسجيل الدخول -->
+  <div class="card shadow mb-4" id="loginBox">
+    <div class="card-body text-center">
+      <h2 class="mb-3">🔐 تسجيل دخول الأدمن</h2>
+      <input type="email" id="email" class="form-control mb-3" placeholder="الإيميل">
+      <input type="password" id="password" class="form-control mb-3" placeholder="الباسورد">
+      <button class="btn btn-primary w-100" onclick="login()">دخول</button>
     </div>
-    <div class="fw-bold mt-2">⏳ جاري تحميل البيانات...</div>
   </div>
 
-  <!-- جدول السيارات -->
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped text-center align-middle">
-      <thead class="table-primary">
-        <tr>
-          <th>اسم المالك</th>
-          <th>رقم السيارة</th>
-          <th>جهة الدخول</th>
-          <th>الشركة</th>
-          <th class="adminOnly">الإجراءات</th>
-        </tr>
-      </thead>
-      <tbody id="carsTableBody">
-        <!-- البيانات هتيجي من Firebase -->
-      </tbody>
-    </table>
+  <!-- إضافة / تعديل سيارة -->
+  <div class="card shadow mb-4" id="addBox" style="display:none;">
+    <div class="card-body">
+      <h2 class="text-center mb-3">🚘 تسجيل / تعديل سيارة</h2>
+      <div class="alert alert-success text-center fw-bold d-none" id="msgBox"></div>
+
+      <input type="text" id="name" class="form-control mb-2" placeholder="الاسم">
+      <input type="text" id="number" class="form-control mb-2" placeholder="رقم السيارة">
+
+      <select id="college" class="form-select mb-2">
+        <option value="">-- اختر جهة الدخول --</option>
+        <option>كليه هندسه</option><option>كليه علوم</option><option>كليه تجاره</option>
+        <option>كليه اداب</option><option>كليه فنون</option><option>كليه حسابات ومعلومات</option>
+        <option>كليه حقوق</option><option>كليه طب اسنان</option><option>كليه طب بشري</option>
+        <option>كليه علاج طبيعي</option><option>كليه علوم صحيه</option>
+        <option>موظف</option><option>مدير امن</option><option>نائب مدير الامن</option><option>مشرف الشركه</option>
+      </select>
+
+      <select id="company" class="form-select mb-3">
+        <option value="لا يوجد">لا يوجد</option>
+        <option>العالميه</option><option>ابو شلوع</option><option>ايمكو</option><option>الوادي</option>
+        <option>ساشكو</option><option>ايماك</option><option>تليكوم</option><option>كوليتي</option>
+      </select>
+
+      <div class="d-flex gap-2">
+        <button id="saveBtn" onclick="saveCar()" class="btn btn-success flex-fill">➕ إضافة</button>
+        <button onclick="logout()" class="btn btn-danger flex-fill">🚪 تسجيل خروج</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Firebase -->
+  <!-- عرض السيارات -->
+  <div class="card shadow">
+    <div class="card-body">
+      <h1 class="text-center mb-3 fw-bold display-3">📋 السيارات المسجلة</h1>
+
+      <div id="countRow" class="d-flex flex-wrap mb-2">
+        <div id="countBox" class="fw-bold text-primary">عدد السيارات الموجودة: 0</div>
+        <div id="onlineUpdate">📡 الموقع محدث أونلاين ويعمل بالإنترنت باستمرار</div>
+      </div>
+
+      <!-- ✅ Spinner التحميل -->
+      <div id="loadingBox" class="my-2">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">جاري التحميل...</span></div>
+        <div class="txt">⏳ جاري تحميل البيانات...</div>
+      </div>
+
+      <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو جهة الدخول أو الشركة" onkeyup="filterTable()">
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle text-center">
+          <thead class="table-primary">
+            <tr>
+              <th>الاسم</th>
+              <th>رقم السيارة</th>
+              <th>جهة الدخول</th>
+              <th>الشركة</th>
+              <th class="adminOnly">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="carsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase (نفس النسخة اللي كانت شغّالة) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getDatabase, ref, push, set, update, remove, onValue } 
+      from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      databaseURL: "YOUR_DATABASE_URL",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyCRR-uXoz14YOudO0K740Y5AUbivB0R5M0",
+      authDomain: "hnu-3069.firebaseapp.com",
+      databaseURL: "https://hnu-3069-default-rtdb.firebaseio.com",
+      projectId: "hnu-3069",
+      storageBucket: "hnu-3069.firebasestorage.app",
+      messagingSenderId: "98084688599",
+      appId: "1:98084688599:web:e272972e76d63f8ae01692",
+      measurementId: "G-P0E5EC7CHJ"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
-    let isAdmin = true; // عدلها حسب النظام عندك
+    let isAdmin = false;
+    let editingId = null;
 
+    function showMsg(text){
+      const msgBox = document.getElementById("msgBox");
+      if(!msgBox) return;
+      msgBox.innerHTML = text;
+      msgBox.classList.remove("d-none");
+      setTimeout(()=> msgBox.classList.add("d-none"), 3000);
+    }
+
+    // تسجيل الدخول
+    window.login = function(){
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(() => alert("❌ خطأ في تسجيل الدخول"));
+    }
+
+    // تسجيل الخروج
+    window.logout = function(){ signOut(auth); }
+
+    // متابعة حالة تسجيل الدخول
+    onAuthStateChanged(auth, (user) => {
+      if(user){
+        isAdmin = true;
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("addBox").style.display = "block";
+        document.querySelectorAll(".adminOnly").forEach(el => el.style.display="table-cell");
+      } else {
+        isAdmin = false;
+        document.getElementById("loginBox").style.display = "block";
+        document.getElementById("addBox").style.display = "none";
+        document.querySelectorAll(".adminOnly").forEach(el => el.style.display="none");
+      }
+      loadCars();
+    });
+
+    // إضافة / تعديل سيارة
+    window.saveCar = function() {
+      const name = document.getElementById("name").value.trim();
+      const number = document.getElementById("number").value.trim();
+      const college = document.getElementById("college").value;
+      let company = document.getElementById("company").value || "لا يوجد";
+
+      if(name && number && college && company){
+        const carsRef = ref(db, "cars");
+
+        onValue(carsRef, (snapshot) => {
+          const cars = snapshot.val() || {};
+          let duplicateId = null;
+
+          const normalizedNumber = number.replace(/\s+/g, '').toUpperCase();
+
+          for (let id in cars) {
+            const dbNumber = String(cars[id].number || "").replace(/\s+/g, '').toUpperCase();
+            if (dbNumber === normalizedNumber) { duplicateId = id; break; }
+          }
+
+          if (duplicateId && !editingId) {
+            const msgBox = document.getElementById("msgBox");
+            msgBox.innerHTML = `⚠ البيانات موجودة بالفعل!
+              <button class="btn btn-warning btn-sm mt-2" onclick="goToCar('${duplicateId}')">اذهب إلى البيانات</button>`;
+            msgBox.classList.remove("d-none");
+            return;
+          } else {
+            if(editingId){
+              update(ref(db, "cars/" + editingId), { name, number, college, company });
+              showMsg("✅ تم تحديث السيارة");
+              editingId = null;
+              document.getElementById("saveBtn").innerText = "➕ إضافة";
+            } else {
+              const newCar = push(carsRef);
+              set(newCar, { name, number, college, company, timestamp: Date.now() });
+              showMsg("✅ تمت إضافة السيارة");
+            }
+
+            // تفريغ الحقول
+            document.getElementById("name").value = "";
+            document.getElementById("number").value = "";
+            document.getElementById("college").value = "";
+            document.getElementById("company").value = "لا يوجد";
+          }
+        }, { onlyOnce: true });
+
+      } else {
+        alert("⚠ من فضلك املأ كل الحقول");
+      }
+    }
+
+    // تحميل السيارات (ويشيل السبينر حتى لو مفيش بيانات)
     function loadCars() {
-      document.getElementById("loadingBox").style.display = "block"; // إظهار التحميل
+      const loadingEl = document.getElementById("loadingBox");
+      if (loadingEl) loadingEl.style.display = "block";
 
       const carsRef = ref(db, "cars");
       onValue(carsRef, (snapshot) => {
-        const cars = snapshot.val();
+        const cars = snapshot.val() || {};
         let table = "";
         let count = 0;
 
-        const carsArray = [];
-        for (let id in cars) {
-          carsArray.push({ id, ...cars[id] });
-        }
-        carsArray.sort((a, b) => b.timestamp - a.timestamp);
+        // ترتيب حسب الأحدث
+        const carsArray = Object.keys(cars).map(id => ({ id, ...cars[id] }));
+        carsArray.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
 
         carsArray.forEach(car => {
           count++;
           table += `
             <tr id="row-${car.id}">
-              <td>${car.name}</td>
-              <td>${car.number}</td>
-              <td>${car.college}</td>
-              <td>${car.company}</td>
+              <td>${car.name || ""}</td>
+              <td>${car.number || ""}</td>
+              <td>${car.college || ""}</td>
+              <td>${car.company || ""}</td>
               <td class="adminOnly" style="display:${isAdmin ? 'table-cell':'none'}">
                 <div class="d-flex justify-content-center gap-1">
-                  <button class="btn btn-sm btn-primary" onclick="editCar('${car.id}','${car.name}','${car.number}','${car.college}','${car.company}')">✏ تعديل</button>
+                  <button class="btn btn-sm btn-primary" onclick="editCar('${car.id}','${car.name||""}','${car.number||""}','${car.college||""}','${car.company||""}')">✏ تعديل</button>
                   <button class="btn btn-sm btn-danger" onclick="deleteCar('${car.id}')">🗑 حذف</button>
                 </div>
               </td>
@@ -145,34 +272,48 @@
         document.getElementById("carsTableBody").innerHTML = table;
         document.getElementById("countBox").innerText = "عدد السيارات الموجودة: " + count;
 
-        document.getElementById("loadingBox").style.display = "none"; // إخفاء بعد التحميل
+        if (loadingEl) loadingEl.style.display = "none";
       });
     }
 
-    window.deleteCar = function(id) {
-      if (confirm("هل أنت متأكد من حذف السيارة؟")) {
+    // الانتقال إلى السيارة المكررة
+    window.goToCar = function(id){
+      const row = document.getElementById("row-" + id);
+      if(row){
+        row.scrollIntoView({ behavior: "smooth", block: "center" });
+        row.classList.add("table-danger");
+        setTimeout(()=> row.classList.remove("table-danger"), 3000);
+      }
+    }
+
+    // تعديل / حذف
+    window.editCar = function(id, name, number, college, company){
+      editingId = id;
+      document.getElementById("name").value = name;
+      document.getElementById("number").value = number;
+      document.getElementById("college").value = college;
+      document.getElementById("company").value = company || "لا يوجد";
+      document.getElementById("saveBtn").innerText = "💾 تحديث";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    window.deleteCar = function(id){
+      if(confirm("هل تريد حذف السيارة بالتأكيد؟")){
         remove(ref(db, "cars/" + id));
+        showMsg("🗑 تم حذف السيارة");
       }
     }
 
-    window.editCar = function(id, name, number, college, company) {
-      const newName = prompt("اسم المالك:", name);
-      const newNumber = prompt("رقم السيارة:", number);
-      const newCollege = prompt("جهة الدخول:", college);
-      const newCompany = prompt("الشركة:", company);
-
-      if (newName && newNumber && newCollege && newCompany) {
-        update(ref(db, "cars/" + id), {
-          name: newName,
-          number: newNumber,
-          college: newCollege,
-          company: newCompany,
-          timestamp: Date.now()
-        });
-      }
+    // البحث
+    window.filterTable = function(){
+      const searchValue = document.getElementById("search").value.toLowerCase();
+      const rows = document.querySelectorAll("#carsTableBody tr");
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(searchValue) ? "" : "none";
+      });
     }
-
-    loadCars();
   </script>
+
 </body>
 </html>
