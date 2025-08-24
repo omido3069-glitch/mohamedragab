@@ -9,36 +9,83 @@
     body {
       font-family: 'Tajawal', Arial, sans-serif;
       direction: rtl;
-      background: #f8f9fa;
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      min-height: 100vh;
     }
+
     h2 {
       font-weight: bold;
+      color: #0d47a1;
     }
-    .adminOnly {
-      display: none;
+
+    .card {
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: #ffffffd9;
+      backdrop-filter: blur(6px);
     }
-    #loading {
-      display: none;
+
+    .btn {
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    /* ✅ تكبير وتغليظ خط الحقول */
+    input, select {
+      border-radius: 12px !important;
+      padding: 14px !important;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    /* ✅ تكبير النصوص داخل الفورم */
+    label, option, .form-control, .form-select {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    /* ✅ تكبير الجدول */
+    .table td, .table th {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    /* ✅ تكبير الرسائل والتنبيهات */
+    #msgBox, #countBox, #onlineUpdate {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    #search {
+      font-size: 1.4rem;
+      padding: 15px;
+      border: 2px solid #0d6efd;
+      border-radius: 50px;
       text-align: center;
       font-weight: bold;
-      color: #0d6efd;
     }
-    #loading span {
-      display: inline-block;
-      animation: bounce 1s infinite;
-    }
-    #loading span:nth-child(2) { animation-delay: 0.2s; }
-    #loading span:nth-child(3) { animation-delay: 0.4s; }
 
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0.8); }
-      40% { transform: scale(1.2); }
+    .table {
+      border-radius: 15px;
+      overflow: hidden;
     }
-    table {
-      font-size: 1.3rem; /* تكبير خط الجدول */
+
+    .table thead {
+      background: #0d6efd;
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: bold;
     }
+
+    #loading {
+      font-size: 1.4rem;
+      color: #0d47a1;
+      font-weight: bold;
+    }
+
     #onlineUpdate {
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       color: green;
       margin-right: 10px;
     }
@@ -120,7 +167,7 @@
 
       <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle text-center">
-          <thead class="table-primary">
+          <thead>
             <tr>
               <th>الاسم</th>
               <th>رقم السيارة</th>
