@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>الاختيار</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Tajawal', Arial, sans-serif;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    /* خلفية متدرجة متحركة */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #0ea5e9);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      z-index: -1;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* اللوجو */
+    .logo-container {
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.15);
+      border: 4px solid rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      animation: floatLogo 3s ease-in-out infinite;
+    }
+
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-12px) scale(1.05); }
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 40px;
+      font-weight: 900;
+      margin-bottom: 40px;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .box {
+      width: 280px;
+      height: 230px;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      color: #fff;
+      font-size: 34px;
+      font-weight: 900;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      text-align: center;
+    }
+
+    .box:hover {
+      transform: translateY(-12px) scale(1.08);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .note {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 12px;
+      color: #ffdddd;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    .icon {
+      font-size: 70px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- اللوجو -->
+  <div class="logo-container">
+    <img src="logo.png" alt="Logo">
+  </div>
+
+  <h1>يرجى اختيار القسم</h1>
+
+  <div class="container">
+    <!-- زر السيارات يفتح system.html -->
+    <div class="box" onclick="location.href='system.html'">
+      <div class="icon">🚗</div>
+      سيارات
+    </div>
+
+    <!-- زر الشركات معطل -->
+    <div class="box disabled">
+      <div class="icon">🏢</div>
+      شركات
+      <div class="note">لم تُفعل بعد</div>
+    </div>
+  </div>
+
+</body>
+</html>
