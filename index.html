@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تجربة GitHub Pages</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      direction: rtl;
+      padding: 50px;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>✅ أهلا بيك في تجربة GitHub Pages</h1>
+  <p>اضغط على الزر عشان تغير لون الخلفية</p>
+  <button onclick="changeColor()">غير اللون</button>
+
+  <script>
+    function changeColor() {
+      const colors = ["#f2f2f2", "#ffcccc", "#ccffcc", "#ccccff", "#ffffcc"];
+      document.body.style.background = colors[Math.floor(Math.random() * colors.length)];
+    }
+  </script>
+</body>
+</html>
