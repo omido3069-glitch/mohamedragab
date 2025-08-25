@@ -44,9 +44,11 @@
       position: relative;
     }
 
-    /* اللوجو المتحرك */
+    /* اللوجو المتجاوب + المتحرك */
     .login-box img {
-      width: 250px;
+      width: 60%;       /* نسبة من عرض الصندوق */
+      max-width: 200px; /* أقصى عرض */
+      height: auto;     /* يحافظ على النسبة */
       margin-bottom: 15px;
       border-radius: 50%;
       background: rgba(255,255,255,0.2);
