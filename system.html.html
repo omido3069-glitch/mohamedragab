@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -31,7 +32,6 @@
       font-weight: bold;
     }
 
-    /* ✅ تكبير وتغليظ خط الحقول */
     input, select {
       border-radius: 12px !important;
       padding: 14px !important;
@@ -39,19 +39,16 @@
       font-weight: bold;
     }
 
-    /* ✅ تكبير النصوص داخل الفورم */
     label, option, .form-control, .form-select {
       font-size: 1.3rem;
       font-weight: bold;
     }
 
-    /* ✅ تكبير الجدول */
     .table td, .table th {
       font-size: 1.3rem;
       font-weight: bold;
     }
 
-    /* ✅ تكبير الرسائل والتنبيهات */
     #msgBox, #countBox, #onlineUpdate {
       font-size: 1.2rem;
       font-weight: bold;
@@ -111,6 +108,7 @@
 
       <input type="text" id="name" class="form-control mb-2" placeholder="الاسم">
       <input type="text" id="number" class="form-control mb-2" placeholder="رقم السيارة">
+      <input type="text" id="phone" class="form-control mb-2" placeholder="رقم الهاتف"><!-- ✅ -->
 
       <select id="college" class="form-select mb-2">
         <option value="">-- اختر جهة الدخول --</option>
@@ -171,6 +169,7 @@
             <tr>
               <th>الاسم</th>
               <th>رقم السيارة</th>
+              <th>رقم الهاتف</th> <!-- ✅ -->
               <th>جهة الدخول</th>
               <th>الشركة</th>
               <th class="adminOnly">إجراءات</th>
@@ -248,12 +247,13 @@
     window.saveCar = function() {
       const name = document.getElementById("name").value.trim();
       const number = document.getElementById("number").value.trim();
+      const phone = document.getElementById("phone").value.trim(); // ✅
       const college = document.getElementById("college").value;
       let company = document.getElementById("company").value;
 
       if(!company) company = "لا يوجد"; 
 
-      if(name && number && college && company){
+      if(name && number && phone && college && company){
         const carsRef = ref(db, "cars");
         onValue(carsRef, (snapshot) => {
           const cars = snapshot.val();
@@ -279,18 +279,19 @@
           } else {
             if(editingId){
               const carRef = ref(db, "cars/" + editingId);
-              update(carRef, { name, number, college, company });
+              update(carRef, { name, number, phone, college, company }); // ✅
               showMsg("✅ تم تحديث السيارة");
               editingId = null;
               document.getElementById("saveBtn").innerText = "➕ إضافة";
             } else {
               const newCar = push(carsRef);
-              set(newCar, { name, number, college, company, timestamp: Date.now() });
+              set(newCar, { name, number, phone, college, company, timestamp: Date.now() }); // ✅
               showMsg("✅ تمت إضافة السيارة");
             }
 
             document.getElementById("name").value = "";
             document.getElementById("number").value = "";
+            document.getElementById("phone").value = ""; // ✅
             document.getElementById("college").value = "";
             document.getElementById("company").value = "لا يوجد"; 
           }
@@ -316,11 +317,13 @@
             <tr id="row-${id}">
               <td>${cars[id].name}</td>
               <td>${cars[id].number}</td>
+              <td>${cars[id].phone || ""}</td> <!-- ✅ -->
               <td>${cars[id].college}</td>
               <td>${cars[id].company}</td>
               <td class="adminOnly" style="display:${isAdmin ? 'table-cell':'none'}">
                 <div class="d-flex justify-content-center gap-1">
-                  <button class="btn btn-sm btn-primary" onclick="editCar('${id}','${cars[id].name}','${cars[id].number}','${cars[id].college}','${cars[id].company}')">✏ تعديل</button>
+                  <button class="btn btn-sm btn-primary" 
+                    onclick="editCar('${id}','${cars[id].name}','${cars[id].number}','${cars[id].phone || ""}','${cars[id].college}','${cars[id].company}')">✏ تعديل</button>
                   <button class="btn btn-sm btn-danger" onclick="deleteCar('${id}')">🗑 حذف</button>
                 </div>
               </td>
@@ -343,10 +346,11 @@
     }
 
     // تعديل سيارة
-    window.editCar = function(id, name, number, college, company){
+    window.editCar = function(id, name, number, phone, college, company){
       editingId = id;
       document.getElementById("name").value = name;
       document.getElementById("number").value = number;
+      document.getElementById("phone").value = phone; // ✅
       document.getElementById("college").value = college;
       document.getElementById("company").value = company;
       document.getElementById("saveBtn").innerText = "💾 تحديث";
