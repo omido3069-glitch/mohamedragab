@@ -46,9 +46,9 @@
 
     /* اللوجو المتجاوب + المتحرك */
     .login-box img {
-      width: 60%;       /* نسبة من عرض الصندوق */
-      max-width: 200px; /* أقصى عرض */
-      height: auto;     /* يحافظ على النسبة */
+      width: 60%;
+      max-width: 200px;
+      height: auto;
       margin-bottom: 15px;
       border-radius: 50%;
       background: rgba(255,255,255,0.2);
@@ -86,7 +86,7 @@
 
     .input-group input {
       width: 100%;
-      padding: 15px 45px 15px 15px; /* مساحة للأيقونة */
+      padding: 15px 45px 15px 15px;
       border: none;
       border-radius: 12px;
       font-size: 18px;
@@ -100,7 +100,7 @@
     .input-group i {
       position: absolute;
       top: 50%;
-      left: 15px;  
+      left: 15px;
       transform: translateY(-50%);
       color: #555;
       font-size: 18px;
@@ -160,6 +160,34 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* ✅ تصغير الشكل على الموبايل */
+    @media (max-width: 600px) {
+      .login-box {
+        padding: 20px;
+        max-width: 320px;
+      }
+
+      .login-box img {
+        width: 50%;
+        max-width: 120px;
+        padding: 10px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      .input-group input {
+        font-size: 16px;
+        padding: 12px 40px 12px 12px;
+      }
+
+      button {
+        font-size: 16px;
+        padding: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -202,7 +230,7 @@
         loader.style.display = "none";
 
         if (user === "admin" && pass === "1234") {
-          window.location.href = "Change.html"; // ✅ فتح الصفحة المطلوبة
+          window.location.href = "Change.html";
         } else {
           errorMsg.textContent = "⚠️ اسم المستخدم أو كلمة المرور غير صحيحة";
         }
