@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>عمالة الشركات</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body { font-family: 'Tajawal', sans-serif; background: #f8f9fa; }
+  h2 { text-align: center; color: #0d6efd; margin: 20px 0; }
+  .table { background: white; }
+  input, select { border-radius: 10px; padding: 10px; font-weight: bold; font-size: 1.05rem; }
+  #search { width:100%; padding:12px; font-size:1.1rem; margin-bottom:10px; border-radius:12px; border:2px solid #0d6efd; }
+  .adminOnly { display:none; }
+  img.card-img { width:60px; height:60px; object-fit:cover; cursor:pointer; border-radius:8px; }
+  #logoutBtn { display:none; }
+</style>
+</head>
+<body>
+<div class="container mt-4">
+
+  <!-- تسجيل الدخول -->
+  <div id="loginSection" class="mb-4">
+    <h2>🔐 دخول الأدمن</h2>
+    <input type="text" id="username" class="form-control mb-2" placeholder="الإيميل">
+    <input type="password" id="password" class="form-control mb-2" placeholder="كلمة السر">
+    <button id="loginBtn" class="btn btn-primary w-100 mb-3">دخول</button>
+  </div>
+
+  <!-- زر تسجيل الخروج -->
+  <button id="logoutBtn" class="btn btn-warning w-100 mb-3">🚪 تسجيل الخروج</button>
+
+  <!-- إضافة عامل جديد -->
+  <div id="addWorkerSection" class="adminOnly mb-4 card p-3 shadow">
+    <h4 class="text-center text-success">➕ إضافة عامل جديد</h4>
+    <input id="name" class="form-control mb-2" placeholder="الاسم">
+    <select id="company" class="form-select mb-2">
+      <option value="">اختر جهة الدخول</option>
+      <option>العالميه</option><option>ساشيكو</option><option>ايماك</option><option>ايمكو</option>
+      <option>ابو شلوع</option><option>كوليتي</option><option>تليكوم</option><option>الوادي</option>
+      <option>الحناوي</option><option>فرندس</option><option>كير</option><option>شركه تاون جاز</option>
+      <option>صيانه كافتريا</option>
+    </select>
+    <input id="phone" class="form-control mb-2" placeholder="رقم الهاتف">
+    <input id="job" class="form-control mb-2" placeholder="نوع العمل">
+    <input id="nid" class="form-control mb-2" placeholder="الرقم القومي">
+    <label class="form-label">📷 صورة البطاقة</label>
+    <input id="idImage" type="file" class="form-control mb-2" accept="image/*">
+    <button onclick="addWorker()" class="btn btn-success w-100">إضافة</button>
+  </div>
+
+  <!-- البحث + الفلتر -->
+  <div class="row mb-3">
+    <div class="col-md-8">
+      <input type="text" id="search" placeholder="🔍 ابحث بالاسم، الرقم القومي، رقم الهاتف، جهة الدخول، نوع العمل">
+    </div>
+    <div class="col-md-4">
+      <select id="companyFilter" class="form-select">
+        <option value="">⬇️ تصفية حسب جهة الدخول</option>
+        <option value="">الكل</option>
+        <option>العالميه</option><option>ساشيكو</option><option>ايماك</option><option>ايمكو</option>
+        <option>ابو شلوع</option><option>كوليتي</option><option>تليكوم</option><option>الوادي</option>
+        <option>الحناوي</option><option>فرندس</option><option>كير</option><option>شركه تاون جاز</option>
+        <option>صيانه كافتريا</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- جدول العمالة -->
+  <div class="table-responsive">
+    <table class="table table-bordered text-center table-hover" id="workersTable">
+      <thead class="table-primary">
+        <tr>
+          <th>الاسم</th>
+          <th>جهة الدخول</th>
+          <th>رقم الهاتف</th>
+          <th>نوع العمل</th>
+          <th>صورة البطاقة</th>
+          <th class="adminOnly">حذف</th>
+          <th>الرقم القومي</th>
+        </tr>
+      </thead>
+      <tbody><!-- يتم ملؤه من Firestore --></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Popup لعرض صورة البطاقة -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" class="img-fluid rounded shadow">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Firebase + Firestore + ImgBB -->
+<script type="module">
+  // ===== إعدادات عامة =====
+  const ADMIN_USER = "omido3069@gmail.com";
+  const ADMIN_PASS = "12345600";
+  let isAdmin = false;
+
+  // مفتاح ImgBB (لرفع الصور)
+  const IMGBB_API_KEY = "50278cd2ec1f082d34009398b27e0096";
+
+  // ===== Firebase Firestore =====
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxZnTzssVZWtGR5iD6feE5d3BUFX3T5E0",
+    authDomain: "companies-4bcc8.firebaseapp.com",
+    projectId: "companies-4bcc8",
+    storageBucket: "companies-4bcc8.appspot.com",
+    messagingSenderId: "688630422572",
+    appId: "1:688630422572:web:580391a664b0193383c589",
+    measurementId: "G-KPHEF2BY6M"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const workersCol = collection(db, "workers");
+
+  // ===== واجهة الأدمن =====
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    if (user===ADMIN_USER && pass===ADMIN_PASS) {
+      isAdmin = true;
+      alert("✅ تم تسجيل الدخول كأدمن");
+      document.querySelectorAll(".adminOnly").forEach(el=>el.style.display="table-cell");
+      document.getElementById("addWorkerSection").style.display="block";
+      document.getElementById("loginSection").style.display="none";
+      document.getElementById("logoutBtn").style.display="block";
+    } else {
+      alert("❌ اسم المستخدم أو كلمة السر غير صحيحة");
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", ()=>{
+    isAdmin = false;
+    document.querySelectorAll(".adminOnly").forEach(el=>el.style.display="none");
+    document.getElementById("addWorkerSection").style.display="none";
+    document.getElementById("loginSection").style.display="block";
+    document.getElementById("logoutBtn").style.display="none";
+    alert("🚪 تم تسجيل الخروج");
+  });
+
+  // ===== رفع صورة إلى ImgBB =====
+  async function uploadToImgBB(file) {
+    const fd = new FormData();
+    fd.append("image", file);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:"POST", body: fd });
+    const data = await res.json();
+    if (data?.success) return data.data.url;
+    throw new Error("فشل رفع الصورة");
+  }
+
+  // ===== إضافة عامل جديد (Firestore + ImgBB) =====
+  window.addWorker = async function () {
+    const name = document.getElementById("name").value.trim();
+    const company = document.getElementById("company").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const job = document.getElementById("job").value.trim();
+    const nid = document.getElementById("nid").value.trim();
+    const file = document.getElementById("idImage").files[0];
+
+    if (!name || !company || !phone || !job || !nid) {
+      alert("❌ يرجى ملء جميع الحقول");
+      return;
+    }
+
+    try {
+      let imgUrl = "";
+      if (file) imgUrl = await uploadToImgBB(file);
+
+      await addDoc(workersCol, {
+        name, company, phone, job, nid,
+        image: imgUrl,
+        createdAt: Date.now()
+      });
+
+      alert("✅ تم إضافة العامل بنجاح");
+      await loadWorkers();
+      // تفريغ الحقول
+      ["name","company","phone","job","nid","idImage"].forEach(id=>{
+        const el = document.getElementById(id);
+        if (el.type==="file") el.value = "";
+        else el.value = "";
+      });
+    } catch (e) {
+      console.error(e);
+      alert("⚠️ حصل خطأ أثناء الإضافة");
+    }
+  };
+
+  // ===== تحميل العمال من Firestore =====
+  async function loadWorkers() {
+    const tbody = document.querySelector("#workersTable tbody");
+    tbody.innerHTML = "";
+    const q = query(workersCol, orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    snap.forEach(docSnap => {
+      const w = docSnap.data();
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${w.name || ""}</td>
+        <td>${w.company || ""}</td>
+        <td>${w.phone || ""}</td>
+        <td>${w.job || ""}</td>
+        <td><img src="${w.image || 'https://via.placeholder.com/120x80?text=No+Image'}" class="card-img" onclick="showImage('${w.image || ''}')"></td>
+        <td class="adminOnly">
+          <button class="btn btn-danger btn-sm" onclick="deleteWorker('${docSnap.id}')">حذف</button>
+        </td>
+        <td>${w.nid || ""}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+  window.onload = loadWorkers;
+
+  // ===== حذف عامل =====
+  window.deleteWorker = async function(id) {
+    if (!confirm("هل أنت متأكد من الحذف؟")) return;
+    try {
+      await deleteDoc(doc(db, "workers", id));
+      alert("🗑️ تم الحذف");
+      await loadWorkers();
+    } catch (e) {
+      console.error(e);
+      alert("⚠️ حصل خطأ أثناء الحذف");
+    }
+  };
+
+  // ===== البحث والفلترة (محليًا على المعروض) =====
+  document.getElementById("search").addEventListener("input", filterTable);
+  document.getElementById("companyFilter").addEventListener("change", filterTable);
+  function filterTable(){
+    const searchVal = document.getElementById("search").value.toLowerCase();
+    const companyVal = document.getElementById("companyFilter").value;
+    document.querySelectorAll("#workersTable tbody tr").forEach(tr=>{
+      const text = tr.innerText.toLowerCase();
+      const company = tr.children[1].innerText;
+      let show = true;
+      if(searchVal && !text.includes(searchVal)) show = false;
+      if(companyVal && company !== companyVal) show = false;
+      tr.style.display = show ? "" : "none";
+    });
+  }
+
+  // ===== عرض صورة البطاقة في Popup =====
+  window.showImage = function(src){
+    if(!src) return;
+    document.getElementById("modalImage").src = src;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+  };
+</script>
+</body>
+</html>
