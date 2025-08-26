@@ -90,7 +90,7 @@
 <body class="container py-4">
 
   <!-- تسجيل الدخول -->
-  <div class="card shadow mb-4" id="loginBox">
+  <div class="card shadow mb-4" id="loginBox" style="width:95%; margin:auto;">
     <div class="card-body text-center">
       <h2 class="mb-3">🔐 تسجيل دخول الأدمن</h2>
       <input type="email" id="email" class="form-control mb-3" placeholder="الإيميل">
@@ -100,16 +100,16 @@
   </div>
 
   <!-- إضافة / تعديل سيارة -->
-  <div class="card shadow mb-4" id="addBox" style="display:none;">
+  <div class="card shadow mb-4" id="addBox" style="display:none; width:95%; margin:auto;">
     <div class="card-body">
       <h2 class="text-center mb-3">🚘 تسجيل / تعديل سيارة</h2>
       <div class="alert alert-success text-center fw-bold d-none" id="msgBox"></div>
 
       <input type="text" id="name" class="form-control mb-2" placeholder="الاسم">
       <input type="text" id="number" class="form-control mb-2" placeholder="رقم السيارة">
-      <input type="text" id="phone" class="form-control mb-2" placeholder="رقم الهاتف"><!-- ✅ -->
+      <input type="text" id="phone" class="form-control mb-2" placeholder="رقم الهاتف">
 
-      <select id="college" class="form-select mb-2">
+      <select id="college" class="form-select mb-2" onchange="toggleManualInput()">
         <option value="">-- اختر جهة الدخول --</option>
         <option>كليه هندسه</option>
         <option>كليه علوم</option>
@@ -126,7 +126,11 @@
         <option>مدير امن</option>
         <option>نائب مدير الامن</option>
         <option>مشرف الشركه</option>
+        <option value="manual">✍ يدوي</option>
       </select>
+
+      <!-- خانة الإدخال اليدوي (مخفية في البداية) -->
+      <input type="text" id="manualCollege" class="form-control mb-2 d-none" placeholder="اكتب جهة الدخول يدوياً">
 
       <select id="company" class="form-select mb-3">
         <option value="لا يوجد">لا يوجد</option>
@@ -148,7 +152,7 @@
   </div>
 
   <!-- عرض السيارات -->
-  <div class="card shadow">
+  <div class="card shadow" style="width:95%; margin:auto;">
     <div class="card-body">
       <!-- زر الرجوع -->
       <button class="btn btn-secondary mb-3" onclick="goBack()">⬅ رجوع</button>
@@ -171,7 +175,7 @@
             <tr>
               <th>الاسم</th>
               <th>رقم السيارة</th>
-              <th>رقم الهاتف</th> <!-- ✅ -->
+              <th>رقم الهاتف</th>
               <th>جهة الدخول</th>
               <th>الشركة</th>
               <th class="adminOnly">إجراءات</th>
@@ -250,13 +254,29 @@
       loadCars();
     });
 
+    // إظهار/إخفاء خانة الإدخال اليدوي
+    window.toggleManualInput = function(){
+      const college = document.getElementById("college").value;
+      const manualInput = document.getElementById("manualCollege");
+      if(college === "manual"){
+        manualInput.classList.remove("d-none");
+      } else {
+        manualInput.classList.add("d-none");
+        manualInput.value = "";
+      }
+    }
+
     // إضافة / تعديل سيارة
     window.saveCar = function() {
       const name = document.getElementById("name").value.trim();
       const number = document.getElementById("number").value.trim();
-      const phone = document.getElementById("phone").value.trim(); // ✅
-      const college = document.getElementById("college").value;
+      const phone = document.getElementById("phone").value.trim();
+      let college = document.getElementById("college").value;
       let company = document.getElementById("company").value;
+
+      if(college === "manual"){
+        college = document.getElementById("manualCollege").value.trim();
+      }
 
       if(!company) company = "لا يوجد"; 
 
@@ -286,20 +306,22 @@
           } else {
             if(editingId){
               const carRef = ref(db, "cars/" + editingId);
-              update(carRef, { name, number, phone, college, company }); // ✅
+              update(carRef, { name, number, phone, college, company });
               showMsg("✅ تم تحديث السيارة");
               editingId = null;
               document.getElementById("saveBtn").innerText = "➕ إضافة";
             } else {
               const newCar = push(carsRef);
-              set(newCar, { name, number, phone, college, company, timestamp: Date.now() }); // ✅
+              set(newCar, { name, number, phone, college, company, timestamp: Date.now() });
               showMsg("✅ تمت إضافة السيارة");
             }
 
             document.getElementById("name").value = "";
             document.getElementById("number").value = "";
-            document.getElementById("phone").value = ""; // ✅
+            document.getElementById("phone").value = "";
             document.getElementById("college").value = "";
+            document.getElementById("manualCollege").classList.add("d-none");
+            document.getElementById("manualCollege").value = "";
             document.getElementById("company").value = "لا يوجد"; 
           }
         }, { onlyOnce: true });
@@ -324,7 +346,7 @@
             <tr id="row-${id}">
               <td>${cars[id].name}</td>
               <td>${cars[id].number}</td>
-              <td>${cars[id].phone || ""}</td> <!-- ✅ -->
+              <td>${cars[id].phone || ""}</td>
               <td>${cars[id].college}</td>
               <td>${cars[id].company}</td>
               <td class="adminOnly" style="display:${isAdmin ? 'table-cell':'none'}">
@@ -357,7 +379,7 @@
       editingId = id;
       document.getElementById("name").value = name;
       document.getElementById("number").value = number;
-      document.getElementById("phone").value = phone; // ✅
+      document.getElementById("phone").value = phone;
       document.getElementById("college").value = college;
       document.getElementById("company").value = company;
       document.getElementById("saveBtn").innerText = "💾 تحديث";
