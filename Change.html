@@ -94,6 +94,7 @@
       backdrop-filter: blur(12px);
       transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
       text-align: center;
+      position: relative;
     }
 
     .box:hover {
@@ -102,22 +103,29 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
-    .disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .note {
-      font-size: 22px;
-      font-weight: bold;
-      margin-top: 12px;
-      color: #ffdddd;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-    }
-
     .icon {
       font-size: 70px;
       margin-bottom: 15px;
+    }
+
+    /* شارة جديد */
+    .badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #22c55e;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 5px 12px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
     }
   </style>
 </head>
@@ -131,17 +139,17 @@
   <h1>يرجى اختيار القسم</h1>
 
   <div class="container">
-    <!-- زر السيارات يفتح system.html -->
+    <!-- زر السيارات -->
     <div class="box" onclick="location.href='system.html'">
       <div class="icon">🚗</div>
       سيارات
     </div>
 
-    <!-- زر الشركات معطل -->
-    <div class="box disabled">
+    <!-- زر الشركات (مفعل + جديد) -->
+    <div class="box" onclick="location.href='we.html'">
+      <span class="badge">جديد</span>
       <div class="icon">🏢</div>
       شركات
-      <div class="note">لم تُفعل بعد</div>
     </div>
   </div>
 
