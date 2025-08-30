@@ -16,7 +16,6 @@
       text-align: center;
     }
 
-    /* خلفية متدرجة متحركة */
     body::before {
       content: "";
       position: absolute;
@@ -34,7 +33,6 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* اللوجو */
     .logo-container {
       width: 250px;
       height: 250px;
@@ -54,7 +52,7 @@
     .logo-container img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
     }
 
     @keyframes floatLogo {
@@ -103,12 +101,26 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
+    .box:active {
+      transform: scale(0.95);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }
+
     .icon {
       font-size: 70px;
       margin-bottom: 15px;
     }
 
-    /* شارة جديد */
+    .box img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
     .badge {
       position: absolute;
       top: 12px;
@@ -127,17 +139,35 @@
       0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.2); opacity: 0.8; }
     }
+
+    /* صف منفصل لـ SAIL */
+    .sail-container {
+      margin-top: 50px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* خانة غير مفعلة */
+    .disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .disabled .badge {
+      background: #f59e0b; /* برتقالي بدل أخضر */
+    }
   </style>
 </head>
 <body>
 
-  <!-- اللوجو -->
   <div class="logo-container">
     <img src="logo.png" alt="Logo">
   </div>
 
   <h1>يرجى اختيار القسم</h1>
 
+  <!-- الصف الأول -->
   <div class="container">
     <!-- زر السيارات -->
     <div class="box" onclick="location.href='system.html'">
@@ -145,11 +175,20 @@
       سيارات
     </div>
 
-    <!-- زر الشركات (مفعل + جديد) -->
+    <!-- زر الشركات -->
     <div class="box" onclick="location.href='we.html'">
       <span class="badge">جديد</span>
       <div class="icon">🏢</div>
       شركات
+    </div>
+  </div>
+
+  <!-- الصف الثاني (SAIL غير مفعلة) -->
+  <div class="sail-container">
+    <div class="box disabled">
+      <span class="badge">قريبًا</span>
+      <img src="25.png" alt="SAIL Logo">
+      SAIL
     </div>
   </div>
 
