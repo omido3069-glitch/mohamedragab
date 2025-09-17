@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>تسجيل حضور أعضاء هيئة التدريس - Firebase</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<style>
+/* نفس التنسيقات السابقة */
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Cairo', sans-serif; }
+body, html { height:100%; }
+body {
+  display: flex; flex-direction: column; align-items:center; padding:20px;
+  background: linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72, #2a5298);
+  background-size: 400% 400%; animation: gradientBG 15s ease infinite; color:#fff;
+}
+@keyframes gradientBG {0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;}}
+h2 { margin-bottom: 20px; text-align:center; }
+form { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; width: 350px;
+  backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; }
+.form-group { margin-bottom: 15px; position: relative; width: 100%; }
+.form-group i { position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: #fff; }
+input { width: 100%; padding: 10px 10px 10px 35px; border: none; border-radius: 10px; outline: none;
+  background: rgba(255,255,255,0.2); color: #fff; }
+input::placeholder { color: rgba(255,255,255,0.7); }
+.btn-center { margin-top: 15px; width: 60%; padding: 12px; border:none; border-radius:10px;
+  cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:10px;
+  background: #28a745; color:#fff; transition: 0.3s; }
+.btn-center:hover { background: #1e7e34; }
+.filter-container { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+select { padding: 10px; border-radius: 10px; border: none; outline: none; font-size: 16px; text-align: right; background: rgba(255,255,255,0.2); color: #fff; }
+select option { color: #000; }
+table { width: 95%; margin-top: 20px; border-collapse: collapse; backdrop-filter: blur(5px); background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+th, td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.3); text-align:center; color:#fff; }
+th { background: rgba(0,0,0,0.3); }
+tbody tr:hover { background: rgba(255,255,255,0.1); }
+.checkout-btn { padding:5px 10px; border:none; border-radius:5px; background:#dc3545; color:#fff; cursor:pointer; font-weight:bold; transition:0.3s; }
+.checkout-btn:hover { background:#a71d2a; }
+.row-checkedin { background: rgba(40,167,69,0.3); }
+.row-checkedout { background: rgba(100,100,100,0.3); color:#ddd; }
+#nameSuggestions { position: absolute; top: 100%; right: 0; background:#fff; color:#000; width:100%; max-height:120px; overflow-y:auto; border-radius:5px; display:none; z-index:10; }
+#nameSuggestions div:hover { background: rgba(0,0,0,0.1); cursor:pointer; }
+#alertMessage { display:none; margin-top:10px; background:#ffc107; color:#000; padding:10px; border-radius:8px; font-weight:bold; text-align:center; }
+.edit-btn { padding:5px 10px; border:none; border-radius:5px; background:#17a2b8; color:#fff; cursor:pointer; transition:0.3s; }
+.edit-btn:hover { background:#117a8b; }
+#manageStaffModal, #editRecordModal, #loginModal {
+  display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background: #1c1c1c; color:#fff; padding:20px; border-radius:15px; width:320px; box-shadow:0 8px 25px rgba(0,0,0,0.7); z-index:1001;
+}
+#manageStaffModal h3, #editRecordModal h3, #loginModal h3 { text-align:center; margin-bottom:15px; color:#fff; }
+#manageStaffModal input, #editRecordModal input, #loginModal input { width:100%; padding:10px; border-radius:8px; margin-bottom:10px; background:#333; color:#fff; border:none; outline:none; }
+#manageStaffModal button, #editRecordModal button, #loginModal button { width:100%; padding:10px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; margin-bottom:5px; transition:0.3s; }
+#addStaffBtn { background:#28a745; color:#fff; } #addStaffBtn:hover { background:#1e7e34; }
+#closeModal, #closeEditModal, #closeLogin { background:#dc3545; color:#fff; } #closeModal:hover, #closeEditModal:hover, #closeLogin:hover { background:#a71d2a; }
+#manageStaffBtn, #loginBtn, #logoutBtn { position:fixed; top:20px; font-size:30px; cursor:pointer; color:#fff; z-index:1000; }
+#manageStaffBtn { left:20px; display:none; } #loginBtn { left:70px; } #logoutBtn { left:120px; display:none; }
+</style>
+</head>
+<body>
+
+<h2><i class="fa-solid fa-chalkboard-user"></i> تسجيل حضور أعضاء هيئة التدريس (Firebase)</h2>
+
+<form id="attendanceForm" style="display:none;">
+  <div class="form-group" style="position:relative;">
+    <i class="fa-solid fa-user"></i>
+    <input type="text" id="name" placeholder="الاسم" autocomplete="off">
+    <div id="nameSuggestions"></div>
+  </div>
+  <div class="form-group">
+    <i class="fa-solid fa-building-columns"></i>
+    <input type="text" id="faculty" placeholder="الكلية" required>
+  </div>
+  <div class="form-group">
+    <i class="fa-solid fa-graduation-cap"></i>
+    <input type="text" id="program" placeholder="البرنامج" required>
+  </div>
+  <button type="button" class="btn-center" id="btnCheckin"><i class="fa-solid fa-right-to-bracket"></i> حضور</button>
+</form>
+
+<div id="alertMessage"></div>
+
+<div class="filter-container">
+  <select id="filterName"><option value="">تصفية بالاسم</option></select>
+  <select id="filterDate"><option value="">تصفية بالتاريخ</option></select>
+</div>
+
+<table id="recordsTable">
+  <thead>
+    <tr>
+      <th>الاسم</th><th>الكلية</th><th>البرنامج</th><th>اليوم</th><th>التاريخ</th>
+      <th>الحضور</th><th>الانصراف</th><th id="editHeader" style="display:none;">تعديل</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<i class="fa-solid fa-user-plus" id="manageStaffBtn" title="إدارة الأعضاء"></i>
+<i class="fa-solid fa-right-to-bracket" id="loginBtn" title="تسجيل دخول"></i>
+<i class="fa-solid fa-right-from-bracket" id="logoutBtn" title="تسجيل خروج"></i>
+
+<!-- إدارة الأعضاء -->
+<div id="manageStaffModal">
+  <h3>إضافة عضو جديد</h3>
+  <input type="text" id="newName" placeholder="الاسم">
+  <input type="text" id="newFaculty" placeholder="الكلية">
+  <input type="text" id="newProgram" placeholder="البرنامج">
+  <button id="addStaffBtn">إضافة</button>
+  <button id="closeModal">إغلاق</button>
+</div>
+
+<!-- نافذة تعديل السجل -->
+<div id="editRecordModal">
+  <h3>تعديل السجل</h3>
+  <input type="text" id="editDay" placeholder="اليوم">
+  <input type="text" id="editDate" placeholder="التاريخ">
+  <input type="text" id="editCheckin" placeholder="وقت الحضور">
+  <input type="text" id="editCheckout" placeholder="وقت الانصراف">
+  <button id="saveEditBtn">حفظ</button>
+  <button id="closeEditModal">إلغاء</button>
+</div>
+
+<!-- نافذة تسجيل الدخول -->
+<div id="loginModal">
+  <h3>تسجيل الدخول</h3>
+  <input type="email" id="loginUser" placeholder="البريد الإلكتروني">
+  <input type="password" id="loginPass" placeholder="كلمة المرور">
+  <button id="submitLogin">تسجيل الدخول</button>
+  <button id="closeLogin">إغلاق</button>
+</div>
+
+<script type="module">
+/* =========== Firebase Config =========== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, updateDoc, doc, getDocs, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUkJTW4FmtBVoMfr7kwSlg2sE3Lt8rCu0",
+  authDomain: "staff-d470d.firebaseapp.com",
+  projectId: "staff-d470d",
+  storageBucket: "staff-d470d.firebasestorage.app",
+  messagingSenderId: "129609661118",
+  appId: "1:129609661118:web:56684db281ecf0111c3cef",
+  measurementId: "G-K1BD8QCS4L"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* =========== DOM Elements =========== */
+const nameInput=document.getElementById("name");
+const facultyInput=document.getElementById("faculty");
+const programInput=document.getElementById("program");
+const alertDiv=document.getElementById("alertMessage");
+const editHeader=document.getElementById("editHeader");
+const attendanceForm=document.getElementById("attendanceForm");
+const manageBtn=document.getElementById("manageStaffBtn");
+const loginBtn=document.getElementById("loginBtn");
+const logoutBtn=document.getElementById("logoutBtn");
+
+/* =========== Helpers =========== */
+function formatTime12(date){
+  let h=date.getHours(), m=date.getMinutes().toString().padStart(2,'0');
+  let ampm=h>=12?"م":"ص"; h=h%12; h=h?h:12;
+  return h.toString().padStart(2,'0')+":"+m+" "+ampm;
+}
+function todayDate(){ return new Date().toLocaleDateString("ar-EG"); }
+function todayDay(){ return ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"][new Date().getDay()]; }
+
+/* =========== Staff Autocomplete =========== */
+let staffData=[];
+async function loadStaff(){
+  const snap=await getDocs(collection(db,"staff"));
+  staffData=snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+nameInput.addEventListener("input", ()=>{
+  const q=nameInput.value.trim().toLowerCase();
+  const div=document.getElementById("nameSuggestions"); div.innerHTML="";
+  if(!q){ div.style.display="none"; return;}
+  const matches=staffData.filter(s=>s.name.toLowerCase().includes(q));
+  matches.forEach(m=>{
+    const d=document.createElement("div"); d.textContent=m.name;
+    d.onclick=()=>{ nameInput.value=m.name; facultyInput.value=m.faculty; programInput.value=m.program; div.style.display="none"; };
+    div.appendChild(d);
+  });
+  div.style.display=matches.length?"block":"none";
+});
+
+/* =========== Records Realtime + Filters =========== */
+let currentEditId=null;
+let allRecords=[];
+const tbody=document.querySelector("#recordsTable tbody");
+const filterName=document.getElementById("filterName");
+const filterDate=document.getElementById("filterDate");
+
+function renderRecords(records){
+  tbody.innerHTML="";
+  let lastDate=null;
+  records.forEach(r=>{
+    if(lastDate!==r.date){
+      let sep=tbody.insertRow();
+      let c=sep.insertCell(0); c.colSpan=8; c.innerText=`📅 ${r.day} - ${r.date}`;
+      c.style.background="rgba(255,255,255,0.2)"; lastDate=r.date;
+    }
+    let row=tbody.insertRow();
+    row.insertCell(0).innerText=r.name;
+    row.insertCell(1).innerText=r.faculty;
+    row.insertCell(2).innerText=r.program;
+    row.insertCell(3).innerText=r.day;
+    row.insertCell(4).innerText=r.date;
+    row.insertCell(5).innerText=r.checkin;
+    let tdCheckout=row.insertCell(6);
+    if(!r.checkout && auth.currentUser){
+      let b=document.createElement("button"); 
+      b.className="checkout-btn"; b.innerText="انصراف";
+      b.onclick=async()=>await updateDoc(doc(db,"records",r.id),{checkout:formatTime12(new Date())});
+      tdCheckout.appendChild(b); row.className="row-checkedin";
+    } else { tdCheckout.innerText=r.checkout||""; row.className="row-checkedout"; }
+    let tdEdit=row.insertCell(7);
+    if(auth.currentUser && r.checkout){
+      let b=document.createElement("button"); 
+      b.className="edit-btn"; b.innerHTML='<i class="fa fa-pen"></i>';
+      b.onclick=()=>{ currentEditId=r.id; document.getElementById("editDay").value=r.day; document.getElementById("editDate").value=r.date; document.getElementById("editCheckin").value=r.checkin; document.getElementById("editCheckout").value=r.checkout; document.getElementById("editRecordModal").style.display="block"; };
+      tdEdit.appendChild(b);
+    }
+  });
+}
+
+function updateFiltersOptions(records){
+  // أسماء
+  const names=[...new Set(records.map(r=>r.name))].sort();
+  filterName.innerHTML='<option value="">تصفية بالاسم</option>';
+  names.forEach(n=>{
+    let opt=document.createElement("option"); opt.value=n; opt.textContent=n;
+    filterName.appendChild(opt);
+  });
+  // تواريخ
+  const dates=[...new Set(records.map(r=>r.date))].sort((a,b)=>new Date(b)-new Date(a));
+  filterDate.innerHTML='<option value="">تصفية بالتاريخ</option>';
+  dates.forEach(d=>{
+    let opt=document.createElement("option"); opt.value=d; opt.textContent=d;
+    filterDate.appendChild(opt);
+  });
+}
+
+function applyFilters(){
+  let n=filterName.value, d=filterDate.value;
+  let filtered=allRecords.filter(r=>{
+    return (!n || r.name===n) && (!d || r.date===d);
+  });
+  renderRecords(filtered);
+}
+
+onSnapshot(query(collection(db,"records"),orderBy("createdAt","desc")), snap=>{
+  allRecords=snap.docs.map(d=>({id:d.id,...d.data()}));
+  updateFiltersOptions(allRecords);
+  applyFilters();
+});
+filterName.addEventListener("change",applyFilters);
+filterDate.addEventListener("change",applyFilters);
+
+/* =========== Attendance =========== */
+document.getElementById("btnCheckin").onclick=async()=>{
+  let n=nameInput.value.trim(), f=facultyInput.value.trim(), p=programInput.value.trim();
+  if(!n||!f||!p){alert("املأ جميع الحقول");return;}
+  const snap=await getDocs(collection(db,"records"));
+  if(snap.docs.find(d=>d.data().name===n && d.data().date===todayDate())){ alert("⚠️ العضو مسجل حضور بالفعل اليوم!"); return;}
+  await addDoc(collection(db,"records"),{
+    name:n, faculty:f, program:p, day:todayDay(), date:todayDate(), checkin:formatTime12(new Date()), checkout:"", createdAt:serverTimestamp()
+  });
+  nameInput.value=facultyInput.value=programInput.value="";
+};
+
+/* =========== Add Staff =========== */
+document.getElementById("addStaffBtn").onclick=async()=>{
+  const n=document.getElementById("newName").value, f=document.getElementById("newFaculty").value, p=document.getElementById("newProgram").value;
+  if(!n||!f||!p){alert("املأ جميع الحقول");return;}
+  await addDoc(collection(db,"staff"),{name:n,faculty:f,program:p});
+  alert("✅ تمت الإضافة"); document.getElementById("newName").value=document.getElementById("newFaculty").value=document.getElementById("newProgram").value="";
+  document.getElementById("manageStaffModal").style.display="none"; loadStaff();
+};
+
+/* =========== Edit Record Save =========== */
+document.getElementById("saveEditBtn").onclick=async()=>{
+  if(!currentEditId) return;
+  await updateDoc(doc(db,"records",currentEditId),{
+    day:document.getElementById("editDay").value,
+    date:document.getElementById("editDate").value,
+    checkin:document.getElementById("editCheckin").value,
+    checkout:document.getElementById("editCheckout").value
+  });
+  document.getElementById("editRecordModal").style.display="none"; currentEditId=null;
+};
+
+/* =========== Auth =========== */
+document.getElementById("submitLogin").onclick=()=>{
+  signInWithEmailAndPassword(auth,document.getElementById("loginUser").value,document.getElementById("loginPass").value).then(()=>{document.getElementById("loginModal").style.display="none";}).catch(e=>alert(e.message));
+};
+document.getElementById("logoutBtn").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{
+  if(u){ attendanceForm.style.display="flex"; manageBtn.style.display="block"; logoutBtn.style.display="block"; loginBtn.style.display="none"; editHeader.style.display="table-cell"; loadStaff(); }
+  else{ attendanceForm.style.display="none"; manageBtn.style.display="none"; logoutBtn.style.display="none"; loginBtn.style.display="block"; editHeader.style.display="none"; }
+});
+
+/* =========== Modal Toggles =========== */
+document.getElementById("manageStaffBtn").onclick=()=>document.getElementById("manageStaffModal").style.display="block";
+document.getElementById("closeModal").onclick=()=>document.getElementById("manageStaffModal").style.display="none";
+document.getElementById("closeEditModal").onclick=()=>document.getElementById("editRecordModal").style.display="none";
+document.getElementById("loginBtn").onclick=()=>document.getElementById("loginModal").style.display="block";
+document.getElementById("closeLogin").onclick=()=>document.getElementById("loginModal").style.display="none";
+</script>
+</body>
+</html>
