@@ -24,7 +24,7 @@
 
     .container {
       display: flex;
-      flex-direction: column; /* هنا خليت العناصر تحت بعض */
+      flex-direction: column;
       width: 90%;
       max-width: 600px;
       gap: 20px;
@@ -53,6 +53,10 @@
     .section i {
       font-size: 3rem;
       transition: transform 0.4s ease;
+    }
+
+    .section span {
+      transition: letter-spacing 0.4s ease;
     }
 
     /* الإطار الدائري المتحرك */
@@ -96,6 +100,10 @@
       background: linear-gradient(to bottom right, #27ae60, #6dd5a1);
     }
 
+    .teachers::after {
+      background: linear-gradient(to bottom right, #8e44ad, #c39bd3);
+    }
+
     .section:hover {
       transform: scale(1.05);
     }
@@ -108,9 +116,24 @@
       letter-spacing: 2px;
     }
 
+    .section:active {
+      transform: scale(0.95);
+    }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    /* موبايل */
+    @media (max-width: 480px) {
+      .section {
+        font-size: 1.5rem;
+        padding: 25px 0;
+      }
+      .section i {
+        font-size: 2.2rem;
+      }
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -125,6 +148,11 @@
     <a href="شركات.html" class="section companies">
       <i class="fa-solid fa-building"></i>
       <span>شركات</span>
+    </a>
+
+    <a href="اعضاء-هيئة-التدريس.html" class="section teachers">
+      <i class="fa-solid fa-user-graduate"></i>
+      <span>أعضاء هيئة التدريس</span>
     </a>
   </div>
 </body>
