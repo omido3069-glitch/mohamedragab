@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول</title>
+  <title>تسجيل الدخول المباشر</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -17,6 +17,7 @@
       background: linear-gradient(-45deg, #ff6b6b, #6a89cc, #38ada9, #f8c291);
       background-size: 400% 400%;
       animation: gradientBG 12s ease infinite;
+      overflow: hidden;
     }
 
     @keyframes gradientBG {
@@ -30,10 +31,16 @@
       padding: 20px 30px;
       border-radius: 20px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      width: 500px;
+      width: 400px;
       text-align: center;
       color: #000;
-      position: relative;
+      opacity: 0;
+      transform: translateY(-50px);
+      animation: fadeSlide 1s forwards;
+    }
+
+    @keyframes fadeSlide {
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .img-container {
@@ -43,30 +50,49 @@
       background: linear-gradient(270deg, #ff6b6b, #6a89cc, #38ada9, #f8c291);
       background-size: 600% 600%;
       animation: borderAnim 8s linear infinite;
+      margin-bottom: 15px;
+      transition: 0.5s, box-shadow 0.5s;
     }
+
+    .img-container:hover {
+      box-shadow: 0 0 25px 5px rgba(255,255,255,0.6);
+      transform: scale(1.05);
+    }
+
     .login-box img {
-      width: 200px; height: 200px; border-radius: 50%; object-fit: cover;
+      width: 180px; height: 180px; border-radius: 50%; object-fit: cover;
     }
+
     @keyframes borderAnim {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    h2 {margin:10px 0; font-size:28px; font-weight:700;}
-    .update-text {margin-bottom:15px; font-size:18px; font-weight:700; color:#000;}
-    .input-group {margin-bottom:12px; text-align:right;}
-    input {
-      width:100%; padding:12px; border:1px solid #ccc; border-radius:10px;
-      font-size:16px; outline:none;
-    }
+    h2 { margin:10px 0; font-size:28px; font-weight:700; }
+    .update-text { margin-bottom:15px; font-size:18px; font-weight:700; color:#000; }
+
     button {
-      width:100%; padding:12px; background:#2ecc71; border:none; border-radius:10px;
-      color:#fff; font-size:18px; font-weight:600; cursor:pointer; transition:0.3s;
+      width:100%; padding:15px; background:#2ecc71; border:none; border-radius:12px;
+      color:#fff; font-size:20px; font-weight:600; cursor:pointer; 
+      transition:0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.5s;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeSlideBtn 0.8s forwards;
+      animation-delay: 0.7s;
     }
-    button:hover {background:#27ae60;}
-    .footer {margin-top:15px; font-size:16px; font-weight:700; color:#000;}
-    .error {color:red; margin-top:8px; font-size:14px;}
+
+    @keyframes fadeSlideBtn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    button:hover { 
+      background:#27ae60; 
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(39, 174, 96,0.6);
+    }
+
+    .footer { margin-top:15px; font-size:16px; font-weight:700; color:#000; }
   </style>
 </head>
 <body>
@@ -77,19 +103,9 @@
     </div>
 
     <h2>تسجيل الدخول</h2>
-    <div class="update-text">تم التحديث بتاريخ 12/9/2025</div>
+    <div class="update-text">تم التحديث بتاريخ 19/9/2025</div>
 
-    <form id="loginForm">
-      <div class="input-group">
-        <input type="text" id="username" placeholder="اسم المستخدم" required>
-      </div>
-      <div class="input-group">
-        <input type="password" id="password" placeholder="كلمة المرور" required>
-      </div>
-      <button type="submit">دخول</button>
-    </form>
-
-    <div id="message"></div>
+    <button id="loginBtn">دخول</button>
 
     <div class="footer">
       <span>تم التصميم بواسطة / محمد رجب</span>
@@ -97,25 +113,10 @@
   </div>
 
   <script>
-    const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      if (username === "admin" && password === "1234") {
-        message.innerHTML = "<p style='color:green'>✅ جاري تحويلك...</p>";
-        setTimeout(() => {
-          window.location.href = "اختيار.html"; // التحويل للصفحة العربية
-        }, 1200);
-      } else {
-        message.innerHTML = "<p class='error'>❌ اسم المستخدم أو كلمة المرور غير صحيحة</p>";
-      }
+    document.getElementById("loginBtn").addEventListener("click", function(){
+      window.location.href = "اختيار.html"; 
     });
   </script>
 
 </body>
 </html>
-
