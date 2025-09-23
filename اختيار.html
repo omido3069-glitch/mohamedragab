@@ -20,6 +20,7 @@
       align-items: center;
       background: #0f2027; /* احتياطي لو الكانفاس مش شغال */
       overflow: hidden;
+      flex-direction: column;
     }
 
     /* Canvas الخلفية */
@@ -124,6 +125,25 @@
         font-size: 1.5rem;
       }
     }
+
+    /* الكارت المعطل */
+    .disabled {
+      pointer-events: none;
+      background: linear-gradient(145deg, rgba(192,57,43,0.8), rgba(231,76,60,0.3));
+      opacity: 0.7;
+    }
+
+    /* الكارت المنفصل */
+    .single-card {
+      display: flex;
+      justify-content: center;
+      margin-top: 25px;
+      width: 100%;
+    }
+
+    .single-card .card {
+      width: 280px;
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -146,6 +166,14 @@
     <a href="staff.html" class="card teachers">
       <i class="fa-solid fa-chalkboard-user"></i>
       <h3>أعضاء هيئة التدريس</h3>
+    </a>
+  </div>
+
+  <!-- الكارت الجديد تحتهم -->
+  <div class="single-card">
+    <a id="dailyCars" class="card disabled">
+      <i class="fa-solid fa-pen-to-square"></i>
+      <h3 style="color:red;">تسجيل سيارات يومي (سيتفعل من 1/10/2025)</h3>
     </a>
   </div>
 
@@ -176,7 +204,6 @@
         if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
         if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
 
-        // جذب للماوس
         let dx = this.x - mouse.x;
         let dy = this.y - mouse.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
@@ -220,7 +247,6 @@
           }
         }
 
-        // خط بين الماوس والجزيئات القريبة
         let dxMouse = particles[i].x - mouse.x;
         let dyMouse = particles[i].y - mouse.y;
         let distanceMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
@@ -282,6 +308,19 @@
 
     initParticles();
     animateParticles();
+
+    // تفعيل كارت تسجيل سيارات يومي بعد 1/10/2025
+    const activationDate = new Date("2025-10-01T00:00:00");
+    const now = new Date();
+
+    if (now >= activationDate) {
+      const daily = document.getElementById("dailyCars");
+      daily.href = "daily_cars.html"; // رابط الصفحة الجديدة
+      daily.classList.remove("disabled");
+      daily.querySelector("i").className = "fa-solid fa-pen-to-square";
+      daily.querySelector("h3").style.color = "white";
+      daily.querySelector("h3").textContent = "تسجيل سيارات يومي";
+    }
   </script>
 </body>
 </html>
