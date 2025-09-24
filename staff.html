@@ -1,314 +1,219 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>تسجيل حضور أعضاء هيئة التدريس - Firebase</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-<style>
-/* نفس التنسيقات السابقة */
-* { margin:0; padding:0; box-sizing:border-box; font-family: 'Cairo', sans-serif; }
-body, html { height:100%; }
-body {
-  display: flex; flex-direction: column; align-items:center; padding:20px;
-  background: linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72, #2a5298);
-  background-size: 400% 400%; animation: gradientBG 15s ease infinite; color:#fff;
-}
-@keyframes gradientBG {0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;}}
-h2 { margin-bottom: 20px; text-align:center; }
-form { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; width: 350px;
-  backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; }
-.form-group { margin-bottom: 15px; position: relative; width: 100%; }
-.form-group i { position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: #fff; }
-input { width: 100%; padding: 10px 10px 10px 35px; border: none; border-radius: 10px; outline: none;
-  background: rgba(255,255,255,0.2); color: #fff; }
-input::placeholder { color: rgba(255,255,255,0.7); }
-.btn-center { margin-top: 15px; width: 60%; padding: 12px; border:none; border-radius:10px;
-  cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:10px;
-  background: #28a745; color:#fff; transition: 0.3s; }
-.btn-center:hover { background: #1e7e34; }
-.filter-container { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-select { padding: 10px; border-radius: 10px; border: none; outline: none; font-size: 16px; text-align: right; background: rgba(255,255,255,0.2); color: #fff; }
-select option { color: #000; }
-table { width: 95%; margin-top: 20px; border-collapse: collapse; backdrop-filter: blur(5px); background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-th, td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.3); text-align:center; color:#fff; }
-th { background: rgba(0,0,0,0.3); }
-tbody tr:hover { background: rgba(255,255,255,0.1); }
-.checkout-btn { padding:5px 10px; border:none; border-radius:5px; background:#dc3545; color:#fff; cursor:pointer; font-weight:bold; transition:0.3s; }
-.checkout-btn:hover { background:#a71d2a; }
-.row-checkedin { background: rgba(40,167,69,0.3); }
-.row-checkedout { background: rgba(100,100,100,0.3); color:#ddd; }
-#nameSuggestions { position: absolute; top: 100%; right: 0; background:#fff; color:#000; width:100%; max-height:120px; overflow-y:auto; border-radius:5px; display:none; z-index:10; }
-#nameSuggestions div:hover { background: rgba(0,0,0,0.1); cursor:pointer; }
-#alertMessage { display:none; margin-top:10px; background:#ffc107; color:#000; padding:10px; border-radius:8px; font-weight:bold; text-align:center; }
-.edit-btn { padding:5px 10px; border:none; border-radius:5px; background:#17a2b8; color:#fff; cursor:pointer; transition:0.3s; }
-.edit-btn:hover { background:#117a8b; }
-#manageStaffModal, #editRecordModal, #loginModal {
-  display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-  background: #1c1c1c; color:#fff; padding:20px; border-radius:15px; width:320px; box-shadow:0 8px 25px rgba(0,0,0,0.7); z-index:1001;
-}
-#manageStaffModal h3, #editRecordModal h3, #loginModal h3 { text-align:center; margin-bottom:15px; color:#fff; }
-#manageStaffModal input, #editRecordModal input, #loginModal input { width:100%; padding:10px; border-radius:8px; margin-bottom:10px; background:#333; color:#fff; border:none; outline:none; }
-#manageStaffModal button, #editRecordModal button, #loginModal button { width:100%; padding:10px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; margin-bottom:5px; transition:0.3s; }
-#addStaffBtn { background:#28a745; color:#fff; } #addStaffBtn:hover { background:#1e7e34; }
-#closeModal, #closeEditModal, #closeLogin { background:#dc3545; color:#fff; } #closeModal:hover, #closeEditModal:hover, #closeLogin:hover { background:#a71d2a; }
-#manageStaffBtn, #loginBtn, #logoutBtn { position:fixed; top:20px; font-size:30px; cursor:pointer; color:#fff; z-index:1000; }
-#manageStaffBtn { left:20px; display:none; } #loginBtn { left:70px; } #logoutBtn { left:120px; display:none; }
-</style>
+  <meta charset="UTF-8">
+  <title>🚘 سيستم السيارات</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tajawal', Arial, sans-serif;
+      direction: rtl;
+      background: #f5f7fa;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .sidebar {
+      height: 100vh;
+      background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      padding: 20px;
+      position: fixed;
+      top: 0; right: 0;
+      width: 280px;
+      overflow-y: auto;
+    }
+
+    .sidebar h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    .last-added {
+      margin-top: 30px;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+    }
+    .last-added h5 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .last-added p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .content {
+      margin-right: 300px;
+      padding: 20px;
+    }
+
+    .car-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease-in-out;
+      height: 100%;
+    }
+    .car-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .car-card h5 {
+      font-size: 1.6rem;       /* أكبر حجم */
+      font-weight: bold;       /* تخين */
+      color: #ffc107;          /* أصفر/برتقالي */
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* ظل خفيف */
+    }
+
+    /* مودال */
+    #loginModal, #carModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-box {
+      background: #fff;
+      color: #000;
+      border-radius: 20px;
+      padding: 25px;
+      width: 400px;
+      max-width: 95%;
+    }
+
+    .d-none {display:none !important;}
+  </style>
 </head>
 <body>
 
-<h2><i class="fa-solid fa-chalkboard-user"></i> تسجيل حضور أعضاء هيئة التدريس (Firebase)</h2>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>🚘 نظام السيارات</h2>
+    <button class="btn btn-light" onclick="document.getElementById('loginModal').style.display='flex'">🔐 دخول الأدمن</button>
+    <button id="addBtn" class="btn btn-success d-none" onclick="openCarModal()">➕ إضافة سيارة</button>
+    <button id="logoutBtn" class="btn btn-danger d-none" onclick="logout()">🚪 خروج</button>
 
-<form id="attendanceForm" style="display:none;">
-  <div class="form-group" style="position:relative;">
-    <i class="fa-solid fa-user"></i>
-    <input type="text" id="name" placeholder="الاسم" autocomplete="off">
-    <div id="nameSuggestions"></div>
+    <!-- آخر سيارة تمت إضافتها -->
+    <div class="last-added">
+      <h5>📌 آخر سيارة</h5>
+      <p id="lastCar">-</p>
+      <p id="lastTime">-</p>
+    </div>
   </div>
-  <div class="form-group">
-    <i class="fa-solid fa-building-columns"></i>
-    <input type="text" id="faculty" placeholder="الكلية" required>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h2 class="mb-3">📋 السيارات المسجلة</h2>
+    <div class="mb-2">
+      <span id="countBox" class="fw-bold text-primary">عدد السيارات: 0</span>
+    </div>
+    <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو الجهة" onkeyup="filterTable()">
+
+    <div class="row" id="carsList"></div>
   </div>
-  <div class="form-group">
-    <i class="fa-solid fa-graduation-cap"></i>
-    <input type="text" id="program" placeholder="البرنامج" required>
+
+  <!-- Login Modal -->
+  <div id="loginModal">
+    <div class="modal-box">
+      <h4 class="mb-3">🔐 تسجيل دخول الأدمن</h4>
+      <input type="email" id="email" class="form-control mb-2" placeholder="✉ الإيميل">
+      <input type="password" id="password" class="form-control mb-3" placeholder="🔑 الباسورد">
+      <button class="btn btn-primary w-100 mb-2" onclick="login()">دخول</button>
+      <button class="btn btn-secondary w-100" onclick="document.getElementById('loginModal').style.display='none'">❌ إغلاق</button>
+    </div>
   </div>
-  <button type="button" class="btn-center" id="btnCheckin"><i class="fa-solid fa-right-to-bracket"></i> حضور</button>
-</form>
 
-<div id="alertMessage"></div>
+  <!-- Car Modal -->
+  <div id="carModal">
+    <div class="modal-box">
+      <h4 id="carModalTitle">🚘 تسجيل سيارة</h4>
+      <input type="text" id="name" class="form-control mb-2" placeholder="👤 الاسم">
+      <input type="text" id="number" class="form-control mb-2" placeholder="🚘 رقم السيارة">
+      <input type="text" id="phone" class="form-control mb-2" placeholder="📞 رقم الهاتف">
 
-<div class="filter-container">
-  <select id="filterName"><option value="">تصفية بالاسم</option></select>
-  <select id="filterDate"><option value="">تصفية بالتاريخ</option></select>
-</div>
+      <select id="college" class="form-control mb-2" onchange="toggleManualInput()">
+        <option value="">🏫 اختر الجهة / الكلية</option>
+        <option value="كليه تجاره">كليه تجاره</option>
+        <option value="كليه هندسه">كليه هندسه</option>
+        <option value="كليه اداب">كليه اداب</option>
+        <option value="كليه حقوق">كليه حقوق</option>
+        <option value="كليه فنون">كليه فنون</option>
+        <option value="كليه علوم">كليه علوم</option>
+        <option value="كليه علوم صحيه">كليه علوم صحيه</option>
+        <option value="كليه حسابات ومعلومات">كليه حسابات ومعلومات</option>
+        <option value="كليه طب اسنان">كليه طب اسنان</option>
+        <option value="كليه طب بشري">كليه طب بشري</option>
+        <option value="manual">✍ يدوي</option>
+      </select>
 
-<table id="recordsTable">
-  <thead>
-    <tr>
-      <th>الاسم</th><th>الكلية</th><th>البرنامج</th><th>اليوم</th><th>التاريخ</th>
-      <th>الحضور</th><th>الانصراف</th><th id="editHeader" style="display:none;">تعديل</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+      <input type="text" id="manualCollege" class="form-control mb-2 d-none" placeholder="✍ اكتب الجهة يدوياً">
 
-<i class="fa-solid fa-user-plus" id="manageStaffBtn" title="إدارة الأعضاء"></i>
-<i class="fa-solid fa-right-to-bracket" id="loginBtn" title="تسجيل دخول"></i>
-<i class="fa-solid fa-right-from-bracket" id="logoutBtn" title="تسجيل خروج"></i>
+      <div class="d-flex gap-2">
+        <button id="saveBtn" onclick="saveCar()" class="btn btn-success flex-fill">💾 حفظ</button>
+        <button class="btn btn-secondary flex-fill" onclick="closeCarModal()">❌ إغلاق</button>
+      </div>
+    </div>
+  </div>
 
-<!-- إدارة الأعضاء -->
-<div id="manageStaffModal">
-  <h3>إضافة عضو جديد</h3>
-  <input type="text" id="newName" placeholder="الاسم">
-  <input type="text" id="newFaculty" placeholder="الكلية">
-  <input type="text" id="newProgram" placeholder="البرنامج">
-  <button id="addStaffBtn">إضافة</button>
-  <button id="closeModal">إغلاق</button>
-</div>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getDatabase, ref, push, set, update, remove, onValue } 
+      from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-<!-- نافذة تعديل السجل -->
-<div id="editRecordModal">
-  <h3>تعديل السجل</h3>
-  <input type="text" id="editDay" placeholder="اليوم">
-  <input type="text" id="editDate" placeholder="التاريخ">
-  <input type="text" id="editCheckin" placeholder="وقت الحضور">
-  <input type="text" id="editCheckout" placeholder="وقت الانصراف">
-  <button id="saveEditBtn">حفظ</button>
-  <button id="closeEditModal">إلغاء</button>
-</div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRR-uXoz14YOudO0K740Y5AUbivB0R5M0",
+      authDomain: "hnu-3069.firebaseapp.com",
+      databaseURL: "https://hnu-3069-default-rtdb.firebaseio.com",
+      projectId: "hnu-3069",
+      storageBucket: "hnu-3069.firebasestorage.app",
+      messagingSenderId: "98084688599",
+      appId: "1:98084688599:web:e272972e76d63f8ae01692",
+      measurementId: "G-P0E5EC7CHJ"
+    };
 
-<!-- نافذة تسجيل الدخول -->
-<div id="loginModal">
-  <h3>تسجيل الدخول</h3>
-  <input type="email" id="loginUser" placeholder="البريد الإلكتروني">
-  <input type="password" id="loginPass" placeholder="كلمة المرور">
-  <button id="submitLogin">تسجيل الدخول</button>
-  <button id="closeLogin">إغلاق</button>
-</div>
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
 
-<script type="module">
-/* =========== Firebase Config =========== */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, updateDoc, doc, getDocs, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+    let isAdmin = false;
+    let editingId = null;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAUkJTW4FmtBVoMfr7kwSlg2sE3Lt8rCu0",
-  authDomain: "staff-d470d.firebaseapp.com",
-  projectId: "staff-d470d",
-  storageBucket: "staff-d470d.firebasestorage.app",
-  messagingSenderId: "129609661118",
-  appId: "1:129609661118:web:56684db281ecf0111c3cef",
-  measurementId: "G-K1BD8QCS4L"
-};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* =========== DOM Elements =========== */
-const nameInput=document.getElementById("name");
-const facultyInput=document.getElementById("faculty");
-const programInput=document.getElementById("program");
-const alertDiv=document.getElementById("alertMessage");
-const editHeader=document.getElementById("editHeader");
-const attendanceForm=document.getElementById("attendanceForm");
-const manageBtn=document.getElementById("manageStaffBtn");
-const loginBtn=document.getElementById("loginBtn");
-const logoutBtn=document.getElementById("logoutBtn");
-
-/* =========== Helpers =========== */
-function formatTime12(date){
-  let h=date.getHours(), m=date.getMinutes().toString().padStart(2,'0');
-  let ampm=h>=12?"م":"ص"; h=h%12; h=h?h:12;
-  return h.toString().padStart(2,'0')+":"+m+" "+ampm;
-}
-function todayDate(){ return new Date().toLocaleDateString("ar-EG"); }
-function todayDay(){ return ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"][new Date().getDay()]; }
-
-/* =========== Staff Autocomplete =========== */
-let staffData=[];
-async function loadStaff(){
-  const snap=await getDocs(collection(db,"staff"));
-  staffData=snap.docs.map(d=>({id:d.id,...d.data()}));
-}
-nameInput.addEventListener("input", ()=>{
-  const q=nameInput.value.trim().toLowerCase();
-  const div=document.getElementById("nameSuggestions"); div.innerHTML="";
-  if(!q){ div.style.display="none"; return;}
-  const matches=staffData.filter(s=>s.name.toLowerCase().includes(q));
-  matches.forEach(m=>{
-    const d=document.createElement("div"); d.textContent=m.name;
-    d.onclick=()=>{ nameInput.value=m.name; facultyInput.value=m.faculty; programInput.value=m.program; div.style.display="none"; };
-    div.appendChild(d);
-  });
-  div.style.display=matches.length?"block":"none";
-});
-
-/* =========== Records Realtime + Filters =========== */
-let currentEditId=null;
-let allRecords=[];
-const tbody=document.querySelector("#recordsTable tbody");
-const filterName=document.getElementById("filterName");
-const filterDate=document.getElementById("filterDate");
-
-function renderRecords(records){
-  tbody.innerHTML="";
-  let lastDate=null;
-  records.forEach(r=>{
-    if(lastDate!==r.date){
-      let sep=tbody.insertRow();
-      let c=sep.insertCell(0); c.colSpan=8; c.innerText=`📅 ${r.day} - ${r.date}`;
-      c.style.background="rgba(255,255,255,0.2)"; lastDate=r.date;
+    window.login = function(){
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(()=>{document.getElementById("loginModal").style.display='none';})
+        .catch(() => alert("❌ خطأ في تسجيل الدخول"));
     }
-    let row=tbody.insertRow();
-    row.insertCell(0).innerText=r.name;
-    row.insertCell(1).innerText=r.faculty;
-    row.insertCell(2).innerText=r.program;
-    row.insertCell(3).innerText=r.day;
-    row.insertCell(4).innerText=r.date;
-    row.insertCell(5).innerText=r.checkin;
-    let tdCheckout=row.insertCell(6);
-    if(!r.checkout && auth.currentUser){
-      let b=document.createElement("button"); 
-      b.className="checkout-btn"; b.innerText="انصراف";
-      b.onclick=async()=>await updateDoc(doc(db,"records",r.id),{checkout:formatTime12(new Date())});
-      tdCheckout.appendChild(b); row.className="row-checkedin";
-    } else { tdCheckout.innerText=r.checkout||""; row.className="row-checkedout"; }
-    let tdEdit=row.insertCell(7);
-    if(auth.currentUser && r.checkout){
-      let b=document.createElement("button"); 
-      b.className="edit-btn"; b.innerHTML='<i class="fa fa-pen"></i>';
-      b.onclick=()=>{ currentEditId=r.id; document.getElementById("editDay").value=r.day; document.getElementById("editDate").value=r.date; document.getElementById("editCheckin").value=r.checkin; document.getElementById("editCheckout").value=r.checkout; document.getElementById("editRecordModal").style.display="block"; };
-      tdEdit.appendChild(b);
-    }
-  });
-}
 
-function updateFiltersOptions(records){
-  // أسماء
-  const names=[...new Set(records.map(r=>r.name))].sort();
-  filterName.innerHTML='<option value="">تصفية بالاسم</option>';
-  names.forEach(n=>{
-    let opt=document.createElement("option"); opt.value=n; opt.textContent=n;
-    filterName.appendChild(opt);
-  });
-  // تواريخ
-  const dates=[...new Set(records.map(r=>r.date))].sort((a,b)=>new Date(b)-new Date(a));
-  filterDate.innerHTML='<option value="">تصفية بالتاريخ</option>';
-  dates.forEach(d=>{
-    let opt=document.createElement("option"); opt.value=d; opt.textContent=d;
-    filterDate.appendChild(opt);
-  });
-}
+    window.logout = function(){ signOut(auth); }
 
-function applyFilters(){
-  let n=filterName.value, d=filterDate.value;
-  let filtered=allRecords.filter(r=>{
-    return (!n || r.name===n) && (!d || r.date===d);
-  });
-  renderRecords(filtered);
-}
-
-onSnapshot(query(collection(db,"records"),orderBy("createdAt","desc")), snap=>{
-  allRecords=snap.docs.map(d=>({id:d.id,...d.data()}));
-  updateFiltersOptions(allRecords);
-  applyFilters();
-});
-filterName.addEventListener("change",applyFilters);
-filterDate.addEventListener("change",applyFilters);
-
-/* =========== Attendance =========== */
-document.getElementById("btnCheckin").onclick=async()=>{
-  let n=nameInput.value.trim(), f=facultyInput.value.trim(), p=programInput.value.trim();
-  if(!n||!f||!p){alert("املأ جميع الحقول");return;}
-  const snap=await getDocs(collection(db,"records"));
-  if(snap.docs.find(d=>d.data().name===n && d.data().date===todayDate())){ alert("⚠️ العضو مسجل حضور بالفعل اليوم!"); return;}
-  await addDoc(collection(db,"records"),{
-    name:n, faculty:f, program:p, day:todayDay(), date:todayDate(), checkin:formatTime12(new Date()), checkout:"", createdAt:serverTimestamp()
-  });
-  nameInput.value=facultyInput.value=programInput.value="";
-};
-
-/* =========== Add Staff =========== */
-document.getElementById("addStaffBtn").onclick=async()=>{
-  const n=document.getElementById("newName").value, f=document.getElementById("newFaculty").value, p=document.getElementById("newProgram").value;
-  if(!n||!f||!p){alert("املأ جميع الحقول");return;}
-  await addDoc(collection(db,"staff"),{name:n,faculty:f,program:p});
-  alert("✅ تمت الإضافة"); document.getElementById("newName").value=document.getElementById("newFaculty").value=document.getElementById("newProgram").value="";
-  document.getElementById("manageStaffModal").style.display="none"; loadStaff();
-};
-
-/* =========== Edit Record Save =========== */
-document.getElementById("saveEditBtn").onclick=async()=>{
-  if(!currentEditId) return;
-  await updateDoc(doc(db,"records",currentEditId),{
-    day:document.getElementById("editDay").value,
-    date:document.getElementById("editDate").value,
-    checkin:document.getElementById("editCheckin").value,
-    checkout:document.getElementById("editCheckout").value
-  });
-  document.getElementById("editRecordModal").style.display="none"; currentEditId=null;
-};
-
-/* =========== Auth =========== */
-document.getElementById("submitLogin").onclick=()=>{
-  signInWithEmailAndPassword(auth,document.getElementById("loginUser").value,document.getElementById("loginPass").value).then(()=>{document.getElementById("loginModal").style.display="none";}).catch(e=>alert(e.message));
-};
-document.getElementById("logoutBtn").onclick=()=>signOut(auth);
-onAuthStateChanged(auth,u=>{
-  if(u){ attendanceForm.style.display="flex"; manageBtn.style.display="block"; logoutBtn.style.display="block"; loginBtn.style.display="none"; editHeader.style.display="table-cell"; loadStaff(); }
-  else{ attendanceForm.style.display="none"; manageBtn.style.display="none"; logoutBtn.style.display="none"; loginBtn.style.display="block"; editHeader.style.display="none"; }
-});
-
-/* =========== Modal Toggles =========== */
-document.getElementById("manageStaffBtn").onclick=()=>document.getElementById("manageStaffModal").style.display="block";
-document.getElementById("closeModal").onclick=()=>document.getElementById("manageStaffModal").style.display="none";
-document.getElementById("closeEditModal").onclick=()=>document.getElementById("editRecordModal").style.display="none";
-document.getElementById("loginBtn").onclick=()=>document.getElementById("loginModal").style.display="block";
-document.getElementById("closeLogin").onclick=()=>document.getElementById("loginModal").style.display="none";
-</script>
-</body>
-</html>
+    onAuthStateChanged(auth, (user) => {
+      if(user){
+        isAdmin = true;
+        document.getElementById("addBtn").classList.remove("d-none");
+        document.getElementById("logoutBtn").classList.remove("d-none");
+      } else {
+        isAdmin = false;
+        document.getElementById("addBtn").classList.add("d-none");
+        document.getElementById("logout
