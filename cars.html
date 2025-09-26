@@ -8,167 +8,135 @@
     body {
       font-family: 'Tajawal', Arial, sans-serif;
       direction: rtl;
-      background: #f5f7fa;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       min-height: 100vh;
-      color: #333;
-    }
-
-    .sidebar {
-      height: 100vh;
-      background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
       color: #fff;
-      padding: 20px;
-      position: fixed;
-      top: 0; right: 0;
-      width: 280px;
-      overflow-y: auto;
     }
 
-    .sidebar h2 {
-      font-size: 1.5rem;
+    h2, h3 {
       font-weight: bold;
-      margin-bottom: 30px;
+      color: #fff;
     }
 
-    .sidebar button {
-      width: 100%;
-      margin-bottom: 10px;
-      border-radius: 12px;
-      font-weight: bold;
-    }
-
-    .last-added {
-      margin-top: 30px;
-      padding: 15px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-    }
-    .last-added h5 {
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-    .last-added p {
-      margin: 0;
-      font-size: 0.9rem;
-    }
-
-    .content {
-      margin-right: 300px;
-      padding: 20px;
+    .navbar {
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
     }
 
     .car-card {
-      background: #fff;
-      border-radius: 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
       padding: 20px;
       margin-bottom: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       transition: transform 0.2s ease-in-out;
       height: 100%;
     }
     .car-card:hover {
-      transform: translateY(-4px);
+      transform: scale(1.03);
+      background: rgba(255,255,255,0.15);
     }
 
-    .car-card h5 {
-      font-size: 1.6rem;       /* أكبر حجم */
-      font-weight: bold;       /* تخين */
-      color: #ffc107;          /* أصفر/برتقالي */
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* ظل خفيف */
+    .btn-custom {
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1.1rem;
     }
 
-    /* مودال */
-    #loginModal, #carModal {
+    input, select {
+      border-radius: 12px !important;
+      padding: 12px !important;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    /* مودال تسجيل الدخول */
+    #loginModal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.8);
       z-index: 9999;
       justify-content: center;
       align-items: center;
     }
 
-    .modal-box {
+    #loginBox {
       background: #fff;
       color: #000;
       border-radius: 20px;
       padding: 25px;
-      width: 400px;
-      max-width: 95%;
+      width: 350px;
+      text-align: center;
     }
 
-    .d-none {display:none !important;}
+    #msgBox {
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>🚘 نظام السيارات</h2>
-    <button class="btn btn-light" onclick="document.getElementById('loginModal').style.display='flex'">🔐 دخول الأدمن</button>
-    <button id="addBtn" class="btn btn-success d-none" onclick="openCarModal()">➕ إضافة سيارة</button>
-    <button id="logoutBtn" class="btn btn-danger d-none" onclick="logout()">🚪 خروج</button>
+  <!-- ناف بار -->
+  <nav class="navbar navbar-dark px-3 mb-4">
+    <span class="navbar-brand">🚘 نظام تسجيل السيارات</span>
+    <button class="btn btn-warning" onclick="document.getElementById('loginModal').style.display='flex'">🔐 دخول الأدمن</button>
+  </nav>
 
-    <!-- آخر سيارة تمت إضافتها -->
-    <div class="last-added">
-      <h5>📌 آخر سيارة</h5>
-      <p id="lastCar">-</p>
-      <p id="lastTime">-</p>
-    </div>
-  </div>
+  <div class="container">
 
-  <!-- Main Content -->
-  <div class="content">
-    <h2 class="mb-3">📋 السيارات المسجلة</h2>
-    <div class="mb-2">
-      <span id="countBox" class="fw-bold text-primary">عدد السيارات: 0</span>
-    </div>
-    <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو الجهة" onkeyup="filterTable()">
+    <!-- صندوق تسجيل / تعديل -->
+    <div id="addBox" class="mb-4" style="display:none;">
+      <h3 class="mb-3">🚘 تسجيل / تعديل سيارة</h3>
+      <div class="alert alert-success text-center d-none" id="msgBox"></div>
 
-    <div class="row" id="carsList"></div>
-  </div>
-
-  <!-- Login Modal -->
-  <div id="loginModal">
-    <div class="modal-box">
-      <h4 class="mb-3">🔐 تسجيل دخول الأدمن</h4>
-      <input type="email" id="email" class="form-control mb-2" placeholder="✉ الإيميل">
-      <input type="password" id="password" class="form-control mb-3" placeholder="🔑 الباسورد">
-      <button class="btn btn-primary w-100 mb-2" onclick="login()">دخول</button>
-      <button class="btn btn-secondary w-100" onclick="document.getElementById('loginModal').style.display='none'">❌ إغلاق</button>
-    </div>
-  </div>
-
-  <!-- Car Modal -->
-  <div id="carModal">
-    <div class="modal-box">
-      <h4 id="carModalTitle">🚘 تسجيل سيارة</h4>
       <input type="text" id="name" class="form-control mb-2" placeholder="👤 الاسم">
       <input type="text" id="number" class="form-control mb-2" placeholder="🚘 رقم السيارة">
       <input type="text" id="phone" class="form-control mb-2" placeholder="📞 رقم الهاتف">
 
-      <select id="college" class="form-control mb-2" onchange="toggleManualInput()">
-        <option value="">🏫 اختر الجهة / الكلية</option>
-        <option value="كليه تجاره">كليه تجاره</option>
-        <option value="كليه هندسه">كليه هندسه</option>
-        <option value="كليه اداب">كليه اداب</option>
-        <option value="كليه حقوق">كليه حقوق</option>
-        <option value="كليه فنون">كليه فنون</option>
-        <option value="كليه علوم">كليه علوم</option>
-        <option value="كليه علوم صحيه">كليه علوم صحيه</option>
-        <option value="كليه حسابات ومعلومات">كليه حسابات ومعلومات</option>
-        <option value="كليه طب اسنان">كليه طب اسنان</option>
-        <option value="كليه طب بشري">كليه طب بشري</option>
+      <select id="college" class="form-select mb-2" onchange="toggleManualInput()">
+        <option value="">-- جهة الدخول --</option>
+        <option>كليه تجاره</option>
+        <option>كليه هندسه</option>
+        <option>كليه علاج طبيعي</option>
+        <option>كليه طب اسنان</option>
+        <option>كليه حقوق</option>
+        <option>كليه اداب</option>
+        <option>كليه علوم</option>
+        <option>كليه علوم صحيه</option>
+        <option>كليه فنون</option>
+        <option>كليه حسابات ومعلومات</option>
         <option value="manual">✍ يدوي</option>
       </select>
 
-      <input type="text" id="manualCollege" class="form-control mb-2 d-none" placeholder="✍ اكتب الجهة يدوياً">
+      <input type="text" id="manualCollege" class="form-control mb-2 d-none" placeholder="✍ جهة الدخول يدوياً">
 
       <div class="d-flex gap-2">
-        <button id="saveBtn" onclick="saveCar()" class="btn btn-success flex-fill">💾 حفظ</button>
-        <button class="btn btn-secondary flex-fill" onclick="closeCarModal()">❌ إغلاق</button>
+        <button id="saveBtn" onclick="saveCar()" class="btn btn-success flex-fill btn-custom">➕ إضافة</button>
+        <button onclick="logout()" class="btn btn-danger flex-fill btn-custom">🚪 خروج</button>
       </div>
+    </div>
+
+    <!-- قائمة السيارات -->
+    <h2 class="mb-3">📋 السيارات المسجلة</h2>
+    <div class="mb-2">
+      <span id="countBox" class="fw-bold text-warning">عدد السيارات: 0</span>
+    </div>
+    <input type="text" id="search" class="form-control mb-3" placeholder="🔍 ابحث بالاسم أو رقم السيارة أو الجهة" onkeyup="filterTable()">
+
+    <div class="row" id="carsList"></div>
+
+  </div>
+
+  <!-- مودال تسجيل الدخول -->
+  <div id="loginModal">
+    <div id="loginBox">
+      <h3 class="mb-3">🔐 تسجيل دخول الأدمن</h3>
+      <input type="email" id="email" class="form-control mb-2" placeholder="✉ الإيميل">
+      <input type="password" id="password" class="form-control mb-3" placeholder="🔑 الباسورد">
+      <button class="btn btn-primary w-100 mb-2" onclick="login()">دخول</button>
+      <button class="btn btn-secondary w-100" onclick="document.getElementById('loginModal').style.display='none'">❌ إغلاق</button>
     </div>
   </div>
 
@@ -198,22 +166,152 @@
     let isAdmin = false;
     let editingId = null;
 
+    function showMsg(text){
+      const msgBox = document.getElementById("msgBox");
+      msgBox.innerHTML = text;
+      msgBox.classList.remove("d-none");
+      setTimeout(()=> msgBox.classList.add("d-none"), 3000);
+    }
+
+    // تسجيل الدخول
     window.login = function(){
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       signInWithEmailAndPassword(auth, email, password)
-        .then(()=>{document.getElementById("loginModal").style.display='none';})
+        .then(()=>{
+          document.getElementById("loginModal").style.display='none';
+        })
         .catch(() => alert("❌ خطأ في تسجيل الدخول"));
     }
 
-    window.logout = function(){ signOut(auth); }
+    // تسجيل الخروج
+    window.logout = function(){
+      signOut(auth);
+    }
 
+    // متابعة حالة تسجيل الدخول
     onAuthStateChanged(auth, (user) => {
       if(user){
         isAdmin = true;
-        document.getElementById("addBtn").classList.remove("d-none");
-        document.getElementById("logoutBtn").classList.remove("d-none");
+        document.getElementById("addBox").style.display = "block";
       } else {
         isAdmin = false;
-        document.getElementById("addBtn").classList.add("d-none");
-        document.getElementById("logout
+        document.getElementById("addBox").style.display = "none";
+      }
+      loadCars();
+    });
+
+    // إظهار/إخفاء الإدخال اليدوي
+    window.toggleManualInput = function(){
+      const college = document.getElementById("college").value;
+      const manualInput = document.getElementById("manualCollege");
+      if(college === "manual"){
+        manualInput.classList.remove("d-none");
+      } else {
+        manualInput.classList.add("d-none");
+        manualInput.value = "";
+      }
+    }
+
+    // إضافة / تعديل سيارة
+    window.saveCar = function() {
+      const name = document.getElementById("name").value.trim();
+      const number = document.getElementById("number").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      let college = document.getElementById("college").value;
+
+      if(college === "manual"){
+        college = document.getElementById("manualCollege").value.trim();
+      }
+
+      if(name && number && phone && college){
+        const carsRef = ref(db, "cars");
+
+        if(editingId){
+          const carRef = ref(db, "cars/" + editingId);
+          update(carRef, { name, number, phone, college });
+          showMsg("✅ تم تحديث السيارة");
+          editingId = null;
+          document.getElementById("saveBtn").innerText = "➕ إضافة";
+        } else {
+          const newCar = push(carsRef);
+          set(newCar, { name, number, phone, college, timestamp: Date.now() });
+          showMsg("✅ تمت إضافة السيارة");
+        }
+
+        document.getElementById("name").value = "";
+        document.getElementById("number").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("college").value = "";
+        document.getElementById("manualCollege").classList.add("d-none");
+        document.getElementById("manualCollege").value = "";
+      } else {
+        alert("⚠ من فضلك املأ كل الحقول");
+      }
+    }
+
+    // تحميل السيارات
+    function loadCars() {
+      const carsRef = ref(db, "cars");
+      onValue(carsRef, (snapshot) => {
+        const cars = snapshot.val();
+        let html = "";
+        let count = 0;
+        for (let id in cars) {
+          count++;
+          html += `
+            <div class="col-md-4">
+              <div class="car-card" id="car-${id}">
+                <h5>${cars[id].name}</h5>
+                <p>🚘 <b>رقم:</b> ${cars[id].number}</p>
+                <p>📞 <b>هاتف:</b> ${cars[id].phone || "-"}</p>
+                <p>🏫 <b>الجهة:</b> ${cars[id].college}</p>
+                ${isAdmin ? `
+                  <div class="mt-2">
+                    <button class="btn btn-sm btn-primary" onclick="editCar('${id}','${cars[id].name}','${cars[id].number}','${cars[id].phone}','${cars[id].college}')">✏ تعديل</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteCar('${id}')">🗑 حذف</button>
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+          `;
+        }
+        document.getElementById("carsList").innerHTML = html;
+        document.getElementById("countBox").innerText = "عدد السيارات: " + count;
+      });
+    }
+
+    // تعديل سيارة
+    window.editCar = function(id, name, number, phone, college){
+      editingId = id;
+      document.getElementById("name").value = name;
+      document.getElementById("number").value = number;
+      document.getElementById("phone").value = phone;
+      document.getElementById("college").value = college;
+      document.getElementById("saveBtn").innerText = "💾 تحديث";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // حذف سيارة
+    window.deleteCar = function(id){
+      if(confirm("هل تريد حذف السيارة بالتأكيد؟")){
+        const carRef = ref(db, "cars/" + id);
+        remove(carRef);
+        showMsg("🗑 تم حذف السيارة");
+      }
+    }
+
+    // البحث
+    window.filterTable = function(){
+      const searchValue = document.getElementById("search").value.toLowerCase();
+      const cards = document.querySelectorAll("#carsList .car-card");
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(searchValue) ? "" : "none";
+      });
+    }
+  </script>
+
+</body>
+
+</html>
