@@ -93,7 +93,7 @@
 
       <input type="text" id="name" class="form-control mb-2" placeholder="👤 الاسم">
       <input type="text" id="number" class="form-control mb-2" placeholder="🚘 رقم السيارة">
-      <input type="text" id="phone" class="form-control mb-2" placeholder="📞 رقم الهاتف">
+      <input type="text" id="phone" class="form-control mb-2" placeholder="📞 رقم الهاتف (اختياري)">
 
       <select id="college" class="form-select mb-2" onchange="toggleManualInput()">
         <option value="">-- جهة الدخول --</option>
@@ -101,6 +101,7 @@
         <option>كليه هندسه</option>
         <option>كليه علاج طبيعي</option>
         <option>كليه طب اسنان</option>
+        <option>كليه طب بشري</option>
         <option>كليه حقوق</option>
         <option>كليه اداب</option>
         <option>كليه علوم</option>
@@ -166,9 +167,10 @@
     let isAdmin = false;
     let editingId = null;
 
-    function showMsg(text){
+    function showMsg(text, type="success"){
       const msgBox = document.getElementById("msgBox");
       msgBox.innerHTML = text;
+      msgBox.className = "alert alert-" + type + " text-center";
       msgBox.classList.remove("d-none");
       setTimeout(()=> msgBox.classList.add("d-none"), 3000);
     }
@@ -214,18 +216,35 @@
     }
 
     // إضافة / تعديل سيارة
-    window.saveCar = function() {
+    window.saveCar = async function() {
       const name = document.getElementById("name").value.trim();
       const number = document.getElementById("number").value.trim();
-      const phone = document.getElementById("phone").value.trim();
+      const phone = document.getElementById("phone").value.trim(); // اختياري
       let college = document.getElementById("college").value;
 
       if(college === "manual"){
         college = document.getElementById("manualCollege").value.trim();
       }
 
-      if(name && number && phone && college){
+      if(name && number && college){
         const carsRef = ref(db, "cars");
+
+        // تحقق من التكرار
+        let duplicate = false;
+        await onValue(carsRef, (snapshot)=>{
+          const cars = snapshot.val();
+          for(let id in cars){
+            if(cars[id].number === number && id !== editingId){
+              duplicate = true;
+              break;
+            }
+          }
+        }, {onlyOnce:true});
+
+        if(duplicate){
+          showMsg("⚠ هذه السيارة مسجلة بالفعل!", "warning");
+          return;
+        }
 
         if(editingId){
           const carRef = ref(db, "cars/" + editingId);
@@ -246,7 +265,7 @@
         document.getElementById("manualCollege").classList.add("d-none");
         document.getElementById("manualCollege").value = "";
       } else {
-        alert("⚠ من فضلك املأ كل الحقول");
+        alert("⚠ من فضلك املأ كل الحقول (ما عدا الهاتف)");
       }
     }
 
@@ -297,7 +316,7 @@
       if(confirm("هل تريد حذف السيارة بالتأكيد؟")){
         const carRef = ref(db, "cars/" + id);
         remove(carRef);
-        showMsg("🗑 تم حذف السيارة");
+        showMsg("🗑 تم حذف السيارة", "danger");
       }
     }
 
@@ -313,5 +332,4 @@
   </script>
 
 </body>
-
 </html>
