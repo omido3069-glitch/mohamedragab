@@ -3,242 +3,337 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>الموقع تحت الصيانة</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <title>سجل دخول وخروج سيارات</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
-    :root{
-      --bg:#0f1724; /* deep navy */
-      --card:#0b1220;
-      --accent-1:#6EE7B7;
-      --accent-2:#60A5FA;
-      --glass: rgba(255,255,255,0.04);
+    body {
+      background: linear-gradient(-45deg, #1e3c72, #2a5298, #6dd5ed, #2193b0);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(96,165,250,0.06), transparent),
-                  radial-gradient(900px 500px at 90% 90%, rgba(110,231,183,0.04), transparent),
-                  var(--bg);
-      color:#e6eef8;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
-
-    .card{
-      width:100%;
-      max-width:920px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:18px;
-      padding:36px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
-      display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:28px;
-      align-items:center;
+    .date-separator {
+      background: linear-gradient(to right, #facc15, #f59e0b);
+      color: #1e293b;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-
-    /* left: artwork */
-    .visual{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
+    input:focus {
+      border: 2px solid #2563eb !important;
+      box-shadow: 0 0 6px rgba(37, 99, 235, 0.6);
     }
-
-    .ring{
-      width:220px;
-      height:220px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: conic-gradient(from 0deg, var(--accent-1), var(--accent-2), #C084FC, var(--accent-1));
-      padding:6px;
-      animation: spin 9s linear infinite;
-    }
-    .ring::before{
-      content:"";
-      position:absolute;
-      inset:6px;
-      border-radius:50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      filter: blur(6px);
-      z-index:0;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    .logo-wrap{
-      width:180px;
-      height:180px;
-      border-radius:50%;
-      background:var(--card);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      z-index:2;
-      overflow:hidden;
-      box-shadow: 0 8px 24px rgba(2,6,23,0.6), inset 0 -6px 18px rgba(0,0,0,0.4);
-      border:1px solid rgba(255,255,255,0.03);
-    }
-
-    .logo{
-      width:86%;
-      height:86%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      font-size:34px;
-      color:var(--accent-2);
-      mix-blend-mode:screen;
-    }
-
-    /* right: content */
-    .content h1{
-      margin:0 0 8px 0;
-      font-size:34px;
-      letter-spacing:0.5px;
-    }
-    .content p{
-      margin:0 0 18px 0;
-      color:rgba(230,238,248,0.8);
-      line-height:1.6;
-    }
-
-    .meta{
-      display:flex;
-      gap:14px;
-      align-items:center;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-    .badge{
-      background:var(--glass);
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:600;
-      font-size:14px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-    }
-
-    .countdown{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .time-part{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      padding:10px 12px;
-      border-radius:10px;
-      min-width:64px;
-      text-align:center;
-      font-weight:700;
-      font-size:18px;
-    }
-
-    .actions{display:flex;gap:10px;align-items:center}
-    .btn{
-      padding:10px 16px;
-      border-radius:10px;
-      font-weight:600;
-      border:0;
-      cursor:pointer;
-      background:linear-gradient(90deg,var(--accent-2),var(--accent-1));
-      color:#05233a;
-      box-shadow: 0 8px 20px rgba(96,165,250,0.08);
-    }
-    .btn.ghost{
-      background:transparent;
-      color:rgba(230,238,248,0.9);
-      border:1px solid rgba(255,255,255,0.04);
-    }
-
-    .note{font-size:13px;color:rgba(230,238,248,0.65);}
-
-    /* responsive */
-    @media (max-width:860px){
-      .card{grid-template-columns:1fr; padding:24px}
-      .visual{margin-bottom:6px}
-      .ring{width:160px;height:160px}
-      .logo-wrap{width:130px;height:130px}
-    }
-
   </style>
 </head>
-<body>
-  <main class="card" role="main" aria-labelledby="maintenance-title">
-    <section class="visual" aria-hidden="true">
-      <div class="ring" aria-hidden="true">
-        <div class="logo-wrap">
-          <div class="logo">شعارك</div>
-        </div>
+<body class="min-h-screen p-6 flex flex-col items-center justify-start">
+
+  <!-- أيقونات روابط أعلى الصفحة -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mb-8">
+    <a href="#" onclick="openAdminModal()" class="bg-gradient-to-br from-green-600 to-green-400 text-white rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 hover:scale-105 transition">
+      <div class="text-5xl mb-3">🔑</div>
+      <div class="text-lg font-bold">تسجيل دخول أدمن</div>
+    </a>
+    <a href="#" class="bg-gradient-to-br from-blue-600 to-blue-400 text-white rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 hover:scale-105 transition">
+      <div class="text-5xl mb-3">📋</div>
+      <div class="text-lg font-bold">عرض السيارات المسجلة</div>
+    </a>
+  </div>
+
+  <div class="max-w-6xl w-full bg-white/90 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
+    <h1 class="text-3xl font-bold mb-3 text-center text-blue-900">🚗 سجل دخول وخروج سيارات</h1>
+
+    <!-- الملاحظة -->
+    <div class="mb-6 p-3 rounded-lg bg-yellow-100 border border-yellow-400 text-yellow-800 font-semibold text-center shadow">
+      ⚠️ في حالة عدم تسجيل خروج السيارة يدويًا، يتم تسجيل خروج تلقائي بعد الساعة 12 ليلًا.
+    </div>
+
+    <!-- Error message -->
+    <div id="errorBox" class="hidden mb-4 p-3 rounded-lg bg-red-100 border border-red-400 text-red-700 font-semibold text-center"></div>
+
+    <!-- Form (مخفي افتراضي) -->
+    <form id="logForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 hidden">
+      <input type="text" id="name" placeholder="👤 الاسم" class="border rounded-lg p-3 shadow focus:outline-none">
+      <input type="text" id="plate" placeholder="🔢 رقم السيارة" class="border rounded-lg p-3 shadow focus:outline-none">
+      <input type="text" id="entryGate" placeholder="🚪 جهة الدخول" class="border rounded-lg p-3 shadow focus:outline-none">
+      <input type="text" id="notes" placeholder="📝 ملاحظات" class="border rounded-lg p-3 shadow focus:outline-none">
+      <button type="submit" class="col-span-1 md:col-span-4 bg-gradient-to-r from-blue-600 to-blue-400 text-white p-3 rounded-lg shadow-lg hover:opacity-90 transition">➕ 🚙 تسجيل دخول</button>
+    </form>
+
+    <!-- زر تسجيل خروج الأدمن -->
+    <div id="logoutAdmin" class="hidden mb-4 text-center">
+      <button onclick="logoutAdminMode()" class="bg-red-600 text-white px-6 py-2 rounded-lg shadow hover:opacity-90 transition">🔓 تسجيل خروج</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+      <div>
+        <label class="font-semibold text-gray-700">📅 اختر التاريخ:</label>
+        <select id="dateFilter" class="border rounded-lg p-2 shadow focus:outline-none">
+          <option value="">كل الأيام</option>
+        </select>
       </div>
-    </section>
-
-    <section class="content">
-      <h1 id="maintenance-title">الموقع حالياً تحت الصيانة</h1>
-      <p>نعتذر عن الإزعاج — نقوم حالياً بعمل تحسينات مهمة على الموقع لكي نقدم لك تجربة أفضل. يمكنك متابعة التحديثات هنا أو العودة لاحقاً.</p>
-
-      <div class="meta">
-        <div class="badge">حالة: صيانة مجدولة</div>
-        <div class="badge">فريق الدعم جاهز</div>
-        <div class="countdown" aria-live="polite" title="باقي على انتهاء الصيانة">
-          <div class="time-part" id="days">--</div>
-          <div class="time-part" id="hours">--</div>
-          <div class="time-part" id="minutes">--</div>
-        </div>
+      <div class="flex-1">
+        <input type="text" id="searchInput" placeholder="🔍 بحث..." class="w-full border rounded-lg p-2 shadow focus:outline-none">
       </div>
+    </div>
 
-      <div class="actions">
-        <button class="btn" id="notifyBtn">أعلمني عند الانتهاء</button>
-        <button class="btn ghost" onclick="location.reload()">أعد المحاولة</button>
+    <!-- Table -->
+    <div class="overflow-x-auto rounded-lg shadow-lg">
+      <table class="w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
+        <thead class="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
+          <tr>
+            <th class="p-3 border">#</th>
+            <th class="p-3 border">👤 الاسم</th>
+            <th class="p-3 border">🔢 رقم السيارة</th>
+            <th class="p-3 border">⏰ الدخول</th>
+            <th class="p-3 border">🚪 جهة الدخول</th>
+            <th class="p-3 border">🚦 الخروج</th>
+            <th class="p-3 border">📝 ملاحظات</th>
+            <th class="p-3 border">⚙️ إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="logsBody" class="bg-white"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- نافذة دخول الأدمن -->
+  <div id="adminModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-6 w-80 shadow-2xl">
+      <h2 class="text-xl font-bold mb-4 text-center">🔑 تسجيل دخول أدمن</h2>
+      <div id="adminError" class="hidden mb-3 p-2 rounded bg-red-100 text-red-700 text-sm text-center"></div>
+      <input type="text" id="adminUser" placeholder="👤 اسم المستخدم" class="border rounded-lg w-full p-2 mb-3">
+      <input type="password" id="adminPass" placeholder="🔒 كلمة المرور" class="border rounded-lg w-full p-2 mb-3">
+      <div class="flex items-center mb-3">
+        <input type="checkbox" id="rememberMe" class="mr-2">
+        <label for="rememberMe" class="text-sm text-gray-700">تذكرني</label>
       </div>
-
-      <p class="note" style="margin-top:16px">أو راسلنا عبر البريد الإلكتروني: <strong>omido3069@gmail.com</strong></p>
-    </section>
-  </main>
+      <div class="flex justify-between gap-2">
+        <button onclick="checkAdminLogin()" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:opacity-90 transition">دخول</button>
+        <button onclick="closeAdminModal()" class="flex-1 bg-gray-400 text-white py-2 rounded-lg hover:opacity-90 transition">إلغاء</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // Countdown: ضع تاريخ الانتهاء كقيمة في data-end بصيغة ISO على عنصر body إذا أردت تغييره
-    (function(){
-      const endAttr = document.body.dataset.end || (new Date(Date.now()+24*60*60*1000)).toISOString();
-      const end = new Date(endAttr);
-      const $d = document.getElementById('days');
-      const $h = document.getElementById('hours');
-      const $m = document.getElementById('minutes');
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDu7UfSHxNbU5MLQizUYme0ifwHBWWOC6g",
+      authDomain: "companies-a701a.firebaseapp.com",
+      databaseURL: "https://companies-a701a-default-rtdb.firebaseio.com",
+      projectId: "companies-a701a",
+      storageBucket: "companies-a701a.firebasestorage.app",
+      messagingSenderId: "815579189112",
+      appId: "1:815579189112:web:4da4125a903931526a828d",
+      measurementId: "G-K9QRTY3SPJ"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-      function pad(n){return String(n).padStart(2,'0')}
-      function tick(){
-        const now = new Date();
-        let diff = Math.max(0, Math.floor((end - now)/1000));
-        const days = Math.floor(diff / (3600*24)); diff -= days*3600*24;
-        const hours = Math.floor(diff/3600); diff -= hours*3600;
-        const minutes = Math.floor(diff/60);
-        $d.textContent = pad(days);
-        $h.textContent = pad(hours);
-        $m.textContent = pad(minutes);
-      }
-      tick();
-      setInterval(tick, 1000*30);
+    let logs = [];
+    let isAdmin = false;
 
-      // Notify button (محاكاة: يحفظ البريد في التخزين المحلي)
-      document.getElementById('notifyBtn').addEventListener('click', async ()=>{
-        const email = prompt('ضع بريدك الإلكتروني ليصلك إشعار عند الانتهاء:');
-        if(!email) return alert('تم الإلغاء');
-        try{
-          localStorage.setItem('maintenance_notify', email);
-          alert('تم تسجيل البريد: ' + email + '\nسنرسل إشعاراً عند الانتهاء (تجريبي)');
-        }catch(e){alert('تعذر التسجيل')}
+    function formatTime(date){
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      const ampm = hours >= 12 ? 'م' : 'ص';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      minutes = minutes < 10 ? '0'+minutes : minutes;
+      return hours + ":" + minutes + " " + ampm;
+    }
+
+    function formatDateArabic(date){
+      return date.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function populateDateFilter(){
+      const dateFilter = document.getElementById('dateFilter');
+      const uniqueDates = [...new Set(logs.map(log => log.date))];
+      dateFilter.innerHTML = '<option value="">كل الأيام</option>';
+      uniqueDates.forEach(date => {
+        const opt = document.createElement('option');
+        opt.value = date;
+        opt.textContent = date;
+        dateFilter.appendChild(opt);
       });
+    }
 
-    })();
+    function renderLogs(){
+      const tbody = document.getElementById('logsBody');
+      tbody.innerHTML = '';
+      let lastDate = '';
+
+      const dateFilterValue = document.getElementById('dateFilter').value;
+      const searchValue = document.getElementById('searchInput').value.toLowerCase();
+
+      const sortedLogs = [...logs].reverse();
+
+      sortedLogs.forEach((log, index) => {
+        if(dateFilterValue && log.date !== dateFilterValue) return;
+        if(searchValue && !(
+          log.name.toLowerCase().includes(searchValue) ||
+          log.plate.toLowerCase().includes(searchValue) ||
+          (log.entryGate && log.entryGate.toLowerCase().includes(searchValue)) ||
+          (log.notes && log.notes.toLowerCase().includes(searchValue))
+        )) return;
+
+        if(log.date !== lastDate){
+          const dateRow = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 8;
+          td.className = 'date-separator';
+          td.textContent = `📅 ${log.date}`;
+          dateRow.appendChild(td);
+          tbody.appendChild(dateRow);
+          lastDate = log.date;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-t hover:bg-gray-100 transition';
+        tr.innerHTML = `
+          <td class="p-3 border text-center">${index+1}</td>
+          <td class="p-3 border">👤 ${log.name}</td>
+          <td class="p-3 border">🔢 ${log.plate}</td>
+          <td class="p-3 border">⏰ ${log.entryTime}</td>
+          <td class="p-3 border">🚪 ${log.entryGate}</td>
+          <td class="p-3 border">${log.exitTime ? `🚦 ${log.exitTime}` : '-'}</td>
+          <td class="p-3 border">📝 ${log.notes || ''}</td>
+          <td class="p-3 border text-center space-x-1">
+            ${isAdmin && !log.exitTime ? `<button onclick="registerExit('${log.key}')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs shadow hover:opacity-90 transition">🚦 خروج</button>` : ''}
+            ${isAdmin ? `<button onclick="deleteLog('${log.key}')" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs shadow hover:opacity-90 transition">🗑️ حذف</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Firebase: قراءة البيانات مباشرة
+    database.ref('carLogs').on('value', snapshot => {
+      logs = [];
+      snapshot.forEach(childSnapshot => {
+        const data = childSnapshot.val();
+        data.key = childSnapshot.key;
+        logs.push(data);
+      });
+      populateDateFilter();
+      renderLogs();
+    });
+
+    // إضافة سجل جديد
+    document.getElementById('logForm').addEventListener('submit', e => {
+      e.preventDefault();
+      if(!isAdmin) return;
+
+      const errorBox = document.getElementById('errorBox');
+      errorBox.classList.add('hidden');
+      errorBox.textContent = '';
+
+      const name = document.getElementById('name').value.trim();
+      const plate = document.getElementById('plate').value.trim();
+      const entryGate = document.getElementById('entryGate').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+
+      const existing = logs.find(log => log.plate === plate && !log.exitTime);
+      if(existing){
+        errorBox.textContent = `🚫 السيارة ${plate} مسجلة بالفعل دخول ولم يتم تسجيل خروجها.`;
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      const entryTime = formatTime(new Date());
+      const date = formatDateArabic(new Date());
+
+      const newLog = { name, plate, entryTime, entryGate, exitTime:null, notes, date };
+      database.ref('carLogs').push(newLog);
+
+      e.target.reset();
+    });
+
+    // تسجيل خروج سيارة
+    function registerExit(key){
+      if(!isAdmin) return;
+      const exitTime = formatTime(new Date());
+      database.ref('carLogs/'+key+'/exitTime').set(exitTime);
+    }
+
+    // حذف سجل
+    function deleteLog(key){
+      if(!isAdmin) return;
+      if(confirm('هل تريد حذف هذا السجل؟')){
+        database.ref('carLogs/'+key).remove();
+      }
+    }
+
+    // فتح/غلق نافذة الأدمن
+    function openAdminModal(){ document.getElementById('adminModal').classList.remove('hidden'); }
+    function closeAdminModal(){
+      document.getElementById('adminModal').classList.add('hidden');
+      document.getElementById('adminUser').value = '';
+      document.getElementById('adminPass').value = '';
+      document.getElementById('rememberMe').checked = false;
+      document.getElementById('adminError').classList.add('hidden');
+    }
+
+    function checkAdminLogin(){
+      const user = document.getElementById('adminUser').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+      const remember = document.getElementById('rememberMe').checked;
+      const adminError = document.getElementById('adminError');
+
+      if(user==='admin' && pass==='1234'){
+        isAdmin = true;
+        if(remember){ localStorage.setItem('isAdmin','true'); }
+        document.getElementById('logForm').classList.remove('hidden');
+        document.getElementById('logoutAdmin').classList.remove('hidden');
+        closeAdminModal();
+        renderLogs();
+      } else {
+        adminError.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+        adminError.classList.remove('hidden');
+      }
+    }
+
+    function logoutAdminMode(){
+      isAdmin = false;
+      localStorage.removeItem('isAdmin');
+      document.getElementById('logForm').classList.add('hidden');
+      document.getElementById('logoutAdmin').classList.add('hidden');
+      renderLogs();
+    }
+
+    // البحث والتصفية
+    document.getElementById('dateFilter').addEventListener('change', renderLogs);
+    document.getElementById('searchInput').addEventListener('input', renderLogs);
+
+    // تفعيل حالة الأدمن إذا تم حفظها
+    if(localStorage.getItem('isAdmin')==='true'){
+      isAdmin = true;
+      document.getElementById('logForm').classList.remove('hidden');
+      document.getElementById('logoutAdmin').classList.remove('hidden');
+    }
+
+    // خروج تلقائي الساعة 12:00 ص
+    setInterval(()=>{
+      const now = new Date();
+      if(now.getHours()===0 && now.getMinutes()===0){
+        logs.forEach(log=>{
+          if(!log.exitTime){
+            database.ref('carLogs/'+log.key+'/exitTime').set('12:00 ص');
+          }
+        });
+      }
+    },60000); // تحقق كل دقيقة
   </script>
 </body>
 </html>
-
-
