@@ -1,319 +1,122 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>الموقع قيد الصيانة</title>
-
-  <!-- خط عربي جميل -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول المباشر</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg1: #0f172a;
-      --bg2: #0b1220;
-      --accent: #5eead4; /* أخضر فاتح */
-      --accent-2: #60a5fa; /* أزرق فاتح */
-      --card: rgba(255,255,255,0.06);
-      --glass: rgba(255,255,255,0.04);
+    * {margin:0; padding:0; box-sizing:border-box; font-family:'Tajawal', sans-serif;}
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #ff6b6b, #6a89cc, #38ada9, #f8c291);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      overflow: hidden;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: 'Cairo', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color:#E6EEF8;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(96,165,250,0.08), transparent),
-                  radial-gradient(800px 400px at 90% 90%, rgba(94,234,212,0.04), transparent),
-                  linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    .container{
-      width:100%;
-      max-width:980px;
-      display:grid;
-      grid-template-columns: 1fr 420px;
-      gap:28px;
-      align-items:center;
+    .login-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      width: 400px;
+      text-align: center;
+      color: #000;
+      opacity: 0;
+      transform: translateY(-50px);
+      animation: fadeSlide 1s forwards;
     }
 
-    /* البطاقة اليسرى (رسالة) */
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border-radius:18px;
-      padding:36px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.04);
+    @keyframes fadeSlide {
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    h1{
-      margin:0 0 10px 0;
-      font-size:30px;
-      letter-spacing:0.4px;
-      color: #F8FAFF;
+    .img-container {
+      display: inline-block;
+      padding: 8px;
+      border-radius: 50%;
+      background: linear-gradient(270deg, #ff6b6b, #6a89cc, #38ada9, #f8c291);
+      background-size: 600% 600%;
+      animation: borderAnim 8s linear infinite;
+      margin-bottom: 15px;
+      transition: 0.5s, box-shadow 0.5s;
     }
 
-    .lead{
-      color: #cfe8ff;
-      opacity:0.92;
-      margin-bottom:18px;
-      line-height:1.6;
-      font-size:15px;
+    .img-container:hover {
+      box-shadow: 0 0 25px 5px rgba(255,255,255,0.6);
+      transform: scale(1.05);
     }
 
-    .features{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:16px;
+    .login-box img {
+      width: 180px; height: 180px; border-radius: 50%; object-fit: cover;
     }
 
-    .pill{
-      background:var(--card);
-      padding:10px 12px;
-      border-radius:999px;
-      font-size:13px;
-      color:#DFF6F0;
-      border:1px solid rgba(255,255,255,0.025);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+    @keyframes borderAnim {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    .actions{
-      margin-top:22px;
-      display:flex;
-      gap:12px;
-      align-items:center;
+    h2 { margin:10px 0; font-size:28px; font-weight:700; }
+    .update-text { margin-bottom:15px; font-size:18px; font-weight:700; color:#000; }
+
+    button {
+      width:100%; padding:15px; background:#2ecc71; border:none; border-radius:12px;
+      color:#fff; font-size:20px; font-weight:600; cursor:pointer; 
+      transition:0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.5s;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeSlideBtn 0.8s forwards;
+      animation-delay: 0.7s;
     }
 
-    .btn{
-      padding:10px 16px;
-      border-radius:12px;
-      font-weight:600;
-      border:0;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      transition:transform .14s ease, box-shadow .14s ease;
-      box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+    @keyframes fadeSlideBtn {
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .btn:active{transform:translateY(1px)}
-    .btn-primary{
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      color:#05203B;
-      padding-left:14px;
-      padding-right:14px;
+    button:hover { 
+      background:#27ae60; 
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(39, 174, 96,0.6);
     }
 
-    .btn-ghost{
-      background:transparent;
-      color:#CFE8FF;
-      border:1px solid rgba(255,255,255,0.06);
-      padding:9px 14px;
-    }
-
-    .meta{
-      margin-top:18px;
-      font-size:13px;
-      color: #B8D7FF;
-      opacity:0.85;
-    }
-
-    /* القائمة اليمنى: أيقونة + عداد */
-    .visual{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:18px;
-      text-align:center;
-    }
-
-    .badge{
-      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      padding:10px 14px;
-      border-radius:999px;
-      font-weight:700;
-      color:#E6FDF6;
-      border:1px solid rgba(255,255,255,0.04);
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .gear{
-      width:200px;
-      height:200px;
-      display:grid;
-      place-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,0.035);
-      box-shadow: 0 10px 30px rgba(2,6,23,0.5);
-      position:relative;
-      overflow:visible;
-    }
-
-    /* تدوير ترس */
-    .gear svg{
-      width:110px;
-      height:110px;
-      animation:spin 6s linear infinite;
-      filter: drop-shadow(0 10px 20px rgba(2,6,23,0.6));
-    }
-    @keyframes spin{
-      from{transform:rotate(0deg)}
-      to{transform:rotate(360deg)}
-    }
-
-    .countdown{
-      font-size:22px;
-      font-weight:700;
-      margin-top:6px;
-      color:#DFF6F0;
-      letter-spacing:0.6px;
-    }
-
-    .small{
-      font-size:13px;
-      color:#9DCBFF;
-      opacity:0.9;
-    }
-
-    /* تأثيرات خلفية صغيرة متحركة */
-    .dot{
-      position:absolute;
-      width:14px;height:14px;border-radius:50%;
-      background:rgba(96,165,250,0.12);
-      filter: blur(10px);
-      animation:float 5s ease-in-out infinite;
-      z-index:0;
-    }
-    .dot.two{width:22px;height:22px; background:rgba(94,234,212,0.08); animation-duration:7s}
-    .dot.three{width:10px;height:10px; background:rgba(96,165,250,0.06); animation-duration:6s}
-
-    @keyframes float{
-      0%{transform:translateY(0px)}
-      50%{transform:translateY(-18px)}
-      100%{transform:translateY(0px)}
-    }
-
-    /* استجابة */
-    @media (max-width:880px){
-      .container{grid-template-columns: 1fr; padding:8px}
-      .visual{order:-1; flex-direction:row; justify-content:space-between}
-      .gear{width:120px;height:120px}
-    }
+    .footer { margin-top:15px; font-size:16px; font-weight:700; color:#000; }
   </style>
 </head>
 <body>
-  <div class="container" role="main" aria-labelledby="title">
-    <div class="card" aria-hidden="false">
-      <h1 id="title">نحن نعمل على تحسين الموقع — عُد قريبًا</h1>
-      <p class="lead">
-        الموقع حالياً تحت الصيانة لتقديم تجربة أفضل. شكرًا لصبرك — فريق العمل يعمل الآن لإكمال التحديثات والاختبارات.
-      </p>
 
-      <div class="features" aria-hidden="false">
-        <div class="pill">🔧 تحديثات أمنية و تحسينات</div>
-        <div class="pill">⚡ أداء أسرع</div>
-        <div class="pill">🎨 تصميم جديد</div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-primary" id="refreshBtn" title="إعادة المحاولة">
-          🔁 إعادة المحاولة
-        </button>
-        <a class="btn btn-ghost" href="mailto:contact@example.com" title="اتصل بنا">
-          ✉️ اتصل بنا
-        </a>
-      </div>
-
-      <div class="meta">
-        المتوقع عودة الخدمة في غضون: <strong id="eta">—</strong>
-        <div class="small" style="margin-top:8px">
-          إذا استمرت المشكلة أكثر من المتوقع، تواصل معنا عبر البريد أو حسابات التواصل.
-        </div>
-      </div>
+  <div class="login-box">
+    <div class="img-container">
+      <img src="1.png" alt="صورة">
     </div>
 
-    <div class="visual" aria-hidden="true">
-      <div class="badge">🚧 صفحة صيانة</div>
+    <h2>تسجيل الدخول</h2>
+    <div class="update-text">تم التحديث بتاريخ 1/10/2025</div>
 
-      <div class="gear" aria-hidden="true">
-        <!-- نقاط خلفية -->
-        <div class="dot" style="right:6px;top:-6px;"></div>
-        <div class="dot two" style="left:-10px;bottom:-6px;"></div>
-        <div class="dot three" style="right:40px;bottom:10px;"></div>
+    <button id="loginBtn">دخول</button>
 
-        <!-- أيقونة ترس SVG -->
-        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"
-            d="M487.5 315.7v-119.4l-48.9-8.5c-2.6-8.2-5.9-16.2-10-23.8l26-43-84.4-84.4-43 26c-7.6-4.1-15.6-7.4-23.8-10L315.7 24.5h-119.4L187.8 73c-8.2 2.6-16.2 5.9-23.8 10l-43-26L36.6 141.4l26 43c-4.1 7.6-7.4 15.6-10 23.8L8.1 217.5v119.4l48.9 8.5c2.6 8.2 5.9 16.2 10 23.8l-26 43 84.4 84.4 43-26c7.6 4.1 15.6 7.4 23.8 10l8.5 48.9h119.4l8.5-48.9c8.2-2.6 16.2-5.9 23.8-10l43 26 84.4-84.4-26-43c4.1-7.6 7.4-15.6 10-23.8l48.9-8.5z"/>
-          <circle cx="256" cy="256" r="64" fill="rgba(255,255,255,0.96)"/>
-        </svg>
-      </div>
-
-      <div>
-        <div class="countdown" id="countdown">-- : -- : --</div>
-        <div class="small">المتبقي حتى الإطلاق التجريبي التالي</div>
-      </div>
+    <div class="footer">
+      <span>تم التصميم بواسطة / محمد رجب</span>
     </div>
   </div>
 
   <script>
-    // Simple countdown: نُظهر عداد زمني افتراضي (قابل للتعديل)
-    // هنا افتراضياً نضع انتهاء الصيانة بعد 3 ساعات من الوقت الحالي
-    (function(){
-      const endTime = new Date(Date.now() + 3 * 60 * 60 * 1000); // عدل هنا إن أردت وقت آخر
-      const cEl = document.getElementById('countdown');
-      const etaEl = document.getElementById('eta');
-
-      function pad(n){ return String(n).padStart(2,'0') }
-
-      function update(){
-        const now = new Date();
-        let diff = Math.max(0, endTime - now);
-        const hrs = Math.floor(diff / (1000*60*60));
-        diff -= hrs * (1000*60*60);
-        const mins = Math.floor(diff / (1000*60));
-        diff -= mins * (1000*60);
-        const secs = Math.floor(diff / 1000);
-
-        cEl.textContent = `${pad(hrs)} : ${pad(mins)} : ${pad(secs)}`;
-
-        // ETA عرض تاريخ/وقت تقريبي
-        const options = { weekday: 'short', year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' };
-        etaEl.textContent = endTime.toLocaleString('ar-EG', options);
-
-        if (endTime - now <= 0){
-          // لو انتهى العدّاد
-          cEl.textContent = '00 : 00 : 00';
-          etaEl.textContent = 'تم الانتهاء — نرجو تحديث الصفحة';
-        }
-      }
-
-      update();
-      setInterval(update, 1000);
-
-      // زر إعادة المحاولة: يجرب تحميل الصفحة الرئيسية
-      document.getElementById('refreshBtn').addEventListener('click', function(){
-        // محاولة الاتصال بالصفحة الرئيسية للموقع
-        // هنا نعيد تحميل الصفحة الحالية، أو يمكنك تغيير المسار '/'
-        location.reload();
-      });
-    })();
+    document.getElementById("loginBtn").addEventListener("click", function(){
+      window.location.href = "اختيار.html"; 
+    });
   </script>
+
 </body>
 </html>
-
