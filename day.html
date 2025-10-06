@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>سجل دخول وخروج سيارات — كامل</title>
+
+  <!-- Tailwind (للستايل السريع) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase Compat (نستخدم النسخة الـ compat علشان نقدر نعمل أكثر من app) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    body { background: linear-gradient(-45deg,#1e3c72,#2a5298,#6dd5ed,#2193b0); background-size:400% 400%; animation:gradientBG 12s ease infinite; }
+    @keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .date-separator{background:linear-gradient(to right,#facc15,#f59e0b);color:#1e293b;font-weight:bold;text-align:center;padding:10px;font-size:1rem;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+    input:focus{outline:none;box-shadow:0 0 8px rgba(37,99,235,0.35);border:2px solid #2563eb}
+    table{min-width:1100px}
+    /* اقتراحات */
+    .suggestions{position:absolute;z-index:60;width:100%;max-height:240px;overflow:auto;background:white;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.15)}
+    .suggestion-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9;direction:rtl}
+    .suggestion-item:hover,.suggestion-item.active{background:#eef2ff}
+    .no-suggestion{padding:10px 12px;color:#64748b}
+    /* توست */
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:rgba(20,20,20,0.9);color:white;padding:10px 14px;border-radius:8px;z-index:200}
+    /* بادج اوفلاين */
+    .offline-badge{display:inline-block;background:#f43f5e;color:white;padding:2px 7px;border-radius:8px;font-size:11px;margin-left:8px}
+    /* زر الخروج أعلى يسار */
+    #logoutBtn{position:fixed;top:14px;left:14px;z-index:300}
+  </style>
+</head>
+<body class="min-h-screen p-6 flex flex-col items-center">
+
+  <!-- زر دخول الأدمن الجديد -->
+  <button onclick="openAdminModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg mb-4 shadow-lg hover:opacity-90">
+    🔑 دخول الأدمن
+  </button>
+
+  <!-- زر تسجيل الخروج للأدمن (فوق الشمال) -->
+  <button id="logoutBtn" class="hidden bg-red-600 text-white px-4 py-2 rounded-2xl shadow-lg hover:opacity-90">🔓 تسجيل خروج</button>
+
+  <div class="w-full max-w-[1200px] bg-white/90 rounded-2xl shadow-2xl p-6 backdrop-blur-md">
+    <h1 class="text-3xl font-bold text-center mb-4 text-blue-900">🚗 سجل دخول وخروج سيارات</h1>
+    <div id="statusNotice" class="mb-4 p-3 rounded-lg bg-yellow-100 border border-yellow-400 text-yellow-800 font-semibold text-center shadow">
+      ⚠️ السجلات محفوظة محليًا أوفلاين وتُرفع تلقائيًا عند عودة الاتصال.
+    </div>
+
+    <div id="errorBox" class="hidden mb-4 p-3 rounded-lg bg-red-100 border border-red-400 text-red-700 font-semibold text-center"></div>
+
+    <!-- نموذج التسجيل -->
+    <form id="logForm" class="relative grid grid-cols-4 gap-4 mb-6 hidden">
+      <input id="name" class="border rounded-lg p-3" placeholder="👤 الاسم" />
+      <div class="relative">
+        <input id="plate" class="border rounded-lg p-3" placeholder="🔢 رقم السيارة" autocomplete="off" />
+        <div id="suggestions" class="suggestions hidden"></div>
+      </div>
+      <input id="entryGate" class="border rounded-lg p-3" placeholder="🚪 جهة الدخول" />
+      <input id="notes" class="border rounded-lg p-3" placeholder="📝 ملاحظات" />
+      <button type="submit" class="col-span-4 bg-gradient-to-r from-blue-600 to-blue-400 text-white p-3 rounded-lg shadow-lg hover:opacity-90">➕ تسجيل دخول</button>
+    </form>
+
+    <div id="logoutAdmin" class="hidden text-left mb-4"></div>
+
+    <!-- فلتر وبحث -->
+    <div class="flex gap-4 items-center mb-4">
+      <div>
+        <label class="font-semibold text-gray-700">📅 اختر التاريخ:</label>
+        <select id="dateFilter" class="border rounded-lg p-2">
+          <option value="">كل الأيام</option>
+        </select>
+      </div>
+      <div class="flex-1">
+        <input id="searchInput" class="w-full border rounded-lg p-2" placeholder="🔍 بحث..." />
+      </div>
+    </div>
+
+    <!-- جدول السجلات -->
+    <div class="overflow-x-auto rounded-lg shadow-lg">
+      <table class="w-full text-base border border-gray-300 bg-white">
+        <thead class="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
+          <tr>
+            <th class="p-3 border">#</th>
+            <th class="p-3 border">👤 الاسم</th>
+            <th class="p-3 border">🔢 رقم السيارة</th>
+            <th class="p-3 border">⏰ الدخول</th>
+            <th class="p-3 border">🚪 جهة الدخول</th>
+            <th class="p-3 border">🚦 الخروج</th>
+            <th class="p-3 border">📝 ملاحظات</th>
+            <th class="p-3 border">⚙️ إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="logsBody" class="bg-white"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="adminModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-6 w-96 shadow-2xl">
+      <h2 class="text-2xl font-bold mb-4 text-center">🔑 تسجيل دخول أدمن</h2>
+      <div id="adminError" class="hidden mb-3 p-2 rounded bg-red-100 text-red-700 text-sm text-center"></div>
+      <input id="adminUser" class="border rounded-lg w-full p-3 mb-3" placeholder="اسم المستخدم" />
+      <input id="adminPass" type="password" class="border rounded-lg w-full p-3 mb-3" placeholder="كلمة المرور" />
+      <div class="flex items-center mb-3">
+        <input id="rememberMe" type="checkbox" class="mr-2" />
+        <label for="rememberMe" class="text-gray-700">تذكرني</label>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="checkAdminLogin()" class="flex-1 bg-green-600 text-white py-2 rounded-lg">دخول</button>
+        <button onclick="closeAdminModal()" class="flex-1 bg-gray-400 text-white py-2 rounded-lg">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+<script>
+/* ============================
+   إعداد Firebase (المشروع الأساسي لتسجيل السجلات)
+   ============================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDu7UfSHxNbU5MLQizUYme0ifwHBWWOC6g",
+  authDomain: "companies-a701a.firebaseapp.com",
+  databaseURL: "https://companies-a701a-default-rtdb.firebaseio.com",
+  projectId: "companies-a701a",
+  storageBucket: "companies-a701a.firebasestorage.app",
+  messagingSenderId: "815579189112",
+  appId: "1:815579189112:web:4da4125a903931526a828d",
+  measurementId: "G-K9QRTY3SPJ"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ============================
+   ربط مشروع hnu-3069 (للـ read فقط)
+   ============================ */
+const externalApp = firebase.initializeApp(
+  { databaseURL: "https://hnu-3069-default-rtdb.firebaseio.com/" },
+  "external"
+);
+const externalDb = externalApp.database();
+
+/* ============================
+   عناصر الـ DOM وحالة التطبيق
+   ============================ */
+const plateInput = document.getElementById('plate');
+const suggestionsBox = document.getElementById('suggestions');
+const nameInput = document.getElementById('name');
+const entryGateInput = document.getElementById('entryGate');
+const notesInput = document.getElementById('notes');
+const logForm = document.getElementById('logForm');
+const toastEl = document.getElementById('toast');
+
+let carsData = [];
+let logs = [];
+let isAdmin = false;
+
+/* ============================
+   دوال مساعدة
+   ============================ */
+function normalizeNumber(s){
+  if(!s) return '';
+  return s.replace(/\s+/g,'').toLowerCase();
+}
+function showToast(msg, ms = 2200){
+  toastEl.textContent = msg;
+  toastEl.classList.remove('hidden');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=> toastEl.classList.add('hidden'), ms);
+}
+function formatTime(date){
+  let h = date.getHours(), m = date.getMinutes();
+  const ampm = h >= 12 ? 'م' : 'ص';
+  h = h % 12 || 12;
+  m = m < 10 ? '0'+m : m;
+  return h + ':' + m + ' ' + ampm;
+}
+function formatDateArabic(date){
+  return date.toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+/* ============================
+   تحميل بيانات السيارات من hnu-3069 مع كاش محلي
+   ============================ */
+async function loadCarsData(){
+  try {
+    const snap = await externalDb.ref('cars').once('value');
+    const obj = snap.val();
+    if(obj){
+      carsData = Object.keys(obj).map(k => ({ key: k, ...obj[k] }));
+      localStorage.setItem('cachedCarsData', JSON.stringify(carsData));
+      console.log('✅ تم تحميل بيانات السيارات من hnu-3069.');
+    } else {
+      carsData = JSON.parse(localStorage.getItem('cachedCarsData') || '[]');
+      console.log('ℹ️ لا توجد بيانات في hnu-3069، استخدام الكاش المحلي إن وُجد.');
+    }
+  } catch (err) {
+    console.warn('⚠️ فشل الوصول لـ hnu-3069 — استخدام الكاش المحلي إن وُجد.');
+    carsData = JSON.parse(localStorage.getItem('cachedCarsData') || '[]');
+  }
+}
+loadCarsData();
+
+/* ============================
+   اقتراحات (Autocomplete)
+   ============================ */
+let currentSuggestions = [];
+let highlightedIndex = -1;
+
+function renderSuggestions(matches){
+  suggestionsBox.innerHTML = '';
+  if(!matches || matches.length === 0){
+    suggestionsBox.innerHTML = '<div class="no-suggestion">لا توجد نتائج</div>';
+    suggestionsBox.classList.remove('hidden');
+    currentSuggestions = [];
+    highlightedIndex = -1;
+    return;
+  }
+  currentSuggestions = matches.slice(0, 12);
+  currentSuggestions.forEach((car, idx) => {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
+    div.setAttribute('data-idx', idx);
+    div.innerHTML = `<div class="font-semibold text-right">${car.number||''}</div>
+                     <div class="text-sm text-gray-600 text-right">${car.name||''} — ${car.college||car.company||''}</div>`;
+    div.addEventListener('click', () => selectSuggestion(idx));
+    suggestionsBox.appendChild(div);
+  });
+  highlightedIndex = -1;
+  suggestionsBox.classList.remove('hidden');
+}
+
+function selectSuggestion(idx){
+  const car = currentSuggestions[idx];
+  if(!car) return;
+  nameInput.value = car.name || '';
+  plateInput.value = car.number || '';
+  entryGateInput.value = car.college || car.company || '';
+  notesInput.value = (car.company && car.company !== 'لا يوجد') ? car.company : (car.phone || '');
+  suggestionsBox.classList.add('hidden');
+  currentSuggestions = [];
+  highlightedIndex = -1;
+}
+
+function fetchSuggestionsFromCache(prefix){
+  if(!prefix || prefix.length < 2){
+    renderSuggestions([]);
+    return;
+  }
+  const np = normalizeNumber(prefix);
+  const starts = [], contains = [];
+  for(const car of carsData){
+    if(!car.number) continue;
+    const nn = normalizeNumber(car.number);
+    if(nn.startsWith(np)) starts.push(car);
+    else if(nn.includes(np)) contains.push(car);
+  }
+  renderSuggestions(starts.concat(contains));
+}
+
+function debounce(fn, delay=180){ let t; return function(...args){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,args), delay); }; }
+const debouncedFetch = debounce(v => fetchSuggestionsFromCache(v), 180);
+
+plateInput.addEventListener('input', function(e){
+  const v = this.value.trim();
+  if(v.length >= 2) debouncedFetch(v);
+  else { suggestionsBox.classList.add('hidden'); suggestionsBox.innerHTML = ''; currentSuggestions = []; highlightedIndex = -1; }
+});
+plateInput.addEventListener('keydown', function(e){
+  if(suggestionsBox.classList.contains('hidden')) return;
+  const items = suggestionsBox.querySelectorAll('.suggestion-item');
+  if(e.key === 'ArrowDown'){ e.preventDefault(); if(highlightedIndex < items.length - 1) highlightedIndex++; updateHighlight(items); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); if(highlightedIndex > 0) highlightedIndex--; updateHighlight(items); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(highlightedIndex >= 0) selectSuggestion(highlightedIndex); }
+  else if(e.key === 'Escape'){ suggestionsBox.classList.add('hidden'); }
+});
+function updateHighlight(items){ items.forEach(it => it.classList.remove('active')); if(highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].classList.add('active'); }
+document.addEventListener('click', (e) => { if(!document.getElementById('plate').contains(e.target) && !suggestionsBox.contains(e.target)) suggestionsBox.classList.add('hidden'); });
+
+/* ============================
+   أوفلاين
+   ============================ */
+function saveOfflineLog(log){
+  let offlineLogs = JSON.parse(localStorage.getItem('offlineLogs') || '[]');
+  offlineLogs.push(log);
+  localStorage.setItem('offlineLogs', JSON.stringify(offlineLogs));
+  const offlineKey = 'offline-' + Date.now();
+  logs.push({ ...log, key: offlineKey, _offline: true });
+  renderLogs();
+  showToast('📴 تم حفظ السجل محليًا (وضع عدم الاتصال).');
+}
+
+async function syncOfflineLogs(){
+  const offlineLogs = JSON.parse(localStorage.getItem('offlineLogs') || '[]');
+  if(!offlineLogs || offlineLogs.length === 0) return;
+  try { for(const log of offlineLogs){ await db.ref('carLogs').push(log); }
+    localStorage.removeItem('offlineLogs');
+    showToast(`✅ تم رفع ${offlineLogs.length} سجل من وضع عدم الاتصال.`);
+    setTimeout(() => { loadLogs(); }, 700);
+  } catch (err){ console.error('خطأ أثناء مزامنة السجلات:', err); showToast('⚠️ فشل مزامنة السجلات، سيعاد المحاولة لاحقًا.'); }
+}
+window.addEventListener('online', () => { loadCarsData().then(() => syncOfflineLogs()); });
+if(navigator.onLine) { loadCarsData(); syncOfflineLogs(); }
+
+/* ============================
+   تحميل وعرض السجلات
+   ============================ */
+function loadLogs(){
+  db.ref('carLogs').on('value', snapshot => {
+    const obj = snapshot.val();
+    logs = [];
+    if(obj){ Object.keys(obj).forEach(k => { logs.push({ key: k, ...obj[k] }); }); }
+    const offlineLocal = JSON.parse(localStorage.getItem('offlineLogs') || '[]');
+    if(offlineLocal && offlineLocal.length){
+      offlineLocal.forEach(ol => {
+        const keyComp = `${(ol.plate||'') }||${(ol.entryTime||'') }||${(ol.date||'')}`;
+        const exists = logs.find(l => `${l.plate||''}||${l.entryTime||''}||${l.date||''}` === keyComp);
+        if(!exists){ logs.push({ ...ol, key: 'offline-local-' + Math.random().toString(36).slice(2), _offline:true }); }
+      });
+    }
+    populateDateFilter();
+    renderLogs();
+  });
+}
+
+function populateDateFilter(){
+  const dateFilter = document.getElementById('dateFilter');
+  const uniqueDates = [...new Set(logs.map(l => l.date))];
+  dateFilter.innerHTML = '<option value="">كل الأيام</option>';
+  uniqueDates.forEach(d => { const opt = document.createElement('option'); opt.value = d; opt.textContent = d; dateFilter.appendChild(opt); });
+}
+
+function renderLogs(){
+  const tbody = document.getElementById('logsBody');
+  tbody.innerHTML = '';
+  const dateVal = document.getElementById('dateFilter').value;
+  const searchVal = (document.getElementById('searchInput').value || '').toLowerCase();
+  const seen = new Set();
+  const display = [...logs].reverse();
+  let index = 0; let lastDate = '';
+  display.forEach(log => {
+    const comp = `${(log.plate||'')}||${(log.entryTime||'')}||${(log.date||'')}`;
+    if(seen.has(comp)) return; seen.add(comp);
+    if(dateVal && log.date !== dateVal) return;
+    if(searchVal && !((log.name||'').toLowerCase().includes(searchVal) || (log.plate||'').toLowerCase().includes(searchVal) || (log.entryGate||'').toLowerCase().includes(searchVal) || (log.notes||'').toLowerCase().includes(searchVal))) return;
+    if(log.date !== lastDate){
+      const trSep = document.createElement('tr'); const td = document.createElement('td');
+      td.colSpan = 8; td.className = 'date-separator'; td.textContent = '📅 ' + log.date; trSep.appendChild(td); tbody.appendChild(trSep); lastDate = log.date;
+    }
+    index++;
+    const tr = document.createElement('tr');
+    const offlineBadge = log._offline ? `<span class="offline-badge">وضع عدم الاتصال</span>` : '';
+    tr.innerHTML = `<td class="p-3 border text-center">${index}</td>
+      <td class="p-3 border">${offlineBadge} ${log.name || ''}</td>
+      <td class="p-3 border">${log.plate || ''}</td>
+      <td class="p-3 border">${log.entryTime || ''}</td>
+      <td class="p-3 border">${log.entryGate || ''}</td>
+      <td class="p-3 border">${log.exitTime ? log.exitTime : '-'}</td>
+      <td class="p-3 border">${log.notes || ''}</td>
+      <td class="p-3 border text-center space-x-1">
+        ${ (isAdmin && !log.exitTime) ? `<button onclick="registerExit('${log.key}')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs">🚦 خروج</button>` : '' }
+        ${ isAdmin ? `<button onclick="deleteLog('${log.key}')" class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs">🗑️ حذف</button>` : '' }
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('dateFilter').addEventListener('change', renderLogs);
+document.getElementById('searchInput').addEventListener('input', renderLogs);
+
+/* ============================
+   إرسال النموذج
+   ============================ */
+logForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  if(!isAdmin) return;
+  const errorBox = document.getElementById('errorBox');
+  errorBox.classList.add('hidden'); errorBox.textContent = '';
+  const name = nameInput.value.trim();
+  const plate = plateInput.value.trim();
+  const entryGate = entryGateInput.value.trim();
+  const notes = notesInput.value.trim();
+  const existing = logs.find(l => l.plate === plate && !l.exitTime);
+  if(existing){ errorBox.textContent = `🚫 السيارة ${plate} مسجلة بالفعل ولم تُسجل خروج.`; errorBox.classList.remove('hidden'); return; }
+  const entryTime = formatTime(new Date());
+  const date = formatDateArabic(new Date());
+  const logData = { name, plate, entryGate, notes, entryTime, exitTime: null, date };
+  if(navigator.onLine){
+    db.ref('carLogs').push(logData).then(() => { showToast('✅ تم تسجيل الدخول.'); }).catch(err => { console.error('خطأ أثناء الإرسال:',err); saveOfflineLog(logData); });
+  } else { saveOfflineLog(logData); }
+  logForm.reset();
+  suggestionsBox.classList.add('hidden');
+});
+
+/* ============================
+   تسجيل الخروج للسجلات
+   ============================ */
+function registerExit(key){
+  if(!isAdmin) return;
+  if(key && key.startsWith && key.startsWith('offline')){
+    const idx = logs.findIndex(l => l.key === key);
+    if(idx !== -1){
+      logs[idx].exitTime = formatTime(new Date());
+      let offlineLogs = JSON.parse(localStorage.getItem('offlineLogs') || '[]');
+      const oi = offlineLogs.findIndex(o => o.plate === logs[idx].plate && !o.exitTime && o.entryTime === logs[idx].entryTime && o.date === logs[idx].date);
+      if(oi !== -1){ offlineLogs[oi].exitTime = logs[idx].exitTime; localStorage.setItem('offlineLogs', JSON.stringify(offlineLogs)); }
+      renderLogs(); showToast('✅ تم تسجيل الخروج محليًا (وضع عدم الاتصال).');
+    }
+  } else { db.ref('carLogs/' + key + '/exitTime').set(formatTime(new Date())); }
+}
+
+/* ============================
+   حذف سجل
+   ============================ */
+function deleteLog(key){
+  if(!isAdmin) return;
+  if(!confirm('هل تريد حذف هذا السجل؟')) return;
+  if(key && key.startsWith && key.startsWith('offline')){
+    const idx = logs.findIndex(l => l.key === key);
+    if(idx !== -1){
+      const plate = logs[idx].plate; const entryTime = logs[idx].entryTime; const date = logs[idx].date;
+      logs.splice(idx,1);
+      let offlineLogs = JSON.parse(localStorage.getItem('offlineLogs') || '[]');
+      offlineLogs = offlineLogs.filter(o => !(o.plate === plate && o.entryTime === entryTime && o.date === date));
+      localStorage.setItem('offlineLogs', JSON.stringify(offlineLogs));
+      renderLogs(); showToast('🗑️ تم حذف السجل المحلي.');
+    }
+  } else { db.ref('carLogs/' + key).remove(); }
+}
+
+/* ============================
+   إعداد واجهة الأدمن
+   ============================ */
+function openAdminModal(){ document.getElementById('adminModal').classList.remove('hidden'); }
+function closeAdminModal(){ document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminUser').value=''; document.getElementById('adminPass').value=''; document.getElementById('adminError').classList.add('hidden'); }
+
+function checkAdminLogin(){
+  const user = document.getElementById('adminUser').value.trim();
+  const pass = document.getElementById('adminPass').value.trim();
+  const remember = document.getElementById('rememberMe').checked;
+  const adminError = document.getElementById('adminError');
+  if(user === 'admin' && pass === '1234'){
+    isAdmin = true;
+    document.getElementById('logForm').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    if(remember) localStorage.setItem('isAdmin','true');
+    closeAdminModal();
+    loadLogs();
+    renderLogs();
+  } else {
+    adminError.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+    adminError.classList.remove('hidden');
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  isAdmin = false;
+  localStorage.removeItem('isAdmin');
+  document.getElementById('logForm').classList.add('hidden');
+  document.getElementById('logoutBtn').classList.add('hidden');
+  showToast('🔒 تم تسجيل الخروج');
+});
+
+if(localStorage.getItem('isAdmin') === 'true'){
+  isAdmin = true;
+  document.getElementById('logForm').classList.remove('hidden');
+  document.getElementById('logoutBtn').classList.remove('hidden');
+  loadLogs();
+}
+
+/* خروج تلقائي عند منتصف الليل */
+setInterval(()=>{
+  const now = new Date();
+  if(now.getHours() === 0 && now.getMinutes() === 0){
+    logs.forEach(log => {
+      if(!log.exitTime){
+        if(log.key && log.key.startsWith && log.key.startsWith('offline')){
+          const idx = logs.findIndex(l => l.key === log.key);
+          if(idx !== -1){
+            logs[idx].exitTime = '12:00 ص';
+            let offlineLogs = JSON.parse(localStorage.getItem('offlineLogs') || '[]');
+            const oi = offlineLogs.findIndex(o => o.plate === logs[idx].plate && !o.exitTime && o.entryTime === logs[idx].entryTime);
+            if(oi !== -1){ offlineLogs[oi].exitTime = '12:00 ص'; localStorage.setItem('offlineLogs', JSON.stringify(offlineLogs)); }
+          }
+        } else { db.ref('carLogs/' + log.key + '/exitTime').set('12:00 ص'); }
+      }
+    });
+    renderLogs();
+  }
+}, 60000);
+
+loadLogs();
+
+</script>
+</body>
+</html>
