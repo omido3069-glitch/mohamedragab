@@ -3,118 +3,134 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-    // إعدادات Firebase الخاصة بك
-    const firebaseConfig = {
-      apiKey: "AIzaSyCRR-uXoz14YOudO0K740Y5AUbivB0R5M0",
-      authDomain: "hnu-3069.firebaseapp.com",
-      databaseURL: "https://hnu-3069-default-rtdb.firebaseio.com",
-      projectId: "hnu-3069",
-      storageBucket: "hnu-3069.firebasestorage.app",
-      messagingSenderId: "98084688599",
-      appId: "1:98084688599:web:e272972e76d63f8ae01692",
-      measurementId: "G-P0E5EC7CHJ"
-    };
-
-    // بدء Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // تسجيل الدخول
-    window.loginUser = async function (event) {
-      event.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const status = document.getElementById("status");
-
-      status.textContent = "جارٍ تسجيل الدخول...";
-      status.className = "text-gray-300 text-center mt-3";
-
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        status.textContent = "✅ تم تسجيل الدخول بنجاح!";
-        status.className = "text-green-400 text-center mt-3";
-
-        // ✅ تحويل المستخدم لصفحة "اختيار"
-        setTimeout(() => {
-          window.location.href = "ekhtiar.html";
-        }, 1500);
-
-      } catch (error) {
-        status.textContent = "❌ " + (error.message.includes("auth/") ? "بيانات غير صحيحة" : error.message);
-        status.className = "text-red-400 text-center mt-3";
-      }
-    }
-  </script>
-
+  <title>الموقع تحت الصيانة</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+    }
+
     body {
-      background: url('122.jpg') no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'Tajawal', sans-serif;
-      position: relative;
+      background: linear-gradient(135deg, #2b2d42, #8d99ae);
+      color: #edf2f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
     }
 
-    body::before {
-      content: "";
+    .container {
+      position: relative;
+      z-index: 2;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+    }
+
+    .loader {
+      width: 80px;
+      height: 80px;
+      border: 8px solid rgba(255, 255, 255, 0.2);
+      border-top: 8px solid #ef233c;
+      border-radius: 50%;
+      animation: spin 1.5s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); color: #ef233c; }
+      50% { transform: scale(1.1); color: #d90429; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .footer {
       position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.55);
-      z-index: 0;
+      bottom: 15px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      line-height: 1.6;
     }
 
-    .login-box {
+    .footer a {
+      color: #ef233c;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+      color: #ff4d6d;
+    }
+
+    .designer {
+      font-size: 0.85rem;
+      color: #edf2f4;
+      opacity: 0.8;
+    }
+
+    /* ✨ تأثير الإضاءة على الاسم ✨ */
+    .shine {
       position: relative;
-      z-index: 10;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+      display: inline-block;
+      background: linear-gradient(90deg, #ef233c, #fff, #ef233c);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shineMove 3s linear infinite;
+    }
+
+    @keyframes shineMove {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
   </style>
 </head>
-
-<body class="flex items-center justify-center min-h-screen text-white">
-
-  <div class="login-box rounded-3xl p-10 w-[90%] max-w-md transition-transform duration-300 hover:scale-[1.02]">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-white mb-2 drop-shadow-lg">مرحبًا بك</h1>
-      <p class="text-gray-200 text-sm">سجّل الدخول للوصول إلى حسابك</p>
-    </div>
-
-    <form class="space-y-6" onsubmit="loginUser(event)">
-      <div>
-        <label class="block mb-2 text-sm text-gray-300">البريد الإلكتروني</label>
-        <input id="email" type="email" placeholder="example@email.com"
-               class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 focus:outline-none focus:border-indigo-400 text-white placeholder-gray-300 shadow-inner" required>
-      </div>
-
-      <div>
-        <label class="block mb-2 text-sm text-gray-300">كلمة المرور</label>
-        <input id="password" type="password" placeholder="••••••••"
-               class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 focus:outline-none focus:border-indigo-400 text-white placeholder-gray-300 shadow-inner" required>
-      </div>
-
-      <button type="submit"
-              class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 py-3 rounded-xl font-semibold text-white shadow-lg hover:opacity-90 transition">
-        تسجيل الدخول
-      </button>
-
-      <div id="status"></div>
-    </form>
-
-    <div class="text-center mt-8 text-gray-300 text-sm">
-      ليس لديك حساب؟ <a href="#" class="text-indigo-400 hover:underline">إنشاء حساب جديد</a>
-    </div>
+<body>
+  <div class="container">
+    <div class="icon">⚙️</div>
+    <h1>الموقع تحت الصيانة</h1>
+    <p>نقوم حالياً بإجراء بعض التحديثات لتحسين تجربتك. <br> سنعود قريباً جداً!</p>
+    <div class="loader"></div>
   </div>
 
+  <div class="footer">
+    © 2025 جميع الحقوق محفوظة | <a href="#">موقعك الإلكتروني</a><br>
+    <div class="designer">تم التصميم بواسطة / <span class="shine">محمد رجب</span></div>
+  </div>
 </body>
 </html>
