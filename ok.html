@@ -179,6 +179,7 @@
   <p>اختر النظام الذي ترغب في الدخول إليه</p>
 
   <div class="menu">
+    <!-- سيستم السيارات -->
     <div class="item-wrapper" onclick="openLink('cars')">
       <div class="ring"></div>
       <div class="ring"></div>
@@ -189,7 +190,8 @@
       </div>
     </div>
 
-    <div class="item-wrapper" onclick="openLink('attendance')">
+    <!-- نظام التسجيل اليومي -->
+    <div class="item-wrapper" onclick="openLink('day')">
       <div class="ring"></div>
       <div class="ring"></div>
       <div class="menu-item">
@@ -199,6 +201,7 @@
       </div>
     </div>
 
+    <!-- شركة سيل الأمنية -->
     <div class="item-wrapper" onclick="openLink('company')">
       <div class="ring"></div>
       <div class="ring"></div>
@@ -209,6 +212,7 @@
       </div>
     </div>
 
+    <!-- شركات العمالة -->
     <div class="item-wrapper" onclick="openLink('workers')">
       <div class="ring"></div>
       <div class="ring"></div>
@@ -227,10 +231,10 @@
   <script>
     function openLink(target) {
       const links = {
-        cars: "#",
-        attendance: "#",
-        company: "#",
-        workers: "#"
+        cars: "cars.html",
+        day: "day.html",
+        company: "company.html",
+        workers: "workers.html"
       };
       window.location.href = links[target] || "#";
     }
