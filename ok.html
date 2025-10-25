@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة شركة سيل للأنظمة الأمنية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #0f172a, #020617 80%);
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      text-align: center;
+      background: linear-gradient(90deg, #3b82f6, #22d3ee, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    p {
+      color: #bbb;
+      text-align: center;
+      margin-bottom: 35px;
+      font-size: 15px;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 25px;
+      justify-items: center;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .item-wrapper {
+      position: relative;
+      width: 140px;
+      height: 160px;
+    }
+
+    .menu-item {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+      z-index: 2;
+      position: relative;
+      padding-top: 15px;
+    }
+
+    .menu-item img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      box-shadow: 0 0 15px rgba(56,189,248,0.4);
+    }
+
+    .menu-item i {
+      font-size: 28px;
+      margin-bottom: 5px;
+      color: #38bdf8;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-item span {
+      font-size: 14px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-6px) scale(1.05);
+      background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(168,85,247,0.2));
+    }
+
+    .menu-item:hover i {
+      transform: scale(1.15);
+      color: #60a5fa;
+    }
+
+    .ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: spin 8s linear infinite;
+      border: 2px dashed rgba(255,255,255,0.08);
+      z-index: 1;
+    }
+
+    .ring::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: #3b82f6;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 10px #3b82f6;
+    }
+
+    .ring:nth-child(2) {
+      width: 180px;
+      height: 180px;
+      animation: spinReverse 10s linear infinite;
+      border: 2px dotted rgba(56,189,248,0.1);
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes spinReverse {
+      0% { transform: translate(-50%, -50%) rotate(360deg); }
+      100% { transform: translate(-50%, -50%) rotate(0deg); }
+    }
+
+    footer {
+      margin-top: 40px;
+      color: #aaa;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    footer span {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 22px; }
+      p { font-size: 13px; margin-bottom: 25px; }
+      .menu { gap: 18px; }
+      .item-wrapper { width: 120px; height: 140px; }
+      .ring { width: 130px; height: 130px; }
+      .ring:nth-child(2) { width: 150px; height: 150px; }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>بوابة الأنظمة</h1>
+  <p>اختر النظام الذي ترغب في الدخول إليه</p>
+
+  <div class="menu">
+    <div class="item-wrapper" onclick="openLink('cars')">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="menu-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" alt="شعار">
+        <i class="fas fa-car"></i>
+        <span>سيستم السيارات</span>
+      </div>
+    </div>
+
+    <div class="item-wrapper" onclick="openLink('attendance')">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="menu-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/992/992700.png" alt="شعار">
+        <i class="fas fa-calendar-check"></i>
+        <span>نظام التسجيل اليومي</span>
+      </div>
+    </div>
+
+    <div class="item-wrapper" onclick="openLink('company')">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="menu-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="شعار">
+        <i class="fas fa-shield-alt"></i>
+        <span>شركة سيل الأمنية</span>
+      </div>
+    </div>
+
+    <div class="item-wrapper" onclick="openLink('workers')">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="menu-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="شعار">
+        <i class="fas fa-users-cog"></i>
+        <span>شركات العمالة</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    تم التصميم والتطوير بواسطة / <span>محمد رجب</span>
+  </footer>
+
+  <script>
+    function openLink(target) {
+      const links = {
+        cars: "#",
+        attendance: "#",
+        company: "#",
+        workers: "#"
+      };
+      window.location.href = links[target] || "#";
+    }
+  </script>
+</body>
+</html>
