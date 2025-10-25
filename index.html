@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الموقع تحت الصيانة</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سيستم سيارات جامعة حلوان الأهلية</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
 
     * {
       margin: 0;
@@ -15,50 +15,44 @@
     }
 
     body {
-      background: linear-gradient(135deg, #2b2d42, #8d99ae);
-      color: #edf2f4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       height: 100vh;
-      text-align: center;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
       overflow: hidden;
+      position: relative;
     }
 
-    .container {
+    .login-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+      padding: 40px 50px;
+      width: 400px;
+      color: #fff;
+      text-align: center;
+      animation: float 3s ease-in-out infinite;
       position: relative;
       z-index: 2;
-      padding: 30px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      animation: fadeIn 1.5s ease-in-out;
     }
 
-    .icon {
-      font-size: 80px;
-      margin-bottom: 20px;
-      animation: pulse 2s infinite;
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 25px;
-    }
-
-    .loader {
-      width: 80px;
-      height: 80px;
-      border: 8px solid rgba(255, 255, 255, 0.2);
-      border-top: 8px solid #ef233c;
+    .logo {
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
-      animation: spin 1.5s linear infinite;
-      margin: 0 auto;
+      object-fit: cover;
+      border: 4px solid #fff;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.7);
+      margin-bottom: 20px;
+      animation: spin 10s linear infinite, glowLogo 3s ease-in-out infinite;
     }
 
     @keyframes spin {
@@ -66,71 +60,161 @@
       100% { transform: rotate(360deg); }
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); color: #ef233c; }
-      50% { transform: scale(1.1); color: #d90429; }
+    @keyframes glowLogo {
+      0%, 100% {
+        box-shadow: 0 0 25px #fff, 0 0 40px #00c6ff;
+      }
+      50% {
+        box-shadow: 0 0 35px #ffeb3b, 0 0 60px #ff416c;
+      }
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    .system-title {
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #ff4b2b, #ff416c, #ffeb3b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-align: center;
+      margin-bottom: 25px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      animation: glow 3s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        text-shadow: 0 0 15px #ff416c, 0 0 30px #ffeb3b;
+      }
+      50% {
+        text-shadow: 0 0 25px #00fff7, 0 0 50px #00c6ff;
+      }
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #ff4b2b, #ff416c);
+      border: none;
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ff416c;
+    }
+
+    .btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.3);
+      transform: skewX(-20deg);
+      transition: 0.5s;
+    }
+
+    .btn:hover::after {
+      left: 100%;
     }
 
     .footer {
-      position: absolute;
-      bottom: 15px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.9rem;
-      opacity: 0.8;
+      margin-top: 25px;
+      font-size: 14px;
+      color: #fff;
+      opacity: 0.9;
       line-height: 1.6;
     }
 
-    .footer a {
-      color: #ef233c;
-      text-decoration: none;
-      transition: 0.3s;
+    .footer strong {
+      display: block;
+      font-size: 18px;
+      color: #ffeb3b;
+      margin-top: 5px;
     }
 
-    .footer a:hover {
-      text-decoration: underline;
-      color: #ff4d6d;
+    .footer span {
+      display: block;
+      font-size: 14px;
+      color: #00fff7;
     }
 
-    .designer {
-      font-size: 0.85rem;
-      color: #edf2f4;
-      opacity: 0.8;
+    .success-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      font-size: 26px;
+      font-weight: bold;
+      padding: 25px 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      opacity: 0;
+      transition: 0.6s ease;
+      z-index: 10;
     }
 
-    /* ✨ تأثير الإضاءة على الاسم ✨ */
-    .shine {
-      position: relative;
+    .success-message.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .smile {
       display: inline-block;
-      background: linear-gradient(90deg, #ef233c, #fff, #ef233c);
-      background-size: 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shineMove 3s linear infinite;
+      animation: smiley 1.5s ease-in-out infinite;
     }
 
-    @keyframes shineMove {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+    @keyframes smiley {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(15deg); }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="icon">⚙️</div>
-    <h1>الموقع تحت الصيانة</h1>
-    <p>نقوم حالياً بإجراء بعض التحديثات لتحسين تجربتك. <br> سنعود قريباً جداً!</p>
-    <div class="loader"></div>
+  <div class="login-box">
+    <img src="1234.jpg" alt="شعار جامعة حلوان الأهلية" class="logo">
+    <h1 class="system-title">🚗 سيستم سيارات جامعة حلوان الأهلية 🚗</h1>
+    <h2>تسجيل الدخول</h2>
+
+    <form>
+      <button class="btn" type="button" onclick="enterSystem()">دخول</button>
+      <div class="footer">
+        تم التصميم والتطوير بواسطة
+        <strong>محمد رجب</strong>
+        <span>📅 تاريخ آخر تحديث: 24 / 10 / 2025</span>
+      </div>
+    </form>
   </div>
 
-  <div class="footer">
-    © 2025 جميع الحقوق محفوظة | <a href="#">موقعك الإلكتروني</a><br>
-    <div class="designer">تم التصميم بواسطة / <span class="shine">محمد رجب</span></div>
+  <div id="successMessage" class="success-message">
+    ✅ تم الدخول إلى النظام <span class="smile">😊</span>
   </div>
+
+  <script>
+    function enterSystem() {
+      const msg = document.getElementById("successMessage");
+      msg.classList.add("show");
+
+      // بعد ثانيتين يتم تحويل المستخدم إلى صفحة ok.html
+      setTimeout(() => {
+        window.location.href = "ok.html";
+      }, 2000);
+    }
+  </script>
 </body>
 </html>
