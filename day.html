@@ -36,16 +36,16 @@
     /* العنوان */
     .title {
       color: var(--blue-dark);
-      font-size:24px; /* زيادة الحجم */
-      font-weight:900; /* زيادة سمك الخط */
+      font-size:24px;
+      font-weight:900;
       text-align:center;
-      margin-top:10px; /* زيادة الهامش العلوي */
-      margin-bottom:4px; /* تقليل الهامش السفلي لتقريب التذييل */
-      letter-spacing: 0.5px; /* إضافة تباعد بسيط للحروف */
-      text-shadow: 0 1px 2px rgba(0,0,0,0.05); /* إضافة ظل خفيف */
+      margin-top:10px;
+      margin-bottom:4px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
-    /* شريط الحالة (أزرق ثابت لكن النص يتغير) — متحرك من اليمين لليسار */
+    /* شريط الحالة */
     .status-wrap{
       width:100%;
       max-width:520px;
@@ -92,7 +92,7 @@
       font-size:15px;
     }
 
-    /* الحقول - مربعات ملونة */
+    /* الحقول */
     .input {
       width:100%;
       padding:12px 14px;
@@ -124,7 +124,6 @@
       align-items:center;
     }
     
-    /* إضافة تنسيق جديد لأدوات البحث والتصفية */
     .filter-bar {
         display: flex;
         gap: 8px;
@@ -136,18 +135,17 @@
         padding: 8px 10px;
         font-size: 14px;
         font-weight: 600;
-        height: 40px; /* لتوحيد الارتفاع */
+        height: 40px;
     }
     .filter-bar select.input {
-        flex-shrink: 0; /* لمنع تقلص قائمة التصفية */
+        flex-shrink: 0;
         width: 140px;
-        text-align: right; /* محاذاة النص لليمين */
-        padding-right: 14px; /* مسافة داخلية لليمين */
+        text-align: right;
+        padding-right: 14px;
     }
     .filter-bar .input[type="text"] {
-        flex-grow: 1; /* للسماح لحقل البحث بأخذ المساحة المتبقية */
+        flex-grow: 1;
     }
-
 
     /* زر تسجيل دخول */
     .btn-primary {
@@ -187,8 +185,7 @@
         background: var(--blue-soft);
     }
 
-
-    /* الاقتراحات — بطاقات مستقلة */
+    /* الاقتراحات */
     .suggestions {
       margin-top:8px;
       display:flex;
@@ -211,7 +208,7 @@
     }
     .suggestion-card:hover{ transform:translateY(-4px); box-shadow:0 8px 20px rgba(13,71,161,0.08) }
 
-    /* الجدول (قابل للتمرير على الموبايل) */
+    /* الجدول */
     .table-wrap{
       width:100%;
       max-width:520px;
@@ -224,12 +221,10 @@
       table {
       width:100%;
       border-collapse:collapse;
-      /* تم إزالة min-width: 700px للسماح للجدول بالتكيف مع العرض الكامل للشاشة */
     }
     th, td{
       padding:8px; 
       text-align:center;
-      /* تم زيادة سمك وغمق لون الخط الفاصل بين السجلات */
       border-bottom:2px solid #ccddee; 
       font-weight:700;
       color:var(--black-bold);
@@ -262,12 +257,12 @@
 
     /* footer */
     .footer { 
-      margin-top:6px; /* تقليل الهامش العلوي لتقريب التذييل من العنوان */
-      color: #999; /* لون رمادي أفتح وأكثر هدوءًا */
-      font-weight: 600; /* خط أقل سمكًا */
-      font-size: 12px; /* حجم أصغر */
+      margin-top:6px;
+      color: #999;
+      font-weight: 600;
+      font-size: 12px;
       text-align: center;
-      padding-bottom: 10px; /* إضافة مساحة سفلية */
+      padding-bottom: 10px;
     }
 
     /* Loader text */
@@ -305,10 +300,13 @@
       background: #f44336;
       color: white;
     }
-    /* إضافة لون تحذيري جديد للميزة الجديدة */
     .notification.warning {
-        background: #ff9800; /* برتقالي */
+        background: #ff9800;
         color: var(--black-bold);
+    }
+    .notification.info {
+        background: #2196F3;
+        color: white;
     }
 
     @keyframes slideIn {
@@ -332,7 +330,6 @@
       font-weight: 800;
       text-align: center;
       padding: 6px; 
-      /* زيادة سمك ووضوح الخطوط العلوية والسفلية للفاصل */
       border-bottom: 3px solid var(--accent);
       border-top: 3px solid var(--accent);
       font-size: 11px; 
@@ -360,25 +357,23 @@
       <span id="status" class="status">✅ البيانات محفوظة محلياً (بدون اتصال بالإنترنت)</span>
     </div>
     
-    <!-- ********************************************** -->
     <!-- زر رفع سجلات اليوم اون لاين -->
-    <!-- ********************************************** -->
     <div class="card" id="uploadCard">
         <button id="uploadBtn" class="btn-secondary">⬆️ رفع سجلات اليوم اون لاين</button>
+        <div id="syncStatus" style="margin-top:8px; font-size:12px; color:#666; text-align:center; display:none;"></div>
     </div>
-    <!-- ********************************************** -->
     
     <div class="card">
-      <label for="carNumber">رقم السيارة</label>
-      <input id="carNumber" class="input" placeholder="اكتب رقم السيارة (اكتب أول رقمين لتظهر الاقتراحات)" autocomplete="off" />
+      <label for="plate">رقم السيارة</label>
+      <input id="plate" class="input" placeholder="اكتب رقم السيارة (اكتب أول رقمين لتظهر الاقتراحات)" autocomplete="off" />
 
       <div id="suggestions" class="suggestions" aria-live="polite"></div>
 
       <label for="name">الاسم</label>
-		      <input id="name" class="input" placeholder="الاسم" />
+      <input id="name" class="input" placeholder="الاسم" />
 
-      <label for="college">جهة الدخول</label>
-		      <input id="college" class="input" placeholder="جهة الدخول" />
+      <label for="entryGate">جهة الدخول</label>
+      <input id="entryGate" class="input" placeholder="جهة الدخول" />
 
       <label for="notes">ملاحظات</label>
       <textarea id="notes" class="input" placeholder="ملاحظات (اختياري)"></textarea>
@@ -390,19 +385,14 @@
       </div>
     </div>
     
-    <!-- ********************************************** -->
-    <!-- إضافة أدوات التصفية والبحث المطلوبة من المستخدم -->
-    <!-- ********************************************** -->
+    <!-- أدوات التصفية والبحث -->
     <div class="filter-bar">
-        <!-- فلتر حسب اليوم -->
         <select id="filterDate" class="input" title="فلتر حسب اليوم">
             <option value="">كل الأيام</option>
         </select>
         
-        <!-- خانة بحث بالاسم أو رقم السيارة -->
         <input type="text" id="searchQuery" class="input" placeholder="بحث بالاسم أو رقم السيارة" title="بحث بالاسم أو رقم السيارة">
     </div>
-    <!-- ********************************************** -->
 
     <div class="table-wrap" style="margin-top:12px;">
       <table id="recordsTable" aria-live="polite">
@@ -426,11 +416,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getDatabase, ref, get, child, set // إضافة set لرفع البيانات
+      getDatabase, ref, get, child, set, onValue, update
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // ====== إعداد Firebase (قراءة البيانات فقط) ======
-    // ملاحظة: يجب استبدال هذه القيم بمتغيرات البيئة في الإنتاج
+    // ====== إعداد Firebase ======
     const firebaseConfig = {
       apiKey: "AIzaSyCRR-uXoz14YOudO0K740Y5AUbivB0R5M0",
       authDomain: "hnu-3069.firebaseapp.com",
@@ -447,55 +436,28 @@
     const dbRef = ref(db);
 
     // ====== العناصر الأساسية في DOM ======
-    const carNumberInput = document.getElementById('carNumber');
+    const plateInput = document.getElementById('plate');
     const nameInput = document.getElementById('name');
-    const collegeInput = document.getElementById('college');
+    const entryGateInput = document.getElementById('entryGate');
     const notesInput = document.getElementById('notes');
     const loginBtn = document.getElementById('loginBtn');
     const suggestionsWrap = document.getElementById('suggestions');
     const recordsBody = document.getElementById('recordsBody');
     const statusSpan = document.getElementById('status');
-    
-    // **********************************************
-    // إضافة عناصر DOM الجديدة
-    // **********************************************
     const filterDateInput = document.getElementById('filterDate');
     const searchQueryInput = document.getElementById('searchQuery');
-    const uploadBtn = document.getElementById('uploadBtn'); // زر الرفع الجديد
-    // **********************************************
-
-    // ====== وظيفة ملء قائمة التصفية بالتواريخ الموجودة ======
-    function populateDateFilter() {
-        // جمع التواريخ الفريدة من السجلات
-        const uniqueDates = [...new Set(recordsCache.map(rec => formatDate(rec.timestamp)))];
-        
-        // فرز التواريخ من الأحدث للأقدم
-        uniqueDates.sort((a, b) => new Date(b) - new Date(a));
-        
-        // مسح القائمة الحالية وإضافة خيار "كل الأيام"
-        filterDateInput.innerHTML = '<option value="">كل الأيام</option>';
-        
-        // إضافة الخيارات الجديدة
-        uniqueDates.forEach(date => {
-            const option = document.createElement('option');
-            option.value = date;
-            
-            // تحويل التاريخ إلى صيغة عربية (مثال: الأربعاء، 15 مايو 2024)
-            const formattedDate = new Date(date).toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            option.textContent = formattedDate;
-            
-            filterDateInput.appendChild(option);
-        });
-    }
+    const uploadBtn = document.getElementById('uploadBtn');
+    const syncStatus = document.getElementById('syncStatus');
 
     // ====== متغيرات التخزين المؤقت ======
-    let carsCache = []; // لتخزين بيانات السيارات من Firebase
-    let recordsCache = []; // لتخزين سجلات الدخول والخروج من Local Storage
-    let filteredRecords = []; // لتخزين السجلات بعد التصفية والبحث
-    
+    let carsCache = [];
+    let recordsCache = [];
+    let filteredRecords = [];
+    let isOnline = navigator.onLine;
+    let realtimeListenerActive = false;
+
     // ====== وظائف مساعدة ======
 
-    // عرض إشعار مؤقت
     function showNotification(message, type = 'success') {
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
@@ -508,7 +470,6 @@
       }, 3000);
     }
 
-    // تنسيق الوقت إلى صيغة 12 ساعة (مثال: 10:30 ص)
     function formatTime(timestamp) {
       const date = new Date(timestamp);
       const hours = date.getHours();
@@ -519,7 +480,6 @@
       return `${formattedHours}:${formattedMinutes} ${ampm}`;
     }
 
-    // تنسيق التاريخ (مثال: 2024-05-15)
     function formatDate(timestamp) {
         const date = new Date(timestamp);
         const year = date.getFullYear();
@@ -530,46 +490,150 @@
 
     // ====== وظائف Local Storage ======
 
-    // تحميل السجلات من Local Storage
     function loadRecordsFromLocalStorage() {
       const records = localStorage.getItem('carRecords');
       recordsCache = records ? JSON.parse(records) : [];
-      // الفرز حسب أحدث سجل (timestamp)
-      recordsCache.sort((a, b) => b.timestamp - a.timestamp);
-      
-      // تحديث قائمة التصفية بالتواريخ الموجودة
+      recordsCache.sort((a, b) => a.timestamp - b.timestamp);
       populateDateFilter();
-      
-      // تحديث السجلات المفلترة عند التحميل
-      applyFilters(); 
+      applyFilters();
     }
 
-    // حفظ السجلات في Local Storage
     function saveRecordsToLocalStorage() {
       localStorage.setItem('carRecords', JSON.stringify(recordsCache));
     }
 
-    // ====== جلب البيانات من Firebase ======
+    function loadCarsFromLocalStorage() {
+      const cars = localStorage.getItem('carsCached');
+      if (cars) {
+        carsCache = JSON.parse(cars);
+        return true;
+      }
+      return false;
+    }
+
+    function saveCarsToLocalStorage() {
+      localStorage.setItem('carsCached', JSON.stringify(carsCache));
+    }
+
+    // ====== وظيفة ملء قائمة التصفية بالتواريخ ======
+    function populateDateFilter() {
+        const uniqueDates = [...new Set(recordsCache.map(rec => formatDate(rec.timestamp)))];
+        uniqueDates.sort((a, b) => new Date(b) - new Date(a));
+        filterDateInput.innerHTML = '<option value="">كل الأيام</option>';
+        uniqueDates.forEach(date => {
+            const option = document.createElement('option');
+            option.value = date;
+            const formattedDate = new Date(date).toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            option.textContent = formattedDate;
+            filterDateInput.appendChild(option);
+        });
+    }
+
+    // ====== جلب بيانات السيارات من Firebase ======
     async function fetchCarsData() {
-      statusSpan.textContent = '⏳ جارٍ جلب بيانات السيارات من Firebase...';
       try {
+        statusSpan.textContent = '⏳ جارٍ جلب بيانات السيارات من Firebase...';
         const snapshot = await get(child(dbRef, 'cars'));
         if (snapshot.exists()) {
-          // تحويل الكائن إلى مصفوفة
           carsCache = Object.values(snapshot.val());
+          saveCarsToLocalStorage();
           statusSpan.textContent = '✅ تم تحديث بيانات السيارات بنجاح.';
+          isOnline = true;
+          updateStatusDisplay();
+          return true;
         } else {
           statusSpan.textContent = '⚠️ لم يتم العثور على بيانات سيارات.';
+          return false;
         }
       } catch (error) {
         console.error("خطأ في جلب بيانات السيارات:", error);
-        statusSpan.textContent = '❌ فشل جلب البيانات. قد تكون البيانات قديمة.';
+        
+        if (loadCarsFromLocalStorage()) {
+          statusSpan.textContent = '⚠️ تم تحميل البيانات المحفوظة محلياً (بدون إنترنت).';
+          isOnline = false;
+          updateStatusDisplay();
+          return true;
+        } else {
+          statusSpan.textContent = '❌ فشل جلب البيانات. تأكد من اتصالك بالإنترنت.';
+          isOnline = false;
+          updateStatusDisplay();
+          return false;
+        }
       }
     }
-    
+
+    // ====== تحديث عرض الحالة ======
+    function updateStatusDisplay() {
+      if (isOnline) {
+        statusSpan.textContent = '✅ متصل بالإنترنت - البيانات محدثة';
+      } else {
+        statusSpan.textContent = '📴 بدون إنترنت - تعمل بالبيانات المحفوظة محلياً';
+      }
+    }
+
+    // ====== المزامنة الحية (Real-time Sync) من Firebase ======
+    function setupRealtimeSync() {
+      if (realtimeListenerActive) return;
+      
+      try {
+        const today = formatDate(Date.now());
+        const datePath = today.replace(/-/g, '');
+        const recordsRef = ref(db, `records/${datePath}`);
+        
+        onValue(recordsRef, (snapshot) => {
+          if (snapshot.exists()) {
+            const firebaseRecords = snapshot.val();
+            
+            // تحويل بيانات Firebase إلى مصفوفة
+            const newRecords = Object.values(firebaseRecords).map(rec => ({
+              id: rec.id,
+              name: rec.name,
+              plate: rec.plate,
+              entryGate: rec.entryGate,
+              notes: rec.notes || '',
+              inTime: rec.inTime,
+              outTime: rec.outTime || '',
+              timestamp: rec.timestamp,
+              outTimestamp: rec.outTimestamp || null
+            }));
+            
+            // دمج السجلات: احتفظ بالسجلات المحلية الجديدة وأضف سجلات Firebase
+            const localIds = new Set(recordsCache.map(r => r.id));
+            const firebaseIds = new Set(newRecords.map(r => r.id));
+            
+            // إزالة السجلات التي تم حذفها من Firebase
+            recordsCache = recordsCache.filter(r => firebaseIds.has(r.id) || !localIds.has(r.id));
+            
+            // تحديث السجلات من Firebase
+            newRecords.forEach(fbRecord => {
+              const existingIndex = recordsCache.findIndex(r => r.id === fbRecord.id);
+              if (existingIndex >= 0) {
+                recordsCache[existingIndex] = fbRecord;
+              } else {
+                recordsCache.push(fbRecord);
+              }
+            });
+            
+            // إعادة ترتيب وحفظ
+            recordsCache.sort((a, b) => a.timestamp - b.timestamp);
+            saveRecordsToLocalStorage();
+            
+            // تحديث العرض
+            populateDateFilter();
+            applyFilters();
+          }
+        }, (error) => {
+          console.error("خطأ في المزامنة الحية:", error);
+        });
+        
+        realtimeListenerActive = true;
+      } catch (error) {
+        console.error("خطأ في إعداد المزامنة الحية:", error);
+      }
+    }
+
     // ====== رفع سجلات اليوم إلى Firebase ======
     async function uploadTodayRecords() {
-        // 1. تحديد سجلات اليوم الحالي (اليوم الذي يتم فيه الضغط على الزر)
         const today = formatDate(Date.now());
         const recordsToUpload = recordsCache.filter(rec => formatDate(rec.timestamp) === today);
         
@@ -578,91 +642,71 @@
             return;
         }
         
-        // 2. إعداد البيانات للرفع (تحويلها إلى كائن)
         const recordsObject = recordsToUpload.reduce((obj, rec) => {
-            // استخدام المعرف الفريد (id) كسجل في Firebase
             obj[rec.id] = rec;
             return obj;
         }, {});
         
-        // 3. الرفع إلى Firebase
         uploadBtn.disabled = true;
         const originalText = uploadBtn.textContent;
         uploadBtn.textContent = `⏳ جارٍ رفع ${recordsToUpload.length} سجل...`;
         
         try {
-            // استخدام دالة set لتحديث البيانات تحت مسار اليوم
-            // المسار: /records/YYYY-MM-DD
-            const datePath = today.replace(/-/g, ''); // إزالة الشرطات لتصبح 20240515
+            const datePath = today.replace(/-/g, '');
             const recordsRef = ref(db, `records/${datePath}`);
             await set(recordsRef, recordsObject);
             
             showNotification(`✅ تم رفع ${recordsToUpload.length} سجل لليوم ${today} بنجاح!`, 'success');
+            isOnline = true;
+            updateStatusDisplay();
+            
+            // تفعيل المزامنة الحية
+            setupRealtimeSync();
         } catch (error) {
             console.error("خطأ في رفع السجلات:", error);
             showNotification('❌ فشل رفع السجلات. تحقق من اتصالك بالإنترنت.', 'error');
+            isOnline = false;
+            updateStatusDisplay();
         } finally {
             uploadBtn.disabled = false;
             uploadBtn.textContent = originalText;
         }
     }
 
-    // **********************************************
-    // إضافة مستمع الحدث لزر الرفع
-    // **********************************************
-    uploadBtn.addEventListener('click', uploadTodayRecords);
-    // **********************************************
-    
-    // **********************************************
-    // إضافة وظيفة تطبيق التصفية والبحث
-    // **********************************************
+    // ====== وظيفة تطبيق التصفية والبحث ======
     function applyFilters() {
-        const selectedDate = filterDateInput.value; // التاريخ المحدد (بصيغة YYYY-MM-DD)
-        const searchQuery = searchQueryInput.value.trim().toLowerCase(); // نص البحث
+        const selectedDate = filterDateInput.value;
+        const searchQuery = searchQueryInput.value.trim().toLowerCase();
         
         filteredRecords = recordsCache.filter(rec => {
             let passesDateFilter = true;
             let passesSearchFilter = true;
             
-            // 1. تصفية حسب اليوم
             if (selectedDate) {
                 const recordDate = formatDate(rec.timestamp);
                 passesDateFilter = recordDate === selectedDate;
             }
             
-            // 2. تصفية حسب الاسم أو رقم السيارة
             if (searchQuery) {
                 const name = (rec.name || '').toLowerCase();
-                const number = (rec.number || '').toLowerCase();
-                passesSearchFilter = name.includes(searchQuery) || number.includes(searchQuery);
+                const plate = (rec.plate || '').toLowerCase();
+                passesSearchFilter = name.includes(searchQuery) || plate.includes(searchQuery);
             }
             
             return passesDateFilter && passesSearchFilter;
         });
         
-        // إعادة عرض السجلات المفلترة
         renderRecords();
     }
-    
-    // **********************************************
-    // إضافة مستمعي الأحداث لأدوات التصفية والبحث
-    // **********************************************
-    // تم تغيير 'change' إلى 'input' لحقل البحث، وتم الإبقاء على 'change' لقائمة التصفية
-    filterDateInput.addEventListener('change', applyFilters);
-    searchQueryInput.addEventListener('input', applyFilters);
-    // **********************************************
 
-
-    // ====== عرض السجلات في الجدول (تم تعديلها لاستخدام filteredRecords) ======
+    // ====== عرض السجلات في الجدول ======
     function renderRecords() {
       recordsBody.innerHTML = '';
       let lastDate = '';
 
-      // استخدام filteredRecords بدلاً من recordsCache
       filteredRecords.forEach(rec => {
         const currentDate = formatDate(rec.timestamp);
 
-        // إضافة فاصل اليوم إذا تغير التاريخ
         if (currentDate !== lastDate) {
             const row = recordsBody.insertRow();
             row.className = 'day-separator';
@@ -674,33 +718,26 @@
 
         const row = recordsBody.insertRow();
         
-        // الاسم
         const nameCell = row.insertCell();
         nameCell.textContent = rec.name;
 
-        // رقم السيارة
-        const numberCell = row.insertCell();
-        numberCell.textContent = rec.number;
+        const plateCell = row.insertCell();
+        plateCell.textContent = rec.plate;
 
-        // جهة الدخول
-        const collegeCell = row.insertCell();
-        collegeCell.textContent = rec.college;
+        const entryGateCell = row.insertCell();
+        entryGateCell.textContent = rec.entryGate;
 
-        // وقت الدخول
         const inTimeCell = row.insertCell();
         inTimeCell.className = 'time-in';
         inTimeCell.textContent = rec.inTime;
 
-        // وقت الخروج
         const outTimeCell = row.insertCell();
         outTimeCell.className = rec.outTime ? 'time-out' : '';
         outTimeCell.textContent = rec.outTime || '—';
 
-        // الملاحظات
         const notesCell = row.insertCell();
         notesCell.textContent = rec.notes || '—';
 
-        // الإجراء (زر الخروج)
         const actionCell = row.insertCell();
         if (!rec.outTime) {
           const exitBtn = document.createElement('button');
@@ -714,37 +751,25 @@
       });
     }
 
-    // ====== بدء التحميل الأولي ======
-    async function loadInitialData() {
-      await fetchCarsData();
-      loadRecordsFromLocalStorage();
-      // renderRecords() يتم استدعاؤها داخل applyFilters التي يتم استدعاؤها داخل loadRecordsFromLocalStorage
-    }
-
     // ====== وظيفة عرض الاقتراحات ======
     function renderSuggestions(q) {
       suggestionsWrap.innerHTML = '';
-      if (q.length < 2) return; // لا تعرض شيئًا إلا بعد حرفين
+      if (q.length < 2) return;
 
-      // ابحث في carsCache عن numbers تحتوي q
-      const matches = carsCache.filter(c=> c.number && c.number.includes(q) );
-      // خذ أول 10 نتيجة
+      const matches = carsCache.filter(c=> c.plate && c.plate.includes(q) );
       matches.slice(0,10).forEach(c=>{
         const card = document.createElement('div');
         card.className = 'suggestion-card';
-        // التعديل المطلوب: إظهار جهة الدخول (college) مع رقم السيارة
-        card.innerHTML = `<div style="font-size:13px;color:var(--blue-dark);">${c.number}</div><div style="font-size:12px;color:#0b0b0b;margin-top:4px">${c.name || ''}</div><div style="font-size:11px;color:#666;margin-top:2px">${c.college || ''}</div>`;
+        card.innerHTML = `<div style="font-size:13px;color:var(--blue-dark);">${c.plate}</div><div style="font-size:12px;color:#0b0b0b;margin-top:4px">${c.name || ''}</div><div style="font-size:11px;color:#666;margin-top:2px">${c.entryGate || ''}</div>`;
         card.addEventListener('click', ()=>{
-          // عند النقر — عبّي الحقول
-          carNumberInput.value = c.number || '';
+          plateInput.value = c.plate || '';
           nameInput.value = c.name || '';
-          collegeInput.value = c.college || '';
+          entryGateInput.value = c.entryGate || '';
           suggestionsWrap.innerHTML = '';
         });
         suggestionsWrap.appendChild(card);
       });
 
-      // لو مفيش نتائج نظهر رسالة صغيرة
       if(matches.length === 0){
         const no = document.createElement('div');
         no.style.color = '#666';
@@ -755,86 +780,80 @@
       }
     }
 
-    // ====== عند تغيير حقل رقم السيارة ======
-    carNumberInput.addEventListener('input', (e)=>{
+    // ====== مستمعي الأحداث ======
+    plateInput.addEventListener('input', (e)=>{
       renderSuggestions(e.target.value.trim());
     });
 
-    // ====== عند اختيار رقم أو الخروج من الحقل ======
-    carNumberInput.addEventListener('change', ()=>{
-      const val = carNumberInput.value.trim();
+    plateInput.addEventListener('change', ()=>{
+      const val = plateInput.value.trim();
       if(!val) return;
-      const found = carsCache.find(c => c.number === val);
+      const found = carsCache.find(c => c.plate === val);
       if(found){
         nameInput.value = found.name || '';
-        collegeInput.value = found.college || '';
+        entryGateInput.value = found.entryGate || '';
       }
     });
 
-    // ====== تسجيل دخول — يخزن في Local Storage ======
+    filterDateInput.addEventListener('change', applyFilters);
+    searchQueryInput.addEventListener('input', applyFilters);
+    uploadBtn.addEventListener('click', uploadTodayRecords);
+
+    // ====== تسجيل دخول ======
     loginBtn.addEventListener('click', async ()=>{
-      const number = carNumberInput.value.trim();
+      const plate = plateInput.value.trim();
       const name = nameInput.value.trim();
-      const college = collegeInput.value.trim();
+      const entryGate = entryGateInput.value.trim();
       const notes = notesInput.value.trim();
 
-      if(!number || !name){
+      if(!plate || !name){
         showNotification('من فضلك أدخل رقم السيارة ثم اختر الاقتراح أو املأ الاسم.', 'error');
         return;
       }
 
-      // 1. التحقق مما إذا كانت السيارة مسجلة دخول بالفعل (التعديل المطلوب)
       const isAlreadyIn = recordsCache.some(rec => 
-        rec.number === number && !rec.outTime // نتحقق من نفس الرقم وعدم وجود وقت خروج
+        rec.plate === plate && !rec.outTime
       );
 
       if (isAlreadyIn) {
-        // إذا كانت مسجلة بالفعل، نوقف العملية ونعرض إشعار تحذيري أنيق
-        // التعديل المطلوب: رسالة تنبيه أنيقة
-        const existingRecord = recordsCache.find(rec => rec.number === number && !rec.outTime);
+        const existingRecord = recordsCache.find(rec => rec.plate === plate && !rec.outTime);
         const entryTime = existingRecord ? existingRecord.inTime : 'وقت غير معروف';
-        const entryCollege = existingRecord ? existingRecord.college : 'جهة غير معروفة';
+        const entryCollege = existingRecord ? existingRecord.entryGate : 'جهة غير معروفة';
         
-        showNotification(`⚠️ السيارة رقم ${number} مسجلة دخول بالفعل! (جهة: ${entryCollege}، وقت: ${entryTime})`, 'warning');
+        showNotification(`⚠️ السيارة رقم ${plate} مسجلة دخول بالفعل! (جهة: ${entryCollege}، وقت: ${entryTime})`, 'warning');
         return;
       }
 
       try {
-        // تعطيل الزر أثناء الحفظ
         loginBtn.disabled = true;
         loginBtn.textContent = '⏳ جارٍ الحفظ...';
 
-        // وقت بصيغة 12 ساعة لعرض، وtimestamp للفرز
         const ts = Date.now();
         const inTime = formatTime(ts);
-        const id = 'rec_' + ts; // معرّف فريد
+        const id = 'rec_' + ts;
 
-        // حفظ في Local Storage
-        recordsCache.push({ id, name, number, college, notes, inTime, outTime:'', timestamp:ts });
+        recordsCache.push({ id, name, plate, entryGate, notes, inTime, outTime:'', timestamp:ts });
         saveRecordsToLocalStorage();
         
-        // إعادة تطبيق الفلاتر لعرض السجل الجديد
-        applyFilters(); 
+        applyFilters();
 
-        // نظف الحقول
-        carNumberInput.value = '';
+        plateInput.value = '';
         nameInput.value = '';
-        collegeInput.value = '';
+        entryGateInput.value = '';
         notesInput.value = '';
         suggestionsWrap.innerHTML = '';
 
-        showNotification('✅ تم تسجيل الدخول بنجاح!', 'success');
+        showNotification('✅ تم تسجيل الدخول بنجاح! (محفوظ محلياً)', 'success');
       } catch(err){
         console.error('خطأ في الحفظ', err);
         showNotification('حدث خطأ أثناء حفظ السجل', 'error');
       } finally {
-        // إعادة تفعيل الزر
         loginBtn.disabled = false;
         loginBtn.textContent = '➕ تسجيل دخول';
       }
     });
 
-    // ====== تسجيل الخروج — يحدث outTime في Local Storage ======
+    // ====== تسجيل الخروج ======
     recordsBody.addEventListener('click', async (e)=>{
       if(e.target && e.target.classList.contains('exit-btn')){
         const id = e.target.getAttribute('data-id');
@@ -842,11 +861,9 @@
         const outTime = formatTime(ts);
 
         try{
-          // تعطيل الزر أثناء الحفظ
           e.target.disabled = true;
           e.target.textContent = '⏳...';
 
-          // تحديث في Local Storage
           const rec = recordsCache.find(r=> r.id === id);
           if(rec){ 
             rec.outTime = outTime; 
@@ -854,10 +871,9 @@
           }
           saveRecordsToLocalStorage();
 
-          // تحديث واجهة المستخدم
           applyFilters();
 
-          showNotification('✅ تم تسجيل الخروج بنجاح!', 'success');
+          showNotification('✅ تم تسجيل الخروج بنجاح! (محفوظ محلياً)', 'success');
         } catch(err){
           console.error('خطأ في تحديث الخروج', err);
           showNotification('فشل تسجيل الخروج', 'error');
@@ -867,7 +883,38 @@
       }
     });
 
-    // ====== بدء التحميل عند فتح الصفحة ======
+    // ====== مراقبة حالة الاتصال بالإنترنت ======
+    window.addEventListener('online', async () => {
+      isOnline = true;
+      updateStatusDisplay();
+      showNotification('✅ تم استعادة الاتصال بالإنترنت', 'success');
+      await fetchCarsData();
+      setupRealtimeSync();
+    });
+
+    window.addEventListener('offline', () => {
+      isOnline = false;
+      updateStatusDisplay();
+      showNotification('📴 فقدت الاتصال بالإنترنت - تعمل بالبيانات المحفوظة محلياً', 'warning');
+    });
+
+    // ====== بدء التحميل الأولي ======
+    async function loadInitialData() {
+      const fetchSuccess = await fetchCarsData();
+      
+      if (!fetchSuccess) {
+        loadCarsFromLocalStorage();
+      }
+      
+      loadRecordsFromLocalStorage();
+      
+      // تفعيل المزامنة الحية إذا كان الاتصال موجوداً
+      if (isOnline) {
+        setupRealtimeSync();
+      }
+    }
+
+    // بدء التطبيق
     loadInitialData();
   </script>
 </body>
