@@ -53,8 +53,8 @@ function render(entries){
   const filterVal = document.getElementById('filter').value;
 
   const filtered = entries.filter(e => {
-    const matchesSearch = (e.name + ' ' + e.number).toLowerCase().includes(searchVal);
-    const matchesFilter = filterVal ? e.college === filterVal : true;
+    const matchesSearch = (e.name + ' ' + e.plate).toLowerCase().includes(searchVal);
+    const matchesFilter = filterVal ? e.entryGate === filterVal : true;
     return matchesSearch && matchesFilter;
   });
 
@@ -68,8 +68,8 @@ function render(entries){
     div.innerHTML = `
       <div class="mb-2">
         <p class="font-semibold text-lg">الاسم: ${escapeHtml(e.name)}</p>
-        <p>رقم السيارة: ${escapeHtml(e.number)}</p>
-        <p>جهة الدخول: ${escapeHtml(e.college)}</p>
+        <p>رقم السيارة: ${escapeHtml(e.plate)}</p>
+        <p>جهة الدخول: ${escapeHtml(e.entryGate)}</p>
         <p>الهاتف: ${escapeHtml(e.phone || '')}</p>
       </div>
       ${isAdmin ? `
@@ -123,15 +123,15 @@ let editId = null;
 document.getElementById('carForm').addEventListener('submit', async e => {
   e.preventDefault();
   const name = document.getElementById('name').value.trim();
-  const number = document.getElementById('plate').value.trim();
-  const destSelect = document.getElementById('destination');
+  const plate = document.getElementById('plate').value.trim();
+  const destSelect = document.getElementById('entryGate');
   const destManual = document.getElementById('destinationManual');
   const phone = document.getElementById('phone').value.trim();
-  const college = destSelect.value === 'manual' ? destManual.value.trim() : destSelect.value;
+  const entryGate = destSelect.value === 'manual' ? destManual.value.trim() : destSelect.value;
 
-  if(!name || !number || !college) return alert('من فضلك املأ الحقول المطلوبة');
+  if(!name || !plate || !entryGate) return alert('من فضلك املأ الحقول المطلوبة');
 
-  const duplicate = (window.entries || []).some(e => e.number === number && e.id !== editId);
+  const duplicate = (window.entries || []).some(e => e.plate === plate && e.id !== editId);
   if(duplicate) return showMessage('⚠️ رقم السيارة مسجل مسبقاً!', 'error');
 
   if(editId){
@@ -139,7 +139,7 @@ document.getElementById('carForm').addEventListener('submit', async e => {
     editId = null;
   }
 
-  await push(carsRef, { name, number, college, phone });
+  await push(carsRef, { name, plate, entryGate, phone });
   showMessage('✅ تم إضافة السيارة بنجاح!');
 
   document.getElementById('carForm').reset();
@@ -159,24 +159,24 @@ document.getElementById('carsContainer').addEventListener('click', e=>{
 
     editId = id;
     document.getElementById('name').value = entry.name;
-    document.getElementById('plate').value = entry.number;
-    if(["كلية هندسة","كلية تجارة","كلية طب بشري","كلية طب الأسنان","كلية الآداب","كلية الحقوق","كلية الفنون","كلية الحاسبات والمعلومات","كلية العلوم","كلية العلوم الصحية","العلاج الطبيعي"].includes(entry.college)){
-      document.getElementById('destination').value = entry.college;
+    document.getElementById('plate').value = entry.plate;
+    if(["كلية هندسة","كلية تجارة","كلية طب بشري","كلية طب الأسنان","كلية الآداب","كلية الحقوق","كلية الفنون","كلية الحاسبات والمعلومات","كلية العلوم","كلية العلوم الصحية","العلاج الطبيعي"].includes(entry.entryGate)){
+      document.getElementById('entryGate').value = entry.entryGate;
       document.getElementById('destinationManual').classList.add('hidden');
       document.getElementById('destinationManual').value = '';
     } else {
-      document.getElementById('destination').value = 'manual';
+      document.getElementById('entryGate').value = 'manual';
       document.getElementById('destinationManual').classList.remove('hidden');
-      document.getElementById('destinationManual').value = entry.college;
+      document.getElementById('destinationManual').value = entry.entryGate;
     }
     document.getElementById('phone').value = entry.phone || '';
   }
 });
 
 // show manual input
-document.getElementById('destination').addEventListener('change', () => {
+document.getElementById('entryGate').addEventListener('change', () => {
   const destManual = document.getElementById('destinationManual');
-  destManual.classList.toggle('hidden', document.getElementById('destination').value!=='manual');
+  destManual.classList.toggle('hidden', document.getElementById('entryGate').value!=='manual');
 });
 
 // search & filter
@@ -253,7 +253,7 @@ form#carForm { flex-wrap: nowrap; }
       </div>
       <div>
         <label class="block font-semibold mb-1 text-white">جهة الدخول</label>
-        <select id="destination" class="w-full border rounded-xl p-2 focus:ring-2 focus:ring-indigo-500">
+        <select id="entryGate" class="w-full border rounded-xl p-2 focus:ring-2 focus:ring-indigo-500">
           <option value="">اختر جهة الدخول</option>
           <option>كلية هندسة</option>
           <option>كلية تجارة</option>
