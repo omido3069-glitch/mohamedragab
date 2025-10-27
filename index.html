@@ -1,1 +1,308 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1200" />
+<title>نظام تسجيل السيارات - للقراءة فقط</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyCRR-uXoz14YOudO0K740Y5AUbivB0R5M0",
+  authDomain: "hnu-3069.firebaseapp.com",
+  databaseURL: "https://hnu-3069-default-rtdb.firebaseio.com",
+  projectId: "hnu-3069",
+  storageBucket: "hnu-3069.firebasestorage.app",
+  messagingSenderId: "98084688599",
+  appId: "1:98084688599:web:e272972e76d63f8ae01692",
+  measurementId: "G-P0E5EC7CHJ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const carsRef = ref(db, 'cars');
+
+// escape
+function escapeHtml(unsafe){ return (unsafe+'').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":"&#039;"}[m])); }
+
+// show messages
+function showMessage(text, type='success') {
+  const msgBox = document.getElementById('msgBox');
+  msgBox.textContent = text;
+  msgBox.className = `fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition-all duration-500 ${
+    type==='success' ? 'bg-green-500' : 'bg-red-500'
+  } translate-y-0 opacity-100 z-50`;
+  msgBox.classList.remove('hidden');
+  setTimeout(() => {
+    msgBox.classList.add('translate-y-[-50px]', 'opacity-0');
+  }, 2500);
+  setTimeout(() => msgBox.classList.add('hidden'), 3000);
+}
+
+// render
+function render(entries){
+  const container = document.getElementById('carsContainer');
+  const carCount = document.getElementById('carCount');
+  container.innerHTML = '';
+  const searchVal = document.getElementById('search').value.trim().toLowerCase();
+  const filterVal = document.getElementById('filter').value;
+
+  const filtered = entries.filter(e => {
+    const matchesSearch = (e.name + ' ' + e.plate).toLowerCase().includes(searchVal);
+    const matchesFilter = filterVal ? e.entryGate === filterVal : true;
+    return matchesSearch && matchesFilter;
+  });
+
+  carCount.textContent = filtered.length;
+
+  const isAdmin = window.isAdmin;
+
+  filtered.forEach((e) => {
+    const div = document.createElement('div');
+    div.className = "bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-lg flex flex-col justify-between";
+    div.innerHTML = `
+      <div class="mb-2">
+        <p class="font-semibold text-lg">الاسم: ${escapeHtml(e.name)}</p>
+        <p>رقم السيارة: ${escapeHtml(e.plate)}</p>
+        <p>جهة الدخول: ${escapeHtml(e.entryGate)}</p>
+        <p>الهاتف: ${escapeHtml(e.phone || '')}</p>
+      </div>
+      ${isAdmin ? `
+      <div class="flex gap-2">
+        <button data-id="${e.id}" class="editBtn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg">✏️ تعديل</button>
+        <button data-id="${e.id}" class="delBtn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg">🗑️ حذف</button>
+      </div>` : ''}
+    `;
+    container.appendChild(div);
+  });
+}
+
+// fetch data
+onValue(carsRef, (snapshot) => {
+  const data = snapshot.val() || {};
+  const entries = [];
+  for (let key in data) entries.push({ id: key, ...data[key] });
+  window.entries = entries;
+  render(entries);
+});
+
+// admin state
+window.isAdmin = false;
+
+// زر تسجيل دخول Admin يفتح المودال فقط عند الضغط
+document.getElementById('adminLoginBtn').addEventListener('click', ()=>{
+  const modal = document.getElementById('loginModal');
+  modal.style.display = 'flex';
+});
+
+// process login
+document.getElementById('loginForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const user = document.getElementById('loginUser').value;
+  const pass = document.getElementById('loginPass').value;
+  if(user==='admin' && pass==='1234'){
+    window.isAdmin = true;
+    showMessage('✅ تم تسجيل الدخول كـ Admin');
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('carFormSection').classList.remove('hidden');
+    render(window.entries || []);
+  } else {
+    showMessage('❌ بيانات خاطئة', 'error');
+  }
+});
+
+// معرف التعديل
+let editId = null;
+
+// إضافة / تعديل سجل
+document.getElementById('carForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const plate = document.getElementById('plate').value.trim();
+  const destSelect = document.getElementById('entryGate');
+  const destManual = document.getElementById('destinationManual');
+  const phone = document.getElementById('phone').value.trim();
+  const entryGate = destSelect.value === 'manual' ? destManual.value.trim() : destSelect.value;
+
+  if(!name || !plate || !entryGate) return alert('من فضلك املأ الحقول المطلوبة');
+
+  const duplicate = (window.entries || []).some(e => e.plate === plate && e.id !== editId);
+  if(duplicate) return showMessage('⚠️ رقم السيارة مسجل مسبقاً!', 'error');
+
+  if(editId){
+    await remove(ref(db, `cars/${editId}`));
+    editId = null;
+  }
+
+  await push(carsRef, { name, plate, entryGate, phone });
+  showMessage('✅ تم إضافة السيارة بنجاح!');
+
+  document.getElementById('carForm').reset();
+  destManual.classList.add('hidden'); destManual.value='';
+});
+
+// حذف وتعديل السيارات
+document.getElementById('carsContainer').addEventListener('click', e=>{
+  const id = e.target.dataset.id;
+  if(!window.isAdmin) return;
+  if(e.target.classList.contains('delBtn')){
+    if(!confirm('حذف السجل؟')) return;
+    remove(ref(db, `cars/${id}`));
+  } else if(e.target.classList.contains('editBtn')){
+    const entry = window.entries.find(en => en.id === id);
+    if(!entry) return;
+
+    editId = id;
+    document.getElementById('name').value = entry.name;
+    document.getElementById('plate').value = entry.plate;
+    if(["كلية هندسة","كلية تجارة","كلية طب بشري","كلية طب الأسنان","كلية الآداب","كلية الحقوق","كلية الفنون","كلية الحاسبات والمعلومات","كلية العلوم","كلية العلوم الصحية","العلاج الطبيعي"].includes(entry.entryGate)){
+      document.getElementById('entryGate').value = entry.entryGate;
+      document.getElementById('destinationManual').classList.add('hidden');
+      document.getElementById('destinationManual').value = '';
+    } else {
+      document.getElementById('entryGate').value = 'manual';
+      document.getElementById('destinationManual').classList.remove('hidden');
+      document.getElementById('destinationManual').value = entry.entryGate;
+    }
+    document.getElementById('phone').value = entry.phone || '';
+  }
+});
+
+// show manual input
+document.getElementById('entryGate').addEventListener('change', () => {
+  const destManual = document.getElementById('destinationManual');
+  destManual.classList.toggle('hidden', document.getElementById('entryGate').value!=='manual');
+});
+
+// search & filter
+document.getElementById('search').addEventListener('input', ()=>render(window.entries||[]));
+document.getElementById('filter').addEventListener('change', ()=>render(window.entries||[]));
+
+</script>
+
+<style>
+body { 
+  font-family: 'Tajawal', sans-serif; 
+  background: linear-gradient(135deg, #4facfe, #7366ff); 
+  min-height: 100vh; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 20px; 
+  min-width: 1200px; 
+  overflow-x: auto; 
+}
+.card { 
+  background: rgba(255,255,255,0.2); 
+  backdrop-filter: blur(15px); 
+  border-radius: 1.5rem; 
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2); 
+  padding: 2rem; 
+  width: 1200px; 
+  margin: 0 auto;
+  position: relative;
+}
+h1 { color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); }
+input, select, button { transition: all 0.3s ease; }
+input:focus, select:focus { transform: scale(1.02); box-shadow: 0 0 0 3px rgba(99,102,241,0.4); }
+button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+form#carForm { flex-wrap: nowrap; }
+#adminLoginBtn { position: fixed; top: 10px; left: 10px; z-index: 1000; background: #fff; color: #000; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+#msgBox { transition: all 0.3s ease; }
+</style>
+
+</head>
+<body>
+
+<!-- Admin Login Button -->
+<button id="adminLoginBtn">تسجيل دخول Admin</button>
+
+<!-- Login Modal (مخفي افتراضياً باستخدام display:none) -->
+<div id="loginModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1001;">
+  <div style="background:#fff; padding:2rem; border-radius:1rem; width:300px;">
+    <h2 class="font-bold mb-4 text-lg">تسجيل دخول Admin</h2>
+    <form id="loginForm" class="flex flex-col gap-2">
+      <input type="text" id="loginUser" placeholder="يوزر" class="border p-2 rounded"/>
+      <input type="password" id="loginPass" placeholder="باسورد" class="border p-2 rounded"/>
+      <button type="submit" class="bg-blue-600 text-white px-3 py-2 rounded mt-2">دخول</button>
+    </form>
+  </div>
+</div>
+
+<!-- رسالة النجاح / التحذير -->
+<div id="msgBox" class="hidden fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-white font-semibold shadow-lg transition-all duration-300"></div>
+
+<div class="card">
+  <h1 class="text-4xl font-bold text-center mb-10">🚗 نظام تسجيل السيارات</h1>
+
+  <!-- Admin Form Section (hidden until login) -->
+  <section id="carFormSection" class="mb-6 hidden">
+    <form id="carForm" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div>
+        <label class="block font-semibold mb-1 text-white">اسم السائق / المالك</label>
+        <input required id="name" class="w-full border rounded-xl p-2 focus:ring-2 focus:ring-indigo-500" placeholder="اكتب الاسم" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1 text-white">رقم السيارة</label>
+        <input required id="plate" class="w-full border rounded-xl p-2 focus:ring-2 focus:ring-indigo-500" placeholder="مثال: م ص 1234" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1 text-white">جهة الدخول</label>
+        <select id="entryGate" class="w-full border rounded-xl p-2 focus:ring-2 focus:ring-indigo-500">
+          <option value="">اختر جهة الدخول</option>
+          <option>كلية هندسة</option>
+          <option>كلية تجارة</option>
+          <option>كلية طب بشري</option>
+          <option>كلية طب الأسنان</option>
+          <option>كلية الآداب</option>
+          <option>كلية الحقوق</option>
+          <option>كلية الفنون</option>
+          <option>كلية الحاسبات والمعلومات</option>
+          <option>كلية العلوم</option>
+          <option>كلية العلوم الصحية</option>
+          <option>العلاج الطبيعي</option>
+          <option value="manual">يدوي</option>
+        </select>
+        <input type="text" id="destinationManual" placeholder="اكتب جهة الدخول" class="w-full border rounded-xl p-2 mt-2 focus:ring-2 focus:ring-indigo-500 hidden" />
+      </div>
+      <div>
+        <label class="block font-semibold mb-1 text-white">رقم الهاتف</label>
+        <input required id="phone" class="w-full border rounded-xl p-2 focus:ring-2 focus:ring-indigo-500" placeholder="010xxxxxxxx" pattern="[0-9+\- ]+" />
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl shadow-lg">➕ إضافة</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Search & Filter -->
+  <section class="flex items-center justify-between mb-4 gap-4">
+    <input id="search" placeholder="🔍 ابحث بالاسم أو رقم السيارة" class="border rounded-xl p-2 w-1/3 focus:ring-2 focus:ring-indigo-500" />
+    <select id="filter" class="border rounded-xl p-2 w-1/3 focus:ring-2 focus:ring-indigo-500">
+      <option value="">كل الكليات</option>
+      <option>كلية هندسة</option>
+      <option>كلية تجارة</option>
+      <option>كلية طب بشري</option>
+      <option>كلية طب الأسنان</option>
+      <option>كلية الآداب</option>
+      <option>كلية الحقوق</option>
+      <option>كلية الفنون</option>
+      <option>كلية الحاسبات والمعلومات</option>
+      <option>كلية العلوم</option>
+      <option>كلية العلوم الصحية</option>
+      <option>العلاج الطبيعي</option>
+    </select>
+    <div class="text-white font-semibold">عدد السيارات: <span id="carCount">0</span></div>
+  </section>
+
+  <!-- Cars Container -->
+  <section id="carsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6"></section>
+</div>
+</body>
+</html>
 
