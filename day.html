@@ -32,6 +32,35 @@
       align-items:center;
       padding:14px;
     }
+    
+    /* --- NEW --- */
+    /* زر الرجوع */
+    .header-wrap {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center; /* يركز العنوان في المنتصف */
+      position: relative; /* ضروري لتحديد موقع زر الرجوع */
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .back-btn {
+      position: absolute;
+      right: 0; /* يضع الزر في أقصى اليمين */
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+      font-size: 28px; /* حجم الأيقونة */
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .back-btn:hover {
+      color: var(--blue-dark);
+    }
+    /* --- END NEW --- */
+
 
     /* العنوان */
     .title {
@@ -39,8 +68,7 @@
       font-size:24px;
       font-weight:900;
       text-align:center;
-      margin-top:10px;
-      margin-bottom:4px;
+      /* تم إزالة الهوامش من هنا ونقلها إلى header-wrap */
       letter-spacing: 0.5px;
       text-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
@@ -338,6 +366,9 @@
     /* responsive adjustments */
     @media (max-width:420px){
       .title{ font-size:18px }
+      /* --- NEW --- */
+      .back-btn { font-size: 24px; }
+      /* --- END NEW --- */
       .card{ padding:12px }
       .input{ font-size:15px; padding:10px }
       .btn-primary{ padding:10px; font-size:15px }
@@ -349,7 +380,15 @@
 <body>
 
   <div style="width:100%;max-width:520px;">
-    <div class="title">🚗 نظام تسجيل السيارات — جامعة حلوان الأهلية</div>
+    
+    <!-- --- MODIFIED --- -->
+    <div class="header-wrap">
+      <a href="#" id="backButton" class="back-btn" title="رجوع">
+        <i class="bi bi-arrow-right-circle-fill"></i>
+      </a>
+      <div class="title">🚗 نظام تسجيل السيارات — جامعة حلوان الأهلية</div>
+    </div>
+    <!-- --- END MODIFIED --- -->
 
     <div class="footer">تم التصميم بواسطة / محمد رجب</div>
 
@@ -421,14 +460,14 @@
 
     // ====== إعداد Firebase ======
     const firebaseConfig = {
-      apiKey: "AIzaSyCRR-uXoz14YOudO0K740Y5AUbivB0R5M0",
-      authDomain: "hnu-3069.firebaseapp.com",
-      databaseURL: "https://hnu-3069-default-rtdb.firebaseio.com",
-      projectId: "hnu-3069",
-      storageBucket: "hnu-3069.firebasestorage.app",
-      messagingSenderId: "98084688599",
-      appId: "1:98084688599:web:e272972e76d63f8ae01692",
-      measurementId: "G-P0E5EC7CHJ"
+      apiKey: "AIzaSyDBSiTb1m0osdrX7YOv4ADr8x-7TghSqmY",
+      authDomain: "day3069-e27df.firebaseapp.com",
+      databaseURL: "https://day3069-e27df-default-rtdb.firebaseio.com",
+      projectId: "day3069-e27df",
+      storageBucket: "day3069-e27df.firebasestorage.app",
+      messagingSenderId: "110258698429",
+      appId: "1:110258698429:web:fcc4114a83829756329fd4",
+      measurementId: "G-Q3LN0HTXXZ"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -448,6 +487,7 @@
     const searchQueryInput = document.getElementById('searchQuery');
     const uploadBtn = document.getElementById('uploadBtn');
     const syncStatus = document.getElementById('syncStatus');
+    const backButton = document.getElementById('backButton'); // --- NEW ---
 
     // ====== متغيرات التخزين المؤقت ======
     let carsCache = [];
@@ -584,12 +624,11 @@
           if (snapshot.exists()) {
             const firebaseRecords = snapshot.val();
             
-            // تحويل بيانات Firebase إلى مصفوفة
             const newRecords = Object.values(firebaseRecords).map(rec => ({
               id: rec.id,
-              name: rec.name,
-              plate: rec.plate,
-              entryGate: rec.entryGate,
+              name: rec.ownerName,
+              plate: rec.carNumber,
+              entryGate: rec.entrance,
               notes: rec.notes || '',
               inTime: rec.inTime,
               outTime: rec.outTime || '',
@@ -597,14 +636,11 @@
               outTimestamp: rec.outTimestamp || null
             }));
             
-            // دمج السجلات: احتفظ بالسجلات المحلية الجديدة وأضف سجلات Firebase
             const localIds = new Set(recordsCache.map(r => r.id));
             const firebaseIds = new Set(newRecords.map(r => r.id));
             
-            // إزالة السجلات التي تم حذفها من Firebase
             recordsCache = recordsCache.filter(r => firebaseIds.has(r.id) || !localIds.has(r.id));
             
-            // تحديث السجلات من Firebase
             newRecords.forEach(fbRecord => {
               const existingIndex = recordsCache.findIndex(r => r.id === fbRecord.id);
               if (existingIndex >= 0) {
@@ -614,11 +650,9 @@
               }
             });
             
-            // إعادة ترتيب وحفظ
             recordsCache.sort((a, b) => a.timestamp - b.timestamp);
             saveRecordsToLocalStorage();
             
-            // تحديث العرض
             populateDateFilter();
             applyFilters();
           }
@@ -643,7 +677,17 @@
         }
         
         const recordsObject = recordsToUpload.reduce((obj, rec) => {
-            obj[rec.id] = rec;
+            obj[rec.id] = {
+                id: rec.id,
+                ownerName: rec.name,
+                carNumber: rec.plate,
+                entrance: rec.entryGate,
+                notes: rec.notes,
+                inTime: rec.inTime,
+                outTime: rec.outTime,
+                timestamp: rec.timestamp,
+                outTimestamp: rec.outTimestamp
+            };
             return obj;
         }, {});
         
@@ -660,7 +704,6 @@
             isOnline = true;
             updateStatusDisplay();
             
-            // تفعيل المزامنة الحية
             setupRealtimeSync();
         } catch (error) {
             console.error("خطأ في رفع السجلات:", error);
@@ -718,14 +761,9 @@
 
         const row = recordsBody.insertRow();
         
-        const nameCell = row.insertCell();
-        nameCell.textContent = rec.name;
-
-        const plateCell = row.insertCell();
-        plateCell.textContent = rec.plate;
-
-        const entryGateCell = row.insertCell();
-        entryGateCell.textContent = rec.entryGate;
+        row.insertCell().textContent = rec.name;
+        row.insertCell().textContent = rec.plate;
+        row.insertCell().textContent = rec.entryGate;
 
         const inTimeCell = row.insertCell();
         inTimeCell.className = 'time-in';
@@ -735,8 +773,7 @@
         outTimeCell.className = rec.outTime ? 'time-out' : '';
         outTimeCell.textContent = rec.outTime || '—';
 
-        const notesCell = row.insertCell();
-        notesCell.textContent = rec.notes || '—';
+        row.insertCell().textContent = rec.notes || '—';
 
         const actionCell = row.insertCell();
         if (!rec.outTime) {
@@ -756,15 +793,15 @@
       suggestionsWrap.innerHTML = '';
       if (q.length < 2) return;
 
-      const matches = carsCache.filter(c=> c.plate && c.plate.includes(q) );
+      const matches = carsCache.filter(c=> c.carNumber && c.carNumber.includes(q) );
       matches.slice(0,10).forEach(c=>{
         const card = document.createElement('div');
         card.className = 'suggestion-card';
-        card.innerHTML = `<div style="font-size:13px;color:var(--blue-dark);">${c.plate}</div><div style="font-size:12px;color:#0b0b0b;margin-top:4px">${c.name || ''}</div><div style="font-size:11px;color:#666;margin-top:2px">${c.entryGate || ''}</div>`;
+        card.innerHTML = `<div style="font-size:13px;color:var(--blue-dark);">${c.carNumber}</div><div style="font-size:12px;color:#0b0b0b;margin-top:4px">${c.ownerName || ''}</div><div style="font-size:11px;color:#666;margin-top:2px">${c.entrance || ''}</div>`;
         card.addEventListener('click', ()=>{
-          plateInput.value = c.plate || '';
-          nameInput.value = c.name || '';
-          entryGateInput.value = c.entryGate || '';
+          plateInput.value = c.carNumber || '';
+          nameInput.value = c.ownerName || '';
+          entryGateInput.value = c.entrance || '';
           suggestionsWrap.innerHTML = '';
         });
         suggestionsWrap.appendChild(card);
@@ -781,17 +818,25 @@
     }
 
     // ====== مستمعي الأحداث ======
-    plateInput.addEventListener('input', (e)=>{
+    
+    // --- NEW ---
+    backButton.addEventListener('click', (e) => {
+        e.preventDefault(); // منع السلوك الافتراضي للرابط
+        history.back(); // العودة للصفحة السابقة
+    });
+    // --- END NEW ---
+    
+        plateInput.addEventListener('input', (e)=>{
       renderSuggestions(e.target.value.trim());
     });
 
     plateInput.addEventListener('change', ()=>{
       const val = plateInput.value.trim();
       if(!val) return;
-      const found = carsCache.find(c => c.plate === val);
+      const found = carsCache.find(c => c.carNumber === val);
       if(found){
-        nameInput.value = found.name || '';
-        entryGateInput.value = found.entryGate || '';
+        nameInput.value = found.ownerName || '';
+        entryGateInput.value = found.entrance || '';
       }
     });
 
@@ -835,6 +880,7 @@
         recordsCache.push({ id, name, plate, entryGate, notes, inTime, outTime:'', timestamp:ts });
         saveRecordsToLocalStorage();
         
+        populateDateFilter();
         applyFilters();
 
         plateInput.value = '';
@@ -874,6 +920,26 @@
           applyFilters();
 
           showNotification('✅ تم تسجيل الخروج بنجاح! (محفوظ محلياً)', 'success');
+          
+          if(isOnline && rec) {
+              const recordDate = formatDate(rec.timestamp);
+              const datePath = recordDate.replace(/-/g, '');
+              const recordRef = ref(db, `records/${datePath}/${rec.id}`);
+              
+              const updateData = {
+                  outTime: rec.outTime,
+                  outTimestamp: rec.outTimestamp
+              };
+              
+              try {
+                  await update(recordRef, updateData);
+                  showNotification('🔄 تم تحديث حالة الخروج على السيرفر.', 'info');
+              } catch (updateError) {
+                  console.error("فشل تحديث الخروج على Firebase:", updateError);
+                  showNotification('⚠️ فشل تحديث الخروج على السيرفر، سيتم الرفع لاحقاً.', 'warning');
+              }
+          }
+          
         } catch(err){
           console.error('خطأ في تحديث الخروج', err);
           showNotification('فشل تسجيل الخروج', 'error');
@@ -908,7 +974,6 @@
       
       loadRecordsFromLocalStorage();
       
-      // تفعيل المزامنة الحية إذا كان الاتصال موجوداً
       if (isOnline) {
         setupRealtimeSync();
       }
@@ -919,3 +984,4 @@
   </script>
 </body>
 </html>
+
