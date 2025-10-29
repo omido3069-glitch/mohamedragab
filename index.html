@@ -1,142 +1,196 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Cairo", sans-serif;
+    }
 
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #fff;
-        }
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #1e3c72, #2a5298, #00c6ff, #0072ff);
+      background-size: 400% 400%;
+      animation: gradientMove 8s ease infinite;
+      overflow: hidden;
+    }
 
-        .login-container {
-            background: rgba(0,0,0,0.6);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            width: 350px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            position: relative;
-        }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 25px auto;
-            overflow: hidden;
-            animation: rotateAvatar 10s linear infinite;
-            border: 4px solid #fff;
-        }
+    .login-box {
+      width: 320px;
+      padding: 50px 40px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      color: #fff;
+      transform: translateY(-100vh);
+      animation: slideIn 1.5s ease forwards;
+    }
 
-        @keyframes rotateAvatar {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+    @keyframes slideIn {
+      0% { transform: translateY(-100vh) rotate(-15deg); opacity: 0; }
+      70% { transform: translateY(30px) rotate(3deg); opacity: 1; }
+      100% { transform: translateY(0) rotate(0); }
+    }
 
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .login-box h2 {
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      animation: textFade 2s ease-in-out;
+    }
 
-        .login-button {
-            display: inline-block;
-            padding: 15px 30px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(to right, #ff6a00, #ee0979);
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
+    @keyframes textFade {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        .login-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        }
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.4s;
+      letter-spacing: 1px;
+      animation: pulse 2s infinite;
+    }
 
-        .footer {
-            margin-top: 25px;
-            font-size: 12px;
-            color: #ccc;
-        }
+    .btn:hover {
+      background: linear-gradient(45deg, #0072ff, #00c6ff);
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00c6ff;
+    }
 
-        /* رسالة الدخول */
-        .success-message {
-            position: absolute;
-            top: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #28a745;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease, top 0.5s ease;
-        }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px #00c6ff; }
+      50% { box-shadow: 0 0 30px #0072ff; }
+      100% { box-shadow: 0 0 10px #00c6ff; }
+    }
 
-        .success-message.show {
-            opacity: 1;
-            top: -40px;
-            pointer-events: auto;
-        }
+    .status {
+      margin-top: 25px;
+      text-align: right;
+      display: none;
+      font-size: 16px;
+      animation: fadeIn 0.6s ease forwards;
+    }
 
-        .success-message span {
-            font-size: 20px;
-        }
-    </style>
+    .status div {
+      margin: 8px 0;
+      opacity: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.4s;
+    }
+
+    .loading::after {
+      content: "⏳";
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0% { content: "⏳"; }
+      33% { content: "⏳."; }
+      66% { content: "⏳.."; }
+      100% { content: "⏳..."; }
+    }
+
+    .check {
+      color: #00ff7f;
+      font-size: 18px;
+      opacity: 0;
+      transition: 0.3s;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      opacity: 0.8;
+      animation: fadeIn 2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="avatar">
-            <img src="1234.jpg" alt="Avatar">
-        </div>
-        <!-- زر تسجيل الدخول -->
-        <a href="#" class="login-button" onclick="login()">تسجيل الدخول</a>
 
-        <!-- رسالة الدخول -->
-        <div class="success-message" id="successMessage">
-            <span>✅</span> تم الدخول إلى النظام
-        </div>
+  <div class="login-box">
+    <h2>مرحبا بعودتك 👋</h2>
+    <button class="btn" id="loginBtn">دخول</button>
 
-        <div class="footer">
-            تم التصميم بواسطة محمد رجب<br>
-            تاريخ آخر تحديث 27/10/2025
-        </div>
+    <div class="status" id="status">
+      <div id="step1">🔹 جاري التحقق من الاتصال <span class="check">✅</span></div>
+      <div id="step2">🔹 جاري التحقق من البيانات <span class="check">✅</span></div>
+      <div id="step3">🔹 جاري التحقق من وجود تحديثات <span class="check">✅</span></div>
     </div>
 
-    <script>
-        function login() {
-            const message = document.getElementById('successMessage');
-            message.classList.add('show');
+    <div class="footer">© 2025 - تم التصميم بواسطه/محمد رجب🔥</div>
+  </div>
 
-            // بعد 3 ثواني توجيه لصفحة ok.html
-            setTimeout(() => {
-                window.location.href = 'ok.html';
-            }, 3000);
-        }
-    </script>
+  <script>
+    const btn = document.getElementById('loginBtn');
+    const statusBox = document.getElementById('status');
+    const steps = [
+      { id: 'step1', delay: 3000 },
+      { id: 'step2', delay: 5000 },
+      { id: 'step3', delay: 7000 },
+    ];
+
+    btn.addEventListener('click', () => {
+      btn.disabled = true;
+      btn.innerText = 'جارٍ التحقق...';
+      statusBox.style.display = 'block';
+
+      steps.forEach((step, index) => {
+        const el = document.getElementById(step.id);
+        setTimeout(() => {
+          el.style.opacity = 1;
+          el.classList.add('loading');
+        }, 500 * index);
+
+        setTimeout(() => {
+          el.classList.remove('loading');
+          el.querySelector('.check').style.opacity = 1;
+        }, step.delay);
+      });
+
+      // بعد الانتهاء من الخطوات كلها
+      setTimeout(() => {
+        btn.innerText = 'تم الدخول ✅';
+        btn.style.background = 'linear-gradient(45deg, #00ff7f, #00c853)';
+        btn.style.boxShadow = '0 0 20px #00ff7f';
+      }, 7500);
+
+      // الانتقال التلقائي بعد 8 ثواني إلى صفحة ok.html
+      setTimeout(() => {
+        window.location.href = "ok.html";
+      }, 8000);
+    });
+  </script>
 </body>
 </html>
