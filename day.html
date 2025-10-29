@@ -59,20 +59,20 @@ textarea.input { min-height:60px; resize:vertical; padding-top:10px; }
 .table-wrap{ width:100%; max-width:520px; background:#fff; border-radius:12px; overflow:auto; box-shadow:0 8px 20px rgba(13,71,161,0.04); margin-top:10px; }
 table { width:100%; border-collapse:collapse; }
 
-th, td{ 
-    padding:8px 6px; 
-    text-align:center; 
-    border-bottom:1px solid #e0eaf3; 
-    font-weight:700; 
-    color:var(--black-bold); 
-    font-size:11px;
-    white-space: nowrap;
+th, td{
+    padding:4px 4px;
+    text-align:center;
+    border-bottom:1px solid #e0eaf3;
+    font-weight:700;
+    color:var(--black-bold);
+    font-size:9px;
+    white-space: normal;
 }
-th{ 
-    background:var(--accent); 
-    color:#fff; 
-    font-size:10px;
-    font-weight:800; 
+th{
+    background:var(--accent);
+    color:#fff;
+    font-size:9px;
+    font-weight:800;
     border-bottom: 2px solid var(--blue-dark);
 }
 .time-in{ color:var(--green); font-weight: 800; }
@@ -220,24 +220,22 @@ const notesInput = document.getElementById('notes');
 const loginBtn = document.getElementById('loginBtn');
 const suggestionsWrap = document.getElementById('suggestions');
 const recordsBody = document.getElementById('recordsBody');
-const statusSpan = document.getElementById('status');
 const filterDateInput = document.getElementById('filterDate');
 const searchQueryInput = document.getElementById('searchQuery');
 const uploadBtn = document.getElementById('uploadBtn');
-
-// عناصر الأدمن
 const adminLoginIcon = document.getElementById('adminLoginIcon');
-const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 const adminLoginModal = document.getElementById('adminLoginModal');
+const adminPassInput = document.getElementById('adminPass');
 const submitAdminLoginBtn = document.getElementById('submitAdminLogin');
 const cancelAdminLoginBtn = document.getElementById('cancelAdminLogin');
-const adminUserInput = document.getElementById('adminUser');
-const adminPassInput = document.getElementById('adminPass');
+const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+const statusSpan = document.getElementById('status');
 
-let carsCache = [];
+// ====== متغيرات الحالة ======
 let recordsCache = [];
-let filteredRecords = [];
-let isInitialSyncDone = false; // لمنع الحذف عند أول تحميل
+let carsCache = [];
+let isInitialSyncDone = false;
+let allCloudRecordsLoaded = false;
 
 // ====== دوال مساعدة ======
 function showNotification(message, type = 'success') {
@@ -257,99 +255,119 @@ function formatDate(ts){ const d=new Date(ts); return `${d.getFullYear()}-${Stri
 
 // ====== التخزين المحلي ======
 function loadRecordsFromLocalStorage(){
-    const recs=localStorage.getItem('carRecords');
-    recordsCache=recs?JSON.parse(recs):[];
-    recordsCache.sort((a,b)=>a.timestamp-b.timestamp);
+    localStorage.removeItem('carRecords');
+    recordsCache = [];
     populateDateFilter();
     applyFilters();
 }
-function saveRecordsToLocalStorage(){ localStorage.setItem('carRecords',JSON.stringify(recordsCache)); }
+
+function saveRecordsToLocalStorage(){
+    localStorage.setItem('carRecords',JSON.stringify(recordsCache));
+}
+
 function loadCarsFromLocalStorage(){ const cars=localStorage.getItem('carsCached'); if(cars){ carsCache=JSON.parse(cars); return true; } return false; }
 function saveCarsToLocalStorage(){ localStorage.setItem('carsCached',JSON.stringify(carsCache)); }
 
 // ====== فلتر التاريخ ======
 function populateDateFilter(){
-    const uniqueDates=[...new Set(recordsCache.map(r=>formatDate(r.timestamp)))].sort((a,b)=>new Date(b)-new Date(a));
-    filterDateInput.innerHTML='<option value="">كل الأيام</option>';
-    uniqueDates.forEach(date=>{
-        const opt=document.createElement('option'); opt.value=date;
-        opt.textContent=new Date(date).toLocaleDateString('ar-EG',{ weekday:'long', year:'numeric', month:'long', day:'numeric' });
-        filterDateInput.appendChild(opt);
+    const dates = [...new Set(recordsCache.map(r => formatDate(r.timestamp)))];
+    dates.sort((a, b) => new Date(b) - new Date(a));
+    
+    filterDateInput.innerHTML = '<option value="">كل الأيام</option>';
+    dates.forEach(date => {
+        const option = document.createElement('option');
+        option.value = date;
+        option.textContent = date;
+        filterDateInput.appendChild(option);
     });
 }
 
-// ====== جلب بيانات السيارات ======
-async function fetchCarsData(){
-    try{
-        statusSpan.textContent='⏳ جارٍ جلب بيانات السيارات...';
-        const snapshot=await get(child(dbRef,'cars'));
-        if(snapshot.exists()){ carsCache=Object.values(snapshot.val()); saveCarsToLocalStorage(); statusSpan.textContent='✅ تم تحديث بيانات السيارات.'; }
-        else { statusSpan.textContent='⚠️ لم يتم العثور على بيانات سيارات.'; }
-    } catch(e){
-        if(loadCarsFromLocalStorage()){ statusSpan.textContent='📴 تم تحميل البيانات المحفوظة (بدون إنترنت).'; }
-        else { statusSpan.textContent='❌ فشل جلب البيانات.'; }
-    }
-}
-
 // ====== عرض الاقتراحات ======
-function renderSuggestions(q){
+function renderSuggestions(query){
     suggestionsWrap.innerHTML='';
-    if(q.length<1) return;
-    const matches=carsCache.filter(c=> c.carNumber && c.carNumber.includes(q));
-    matches.slice(0,10).forEach(c=>{
-        const card=document.createElement('div'); card.className='suggestion-card';
-        card.innerHTML=`<div style="font-size:13px;color:var(--blue-dark);">${c.carNumber}</div>
-        <div style="font-size:12px;color:#0b0b0b;margin-top:4px">${c.ownerName||''}</div>
-        <div style="font-size:11px;color:#666;margin-top:2px">${c.entrance||''}</div>`;
-        card.addEventListener('click',()=>{
-            carNumberInput.value=c.carNumber||'';
-            nameInput.value=c.ownerName||'';
-            collegeInput.value=c.entrance||'';
+    if(query.length<2) return;
+    const matches=carsCache.filter(c=>c.number.includes(query));
+    matches.slice(0,5).forEach(car=>{
+        const card=document.createElement('div');
+        card.className='suggestion-card';
+        card.textContent=car.number;
+        card.onclick=()=>{
+            carNumberInput.value=car.number;
+            nameInput.value=car.name;
+            collegeInput.value=car.college;
+            notesInput.value=car.notes || '';
             suggestionsWrap.innerHTML='';
-        });
+        };
         suggestionsWrap.appendChild(card);
     });
 }
 
-// ====== عرض السجلات في الجدول ======
+// ====== عرض الجدول ======
 function renderRecords(){
     recordsBody.innerHTML='';
-    const sortedRecords = [...filteredRecords].sort((a, b) => a.timestamp - b.timestamp);
-    
-    let lastDate='';
-    sortedRecords.forEach(r=>{
-        const curDate = formatDate(r.timestamp);
-        if(curDate !== lastDate){
-            const dayRow=recordsBody.insertRow();
-            dayRow.className='day-separator';
-            const cell=dayRow.insertCell();
-            cell.colSpan=7;
-            cell.textContent=new Date(r.timestamp).toLocaleDateString('ar-EG',{ weekday:'long', year:'numeric', month:'long', day:'numeric' });
-            lastDate=curDate;
+    if(recordsCache.length===0){
+        recordsBody.innerHTML = '<tr><td colspan="7" style="padding:16px; color:#999;">لا توجد سجلات لعرضها</td></tr>';
+        return;
+    }
+
+    const filteredRecords = recordsCache.filter(r => r.filtered);
+    if(filteredRecords.length===0){
+        recordsBody.innerHTML = '<tr><td colspan="7" style="padding:16px; color:#999;">لا توجد نتائج مطابقة لفلتر البحث</td></tr>';
+        return;
+    }
+
+    let lastDate = null;
+    filteredRecords.forEach(r => {
+        const currentDate = formatDate(r.timestamp);
+        
+        if (currentDate !== lastDate) {
+            const dateRow = recordsBody.insertRow();
+            dateRow.className = 'day-separator';
+            const cell = dateRow.insertCell();
+            cell.colSpan = 7;
+            cell.textContent = currentDate;
+            lastDate = currentDate;
         }
-        const row=recordsBody.insertRow();
-        [r.name,r.number,r.college,r.inTime,r.outTime||'—',r.notes||'—'].forEach((val,i)=>{
-            const cell=row.insertCell(); cell.textContent=val;
-            if(i===3) cell.className='time-in'; if(i===4 && r.outTime) cell.className='time-out';
-        });
-        const actionCell=row.insertCell();
+
+        const row = recordsBody.insertRow();
+        row.dataset.id = r.id;
+        
+        row.insertCell().textContent = r.name;
+        row.insertCell().textContent = r.number;
+        row.insertCell().textContent = r.college;
+        
+        const inTimeCell = row.insertCell();
+        inTimeCell.className = 'time-in';
+        inTimeCell.textContent = r.inTime;
+        
+        const outTimeCell = row.insertCell();
+        outTimeCell.className = r.outTime ? 'time-out' : '';
+        outTimeCell.textContent = r.outTime || '-';
+        
+        row.insertCell().textContent = r.notes || '-';
+        
+        const actionCell = row.insertCell();
         actionCell.className = 'action-cell';
-        if(!r.outTime){
-            const btn=document.createElement('button'); btn.className='exit-btn'; btn.textContent='خروج'; btn.dataset.id=r.id;
-            actionCell.appendChild(btn);
-        } else {
-            actionCell.textContent='تم الخروج';
+        if (!r.outTime) {
+            const exitBtn = document.createElement('button');
+            exitBtn.className = 'exit-btn';
+            exitBtn.dataset.id = r.id;
+            exitBtn.textContent = 'خروج';
+            actionCell.appendChild(exitBtn);
         }
     });
 }
 
+// ====== تطبيق الفلاتر ======
 function applyFilters(){
-    const selDate=filterDateInput.value; const sq=searchQueryInput.value.trim().toLowerCase();
-    filteredRecords=recordsCache.filter(r=>{
+    const selDate=filterDateInput.value;
+    const sq=searchQueryInput.value.trim().toLowerCase();
+    
+    recordsCache.forEach(r=>{
         let d=true, s=true;
         if(selDate) d=formatDate(r.timestamp)===selDate;
         if(sq){ const n=r.name.toLowerCase(), num=r.number.toLowerCase(); s=n.includes(sq)||num.includes(sq); }
-        return d&&s;
+        r.filtered=d&&s;
     });
     renderRecords();
 }
@@ -360,26 +378,62 @@ searchQueryInput.addEventListener('input',applyFilters);
 carNumberInput.addEventListener('input', (e) => renderSuggestions(e.target.value.trim()));
 
 
-// ====== تسجيل الدخول والخروج للسيارات ======
+// ====== تسجيل الدخول للسيارات ======
 loginBtn.addEventListener('click',()=>{
     const number=carNumberInput.value.trim(), name=nameInput.value.trim(), college=collegeInput.value.trim(), notes=notesInput.value.trim();
     if(!number||!name){ showNotification('من فضلك أدخل رقم السيارة والاسم','error'); return; }
     if(recordsCache.some(r=>r.number===number && !r.outTime)){ showNotification(`⚠️ السيارة ${number} مسجلة دخول بالفعل!`,'warning'); return; }
     const ts=Date.now();
-    recordsCache.push({ id:'rec_'+ts, name, number, college, notes, inTime:formatTime(ts), outTime:'', timestamp:ts });
+    const newRecord = { id:'rec_'+ts, name, number, college, notes, inTime:formatTime(ts), outTime:'', timestamp:ts };
+    recordsCache.push(newRecord);
     recordsCache.sort((a,b)=>a.timestamp-b.timestamp);
     saveRecordsToLocalStorage(); 
     applyFilters();
     carNumberInput.value=''; nameInput.value=''; collegeInput.value=''; notesInput.value=''; suggestionsWrap.innerHTML='';
     showNotification('✅ تم تسجيل الدخول بنجاح!','success');
-});
 
-recordsBody.addEventListener('click',e=>{
-    if(e.target.classList.contains('exit-btn')){
-        const rec=recordsCache.find(r=>r.id===e.target.dataset.id);
-        if(rec){ rec.outTime=formatTime(Date.now()); rec.outTimestamp=Date.now(); saveRecordsToLocalStorage(); applyFilters(); showNotification('✅ تم تسجيل الخروج بنجاح!','success'); }
+    const today=formatDate(ts);
+    const datePath = today.replace(/-/g,'');
+    set(ref(db,`records/${datePath}/${newRecord.id}`), newRecord).catch(e => console.error("Failed to sync new entry to Firebase:", e));
+
+    if(!carsCache.some(c=>c.number===number)){
+        carsCache.push({ number, name, college, notes });
+        saveCarsToLocalStorage();
     }
 });
+
+// ====== تسجيل الخروج للسيارات (تم التعديل) ======
+recordsBody.addEventListener('click', e => {
+    const exitButton = e.target.closest('.exit-btn');
+    if (exitButton) {
+        const recId = exitButton.dataset.id;
+        const rec = recordsCache.find(r => r.id === recId);
+        if (rec) {
+            const outTs = Date.now();
+            rec.outTime = formatTime(outTs);
+            rec.outTimestamp = outTs;
+            
+            // لا حاجة للحفظ المحلي، سيتم التحديث عبر المزامنة
+            applyFilters();
+            showNotification('✅ تم تسجيل الخروج بنجاح!', 'success');
+
+            // تحديث السحابة فوراً
+            const recordDate = formatDate(rec.timestamp);
+            const datePath = recordDate.replace(/-/g, '');
+            const recordRef = ref(db, `records/${datePath}/${rec.id}`);
+            
+            set(recordRef, rec).catch(err => {
+                console.error("Failed to sync exit to Firebase:", err);
+                showNotification('❌ فشل تحديث الخروج في السحابة', 'error');
+                // في حالة الفشل، يمكن إعادة الحقول القديمة وعرض خطأ
+                rec.outTime = '';
+                rec.outTimestamp = undefined;
+                applyFilters();
+            });
+        }
+    }
+});
+
 
 // ====== رفع السجلات والمزامنة ======
 uploadBtn.addEventListener('click', async ()=>{
@@ -391,18 +445,19 @@ uploadBtn.addEventListener('click', async ()=>{
     try{
         await set(ref(db,`records/${today.replace(/-/g,'')}`),obj);
         showNotification(`✅ تم رفع ${todayRecs.length} سجل بنجاح!`,'success');
+        recordsCache = recordsCache.filter(r => formatDate(r.timestamp) !== today);
+        saveRecordsToLocalStorage();
+        await loadAllCloudRecords();
     } catch(e){ showNotification('❌ فشل رفع السجلات','error'); }
     finally{ uploadBtn.disabled=false; uploadBtn.textContent='⬆️ رفع سجلات اليوم اون لاين'; }
 });
 
-// *** تم التعديل: دالة المزامنة اللحظية الآن تدعم الحذف ***
 function listenForRealtimeUpdates() {
     const today = formatDate(Date.now());
     const datePath = today.replace(/-/g, '');
     const recordsRef = ref(db, `records/${datePath}`);
 
     onValue(recordsRef, (snapshot) => {
-        // لا تقم بأي عملية حذف عند أول تحميل للصفحة
         if (!isInitialSyncDone) {
             isInitialSyncDone = true;
             return;
@@ -412,13 +467,11 @@ function listenForRealtimeUpdates() {
         const todayLocalRecs = recordsCache.filter(r => formatDate(r.timestamp) === today);
 
         if (snapshot.exists()) {
-            // الحالة 1: هناك بيانات في السحابة
             const cloudRecords = Object.values(snapshot.val());
             const cloudRecordIds = cloudRecords.map(r => r.id);
 
-            // حذف السجلات المحلية التي لم تعد موجودة في السحابة
             const recordsToRemove = todayLocalRecs.filter(localRec => {
-                const isOldEnough = (Date.now() - localRec.timestamp) > 60000; // مر على إنشائه دقيقة
+                const isOldEnough = (Date.now() - localRec.timestamp) > 60000;
                 return isOldEnough && !cloudRecordIds.includes(localRec.id);
             });
 
@@ -428,21 +481,19 @@ function listenForRealtimeUpdates() {
                 changesMade = true;
             }
 
-            // إضافة أو تحديث السجلات من السحابة
             cloudRecords.forEach(cloudRec => {
                 const existingRec = recordsCache.find(localRec => localRec.id === cloudRec.id);
                 if (!existingRec) {
                     recordsCache.push(cloudRec);
                     changesMade = true;
-                } else if (cloudRec.outTime && !existingRec.outTime) {
-                    existingRec.outTime = cloudRec.outTime;
-                    existingRec.outTimestamp = cloudRec.outTimestamp;
+                } else if (JSON.stringify(existingRec) !== JSON.stringify(cloudRec)) {
+                    // تحديث السجل المحلي إذا كان هناك اختلاف
+                    Object.assign(existingRec, cloudRec);
                     changesMade = true;
                 }
             });
 
         } else {
-            // الحالة 2: المسار في السحابة فارغ (تم الحذف)
             if (todayLocalRecs.length > 0) {
                 recordsCache = recordsCache.filter(r => formatDate(r.timestamp) !== today);
                 changesMade = true;
@@ -457,6 +508,49 @@ function listenForRealtimeUpdates() {
             applyFilters();
         }
     });
+}
+
+// ====== جلب جميع السجلات من السحابة ======
+async function loadAllCloudRecords() {
+    if(allCloudRecordsLoaded) return;
+    try {
+        const snapshot = await get(child(dbRef, 'records'));
+        if (snapshot.exists()) {
+            recordsCache = [];
+            const allDays = snapshot.val();
+            Object.values(allDays).forEach(dayRecords => {
+                Object.values(dayRecords).forEach(record => {
+                    recordsCache.push(record);
+                });
+            });
+            recordsCache.sort((a, b) => a.timestamp - b.timestamp);
+            populateDateFilter();
+            applyFilters();
+            allCloudRecordsLoaded = true;
+            showNotification('✅ تم تحميل جميع السجلات السحابية بنجاح', 'success');
+        } else {
+            showNotification('⚠️ لا توجد سجلات سحابية لعرضها', 'info');
+        }
+    } catch (error) {
+        showNotification('❌ فشل تحميل السجلات السحابية', 'error');
+        console.error("Error loading all cloud records:", error);
+    }
+}
+
+
+// ====== جلب بيانات السيارات ======
+async function fetchCarsData() {
+    if (loadCarsFromLocalStorage()) return;
+
+    try {
+        const snapshot = await get(child(dbRef, 'cars'));
+        if (snapshot.exists()) {
+            carsCache = Object.values(snapshot.val());
+            saveCarsToLocalStorage();
+        }
+    } catch (error) {
+        console.error("Error fetching cars data:", error);
+    }
 }
 
 // ====== منطق تسجيل دخول وخروج الأدمن ======
@@ -480,15 +574,15 @@ cancelAdminLoginBtn.addEventListener('click', () => {
 });
 
 submitAdminLoginBtn.addEventListener('click', () => {
-    const user = adminUserInput.value.trim();
-    const pass = adminPassInput.value.trim();
-    if (user === 'admin' && pass === '1234') {
+    const user = document.getElementById('adminUser').value;
+    const pass = adminPassInput.value;
+    
+    if (user === 'admin' && pass === '123456') {
         setAdminMode(true);
         adminLoginModal.classList.remove('show');
         showNotification('✅ تم تسجيل الدخول كمسؤول', 'success');
-        adminPassInput.value = '';
     } else {
-        showNotification('❌ بيانات الدخول غير صحيحة', 'error');
+        showNotification('❌ اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
     }
 });
 
@@ -504,10 +598,10 @@ async function init(){
     }
     await fetchCarsData();
     loadRecordsFromLocalStorage();
+    await loadAllCloudRecords();
     listenForRealtimeUpdates(); 
 }
 init();
 </script>
 </body>
 </html>
-
