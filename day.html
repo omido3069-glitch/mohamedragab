@@ -30,6 +30,7 @@ body{
   padding:14px;
 }
 
+/* --- الأنماط العامة --- */
 .title { color: var(--blue-dark); font-size:24px; font-weight:900; text-align:center; margin-top:10px; margin-bottom:4px; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.05);}
 .status-wrap{ width:100%; max-width:520px; overflow:hidden; border-radius:10px; margin-bottom:12px; background:linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05)); border:1px solid rgba(13,71,161,0.06);}
 .status { display:block; white-space:nowrap; padding:8px 12px; font-weight:700; color:var(--black-bold); background: linear-gradient(90deg, rgba(235,246,255,0.6), rgba(255,255,255,0)); transform:translateX(100%); animation: slideRTL 8s linear infinite; font-size:14px; }
@@ -40,18 +41,9 @@ label{ display:block; text-align:right; margin:8px 0 6px; font-weight:800; color
 .input { width:100%; padding:12px 14px; border-radius:12px; border:1px solid #d6eaf8; background: var(--card-blue); text-align:center; font-size:16px; font-weight:700; color:var(--black-bold); outline:none; box-sizing:border-box; }
 .input:focus{ box-shadow:0 6px 18px rgba(33,150,243,0.12); border-color:var(--accent); background:#eef8ff; }
 textarea.input { min-height:60px; resize:vertical; padding-top:10px; }
-
-.row { display:flex; gap:10px; align-items:center; }
-
-.filter-bar { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; max-width: 520px; }
-.filter-bar .input { padding: 8px 10px; font-size: 14px; font-weight: 600; height: 40px; }
-.filter-bar select.input { flex-shrink: 0; width: 140px; text-align: right; padding-right: 14px; }
-.filter-bar .input[type="text"] { flex-grow: 1; }
-
 .btn-primary { margin-top:12px; width:100%; padding:12px; border-radius:12px; border:none; background: linear-gradient(90deg,#1565c0,#42a5f5); color:white; font-weight:800; font-size:16px; cursor:pointer; transition:opacity 0.3s ease; }
 .btn-primary:active{transform:scale(.995)}
 .btn-primary:disabled{opacity:.6;cursor:not-allowed}
-
 .btn-secondary { display: block; width: 100%; text-align: center; padding: 8px; border-radius: 12px; border: 1px solid var(--accent); background: #fff; color: var(--accent); font-weight: 800; font-size: 15px; cursor: pointer; transition: background 0.3s ease; text-decoration: none; box-sizing: border-box; }
 .btn-secondary:hover { background: var(--blue-soft); }
 
@@ -59,43 +51,91 @@ textarea.input { min-height:60px; resize:vertical; padding-top:10px; }
 .suggestion-card{ background: linear-gradient(180deg,#e8f6ff, #d7efff); border-radius:12px; padding:10px 12px; min-width:96px; text-align:center; font-weight:800; color:var(--blue-dark); cursor:pointer; box-sizing:border-box; border:1px solid rgba(13,71,161,0.06); transition:transform .12s ease, box-shadow .12s ease; }
 .suggestion-card:hover{ transform:translateY(-4px); box-shadow:0 8px 20px rgba(13,71,161,0.08) }
 
+/* --- أنماط الفلترة والجدول --- */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; max-width: 520px; }
+.filter-bar .input { padding: 8px 10px; font-size: 14px; font-weight: 600; height: 40px; }
+.filter-bar select.input { flex-shrink: 0; width: 140px; text-align: right; padding-right: 14px; }
+.filter-bar .input[type="text"] { flex-grow: 1; }
 .table-wrap{ width:100%; max-width:520px; background:#fff; border-radius:12px; overflow:auto; box-shadow:0 8px 20px rgba(13,71,161,0.04); margin-top:10px; }
 table { width:100%; border-collapse:collapse; }
-th, td{ padding:8px; text-align:center; border-bottom:2px solid #ccddee; font-weight:700; color:var(--black-bold); font-size:10px; }
-th{ background:var(--accent); color:#fff; font-size:9px; font-weight:800; }
-.time-in{ color:var(--green) }
-.time-out{ color:var(--danger) }
+
+th, td{ 
+    padding:8px 6px; 
+    text-align:center; 
+    border-bottom:1px solid #e0eaf3; 
+    font-weight:700; 
+    color:var(--black-bold); 
+    font-size:11px;
+    white-space: nowrap;
+}
+th{ 
+    background:var(--accent); 
+    color:#fff; 
+    font-size:10px;
+    font-weight:800; 
+    border-bottom: 2px solid var(--blue-dark);
+}
+.time-in{ color:var(--green); font-weight: 800; }
+.time-out{ color:var(--danger); font-weight: 800; }
 .exit-btn{ background:var(--danger); color:#fff; border:none; padding:4px 6px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer; transition:opacity 0.3s ease; }
-.exit-btn:disabled{ opacity:.6; cursor:not-allowed; }
 
-.footer { margin-top:6px; color: #999; font-weight: 600; font-size: 12px; text-align: center; padding-bottom: 10px; }
+.day-separator td {
+    background: var(--blue-soft);
+    color: var(--blue-dark);
+    font-weight: 800;
+    text-align: center;
+    padding: 6px;
+    border-bottom: 2px solid var(--accent);
+    border-top: 2px solid var(--accent);
+    font-size: 12px;
+}
 
-.loading-text { display:inline-block; font-weight:800; color:var(--blue-dark); margin-left:8px; }
-.pulse { display:inline-block; width:8px;height:8px;border-radius:50%; background:var(--blue-dark); margin-left:6px; animation:pulse 1s infinite; }
-@keyframes pulse { 0%{opacity:1}50%{opacity:.3}100%{opacity:1} }
 
-.notification { position: fixed; top: 20px; right: 20px; padding: 12px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; animation: slideIn 0.3s ease; z-index: 1000; }
+/* --- أنماط الأدمن وتسجيل الدخول --- */
+.admin-controls, .admin-only, .exit-btn, th.action-col, td.action-cell { display: none; }
+body.admin-logged-in .admin-controls,
+body.admin-logged-in .admin-only,
+body.admin-logged-in .exit-btn,
+body.admin-logged-in th.action-col,
+body.admin-logged-in td.action-cell { display: revert; }
+#adminLoginIcon { position: fixed; top: 15px; left: 15px; width: 44px; height: 44px; background: var(--blue-dark); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1001; }
+#adminLogoutBtn { display: none; }
+body.admin-logged-in #adminLoginIcon { display: none; }
+body.admin-logged-in #adminLogoutBtn { display: block; }
+
+/* --- نافذة تسجيل الدخول (Modal) --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
+.modal-content { background: white; padding: 20px; border-radius: 14px; width: 90%; max-width: 340px; text-align: center; }
+.modal-overlay.show { display: flex; }
+
+/* --- الإشعارات --- */
+.notification { position: fixed; top: 20px; right: 20px; padding: 12px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; z-index: 1000; transition: transform 0.3s ease, opacity 0.5s ease; }
 .notification.success { background: #4caf50; color: white; }
 .notification.error { background: #f44336; color: white; }
-.notification.warning { background: #ff9800; color: var(--black-bold); }
 .notification.info { background: #2196F3; color: white; }
-@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-.notification.fade-out { animation: fadeOut 0.5s ease-out forwards; }
-@keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(400px); } }
+@keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
+.notification { animation: slideIn 0.3s ease-out forwards; }
+.notification.fade-out { transform: translateX(110%); opacity: 0; }
 
-.day-separator td { background: var(--blue-soft); color: var(--blue-dark); font-weight: 800; text-align: center; padding: 6px; border-bottom: 3px solid var(--accent); border-top: 3px solid var(--accent); font-size: 11px; }
-
-@media (max-width:420px){
-  .title{ font-size:18px }
-  .card{ padding:12px }
-  .input{ font-size:15px; padding:10px }
-  .btn-primary{ padding:10px; font-size:15px }
-  th,td{ padding:4px; font-size:9px } 
-  .suggestion-card{ min-width:86px; padding:8px 10px; font-size:13px }
-}
 </style>
 </head>
 <body>
+
+<div id="adminLoginIcon" title="دخول المسؤول"><i class="bi bi-person-fill-lock"></i></div>
+<button id="adminLogoutBtn" class="btn-secondary admin-only" style="position: fixed; top: 15px; left: 15px; width: auto; padding: 8px 16px; z-index: 1001;">تسجيل الخروج</button>
+
+<div id="adminLoginModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color: var(--blue-dark); margin-top: 0;">دخول المسؤول</h3>
+        <label for="adminUser">اسم المستخدم</label>
+        <input id="adminUser" class="input" value="admin">
+        <label for="adminPass">كلمة المرور</label>
+        <input id="adminPass" type="password" class="input">
+        <button id="submitAdminLogin" class="btn-primary">دخول</button>
+        <button id="cancelAdminLogin" class="btn-secondary" style="margin-top: 8px;">إلغاء</button>
+    </div>
+</div>
+
 
 <div style="width:100%;max-width:520px;">
 <div class="title">🚗 نظام تسجيل السيارات — جامعة حلوان الأهلية</div>
@@ -105,38 +145,31 @@ th{ background:var(--accent); color:#fff; font-size:9px; font-weight:800; }
   <span id="status" class="status">✅ البيانات محفوظة محلياً (بدون اتصال بالإنترنت)</span>
 </div>
 
-<div class="card" id="uploadCard">
-    <button id="uploadBtn" class="btn-secondary">⬆️ رفع سجلات اليوم اون لاين</button>
-    <div id="syncStatus" style="margin-top:8px; font-size:12px; color:#666; text-align:center; display:none;"></div>
+<div class="admin-controls">
+    <div class="card" id="uploadCard">
+        <button id="uploadBtn" class="btn-secondary">⬆️ رفع سجلات اليوم اون لاين</button>
+    </div>
 </div>
 
-<div class="card">
-  <label for="carNumber">رقم السيارة</label>
-  <input id="carNumber" class="input" placeholder="اكتب رقم السيارة (اكتب أول رقمين لتظهر الاقتراحات)" autocomplete="off" />
-
-  <div id="suggestions" class="suggestions" aria-live="polite"></div>
-
-  <label for="name">الاسم</label>
-  <input id="name" class="input" placeholder="الاسم" />
-
-  <label for="college">جهة الدخول</label>
-  <input id="college" class="input" placeholder="جهة الدخول" />
-
-  <label for="notes">ملاحظات</label>
-  <textarea id="notes" class="input" placeholder="ملاحظات (اختياري)"></textarea>
-
-  <button id="loginBtn" class="btn-primary">➕ تسجيل دخول</button>
-
-  <div id="loadingRow" style="margin-top:10px;display:none;">
-    <span class="loading-text">جارٍ جلب الاقتراحات</span><span class="pulse" aria-hidden="true"></span>
-  </div>
+<div class="admin-controls">
+    <div class="card">
+      <label for="carNumber">رقم السيارة</label>
+      <input id="carNumber" class="input" placeholder="اكتب رقم السيارة" autocomplete="off" />
+      <div id="suggestions" class="suggestions" aria-live="polite"></div>
+      <label for="name">الاسم</label>
+      <input id="name" class="input" placeholder="الاسم" />
+      <label for="college">جهة الدخول</label>
+      <input id="college" class="input" placeholder="جهة الدخول" />
+      <label for="notes">ملاحظات</label>
+      <textarea id="notes" class="input" placeholder="ملاحظات (اختياري)"></textarea>
+      <button id="loginBtn" class="btn-primary">➕ تسجيل دخول</button>
+    </div>
 </div>
 
 <div class="filter-bar">
     <select id="filterDate" class="input" title="فلتر حسب اليوم">
         <option value="">كل الأيام</option>
     </select>
-
     <input type="text" id="searchQuery" class="input" placeholder="بحث بالاسم أو رقم السيارة" title="بحث بالاسم أو رقم السيارة">
 </div>
 
@@ -150,7 +183,7 @@ th{ background:var(--accent); color:#fff; font-size:9px; font-weight:800; }
         <th>وقت الدخول</th>
         <th>وقت الخروج</th>
         <th>ملاحظات</th>
-        <th>إجراء</th>
+        <th class="action-col">إجراء</th>
       </tr>
     </thead>
     <tbody id="recordsBody"></tbody>
@@ -164,7 +197,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getDatabase, ref, get, child, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 // ====== Firebase Config ======
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDBSiTb1m0osdrX7YOv4ADr8x-7TghSqmY",
   authDomain: "day3069-e27df.firebaseapp.com",
@@ -193,25 +225,37 @@ const filterDateInput = document.getElementById('filterDate');
 const searchQueryInput = document.getElementById('searchQuery');
 const uploadBtn = document.getElementById('uploadBtn');
 
+// عناصر الأدمن
+const adminLoginIcon = document.getElementById('adminLoginIcon');
+const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+const adminLoginModal = document.getElementById('adminLoginModal');
+const submitAdminLoginBtn = document.getElementById('submitAdminLogin');
+const cancelAdminLoginBtn = document.getElementById('cancelAdminLogin');
+const adminUserInput = document.getElementById('adminUser');
+const adminPassInput = document.getElementById('adminPass');
+
 let carsCache = [];
 let recordsCache = [];
 let filteredRecords = [];
-let isOnline = navigator.onLine;
-let realtimeListenerActive = false;
+let isInitialSyncDone = false; // لمنع الحذف عند أول تحميل
 
-// ====== Helper Functions ======
-function showNotification(message,type='success'){
-  const n = document.createElement('div'); n.className=`notification ${type}`; n.textContent=message;
-  document.body.appendChild(n);
-  setTimeout(()=>{ n.classList.add('fade-out'); n.addEventListener('animationend',()=>n.remove()) },3000);
+// ====== دوال مساعدة ======
+function showNotification(message, type = 'success') {
+    const n = document.createElement('div');
+    n.className = `notification ${type}`;
+    n.textContent = message;
+    document.body.appendChild(n);
+
+    setTimeout(() => {
+        n.classList.add('fade-out');
+        n.addEventListener('transitionend', () => n.remove());
+    }, 3000);
 }
+
 function formatTime(ts){ const d=new Date(ts); const h=d.getHours(); const m=d.getMinutes(); const ampm=h>=12?'م':'ص'; return `${h%12||12}:${m<10?'0'+m:m} ${ampm}`; }
-function formatDate(ts){ 
-    const d=new Date(ts); 
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; 
-}
+function formatDate(ts){ const d=new Date(ts); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
-// ====== Local Storage ======
+// ====== التخزين المحلي ======
 function loadRecordsFromLocalStorage(){
     const recs=localStorage.getItem('carRecords');
     recordsCache=recs?JSON.parse(recs):[];
@@ -219,17 +263,11 @@ function loadRecordsFromLocalStorage(){
     populateDateFilter();
     applyFilters();
 }
-function saveRecordsToLocalStorage(){
-    localStorage.setItem('carRecords',JSON.stringify(recordsCache));
-}
-function loadCarsFromLocalStorage(){
-    const cars=localStorage.getItem('carsCached');
-    if(cars){ carsCache=JSON.parse(cars); return true; }
-    return false;
-}
+function saveRecordsToLocalStorage(){ localStorage.setItem('carRecords',JSON.stringify(recordsCache)); }
+function loadCarsFromLocalStorage(){ const cars=localStorage.getItem('carsCached'); if(cars){ carsCache=JSON.parse(cars); return true; } return false; }
 function saveCarsToLocalStorage(){ localStorage.setItem('carsCached',JSON.stringify(carsCache)); }
 
-// ====== Date Filter ======
+// ====== فلتر التاريخ ======
 function populateDateFilter(){
     const uniqueDates=[...new Set(recordsCache.map(r=>formatDate(r.timestamp)))].sort((a,b)=>new Date(b)-new Date(a));
     filterDateInput.innerHTML='<option value="">كل الأيام</option>';
@@ -240,45 +278,23 @@ function populateDateFilter(){
     });
 }
 
-// ====== Fetch Cars from Firebase ======
+// ====== جلب بيانات السيارات ======
 async function fetchCarsData(){
     try{
-        statusSpan.textContent='⏳ جارٍ جلب بيانات السيارات من Firebase...';
+        statusSpan.textContent='⏳ جارٍ جلب بيانات السيارات...';
         const snapshot=await get(child(dbRef,'cars'));
-        if(snapshot.exists()){
-            carsCache=Object.values(snapshot.val());
-            saveCarsToLocalStorage();
-            statusSpan.textContent='✅ تم تحديث بيانات السيارات بنجاح.';
-            isOnline=true; updateStatusDisplay();
-            return true;
-        } else {
-            statusSpan.textContent='⚠️ لم يتم العثور على بيانات سيارات.';
-            return false;
-        }
+        if(snapshot.exists()){ carsCache=Object.values(snapshot.val()); saveCarsToLocalStorage(); statusSpan.textContent='✅ تم تحديث بيانات السيارات.'; }
+        else { statusSpan.textContent='⚠️ لم يتم العثور على بيانات سيارات.'; }
     } catch(e){
-        console.error(e);
-        if(loadCarsFromLocalStorage()){
-            statusSpan.textContent='⚠️ تم تحميل البيانات المحفوظة محلياً (بدون إنترنت).';
-            isOnline=false; updateStatusDisplay();
-            return true;
-        } else {
-            statusSpan.textContent='❌ فشل جلب البيانات. تأكد من اتصالك بالإنترنت.';
-            isOnline=false; updateStatusDisplay();
-            return false;
-        }
+        if(loadCarsFromLocalStorage()){ statusSpan.textContent='📴 تم تحميل البيانات المحفوظة (بدون إنترنت).'; }
+        else { statusSpan.textContent='❌ فشل جلب البيانات.'; }
     }
 }
 
-// ====== Status Display ======
-function updateStatusDisplay(){
-    if(isOnline) statusSpan.textContent='✅ متصل بالإنترنت - البيانات محدثة';
-    else statusSpan.textContent='📴 بدون إنترنت - تعمل بالبيانات المحفوظة محلياً';
-}
-
-// ====== Render Suggestions ======
+// ====== عرض الاقتراحات ======
 function renderSuggestions(q){
     suggestionsWrap.innerHTML='';
-    if(q.length<2) return;
+    if(q.length<1) return;
     const matches=carsCache.filter(c=> c.carNumber && c.carNumber.includes(q));
     matches.slice(0,10).forEach(c=>{
         const card=document.createElement('div'); card.className='suggestion-card';
@@ -293,13 +309,40 @@ function renderSuggestions(q){
         });
         suggestionsWrap.appendChild(card);
     });
-    if(matches.length===0){
-        const no=document.createElement('div'); no.style.color='#666'; no.style.fontWeight='700'; no.style.marginTop='6px';
-        no.textContent='لا توجد اقتراحات لهذه البداية'; suggestionsWrap.appendChild(no);
-    }
 }
 
-// ====== Apply Filters ======
+// ====== عرض السجلات في الجدول ======
+function renderRecords(){
+    recordsBody.innerHTML='';
+    const sortedRecords = [...filteredRecords].sort((a, b) => a.timestamp - b.timestamp);
+    
+    let lastDate='';
+    sortedRecords.forEach(r=>{
+        const curDate = formatDate(r.timestamp);
+        if(curDate !== lastDate){
+            const dayRow=recordsBody.insertRow();
+            dayRow.className='day-separator';
+            const cell=dayRow.insertCell();
+            cell.colSpan=7;
+            cell.textContent=new Date(r.timestamp).toLocaleDateString('ar-EG',{ weekday:'long', year:'numeric', month:'long', day:'numeric' });
+            lastDate=curDate;
+        }
+        const row=recordsBody.insertRow();
+        [r.name,r.number,r.college,r.inTime,r.outTime||'—',r.notes||'—'].forEach((val,i)=>{
+            const cell=row.insertCell(); cell.textContent=val;
+            if(i===3) cell.className='time-in'; if(i===4 && r.outTime) cell.className='time-out';
+        });
+        const actionCell=row.insertCell();
+        actionCell.className = 'action-cell';
+        if(!r.outTime){
+            const btn=document.createElement('button'); btn.className='exit-btn'; btn.textContent='خروج'; btn.dataset.id=r.id;
+            actionCell.appendChild(btn);
+        } else {
+            actionCell.textContent='تم الخروج';
+        }
+    });
+}
+
 function applyFilters(){
     const selDate=filterDateInput.value; const sq=searchQueryInput.value.trim().toLowerCase();
     filteredRecords=recordsCache.filter(r=>{
@@ -311,83 +354,160 @@ function applyFilters(){
     renderRecords();
 }
 
-// ====== Render Records Table ======
-function renderRecords(){
-    recordsBody.innerHTML=''; let lastDate='';
-    filteredRecords.forEach(r=>{
-        const curDate=formatDate(r.timestamp);
-        if(curDate!==lastDate){
-            const row=recordsBody.insertRow(); row.className='day-separator';
-            const cell=row.insertCell(); cell.colSpan=7;
-            cell.textContent=new Date(r.timestamp).toLocaleDateString('ar-EG',{ weekday:'long', year:'numeric', month:'long', day:'numeric' });
-            lastDate=curDate;
-        }
-        const row=recordsBody.insertRow();
-        [r.name,r.number,r.college,r.inTime,r.outTime||'—',r.notes||'—'].forEach((val,i)=>{
-            const cell=row.insertCell(); cell.textContent=val;
-            if(i===3) cell.className='time-in'; if(i===4 && r.outTime) cell.className='time-out';
-        });
-        const actionCell=row.insertCell();
-        if(!r.outTime){
-            const btn=document.createElement('button'); btn.className='exit-btn'; btn.textContent='خروج'; btn.dataset.id=r.id;
-            actionCell.appendChild(btn);
-        } else actionCell.textContent='تم الخروج';
-    });
-}
-
-// ====== Event Listeners ======
-carNumberInput.addEventListener('input',e=>renderSuggestions(e.target.value.trim()));
+// ====== مستمعات الأحداث الرئيسية ======
 filterDateInput.addEventListener('change',applyFilters);
 searchQueryInput.addEventListener('input',applyFilters);
+carNumberInput.addEventListener('input', (e) => renderSuggestions(e.target.value.trim()));
 
-// ====== Login ======
+
+// ====== تسجيل الدخول والخروج للسيارات ======
 loginBtn.addEventListener('click',()=>{
-    const number=carNumberInput.value.trim();
-    const name=nameInput.value.trim();
-    const college=collegeInput.value.trim();
-    const notes=notesInput.value.trim();
+    const number=carNumberInput.value.trim(), name=nameInput.value.trim(), college=collegeInput.value.trim(), notes=notesInput.value.trim();
     if(!number||!name){ showNotification('من فضلك أدخل رقم السيارة والاسم','error'); return; }
-    const already=recordsCache.some(r=>r.number===number && !r.outTime);
-    if(already){ showNotification(`⚠️ السيارة ${number} مسجلة دخول بالفعل!`,'warning'); return; }
-    const ts=Date.now(); const inTime=formatTime(ts); const id='rec_'+ts;
-    recordsCache.push({ id, name, number, college, notes, inTime, outTime:'', timestamp:ts });
-    saveRecordsToLocalStorage(); applyFilters();
+    if(recordsCache.some(r=>r.number===number && !r.outTime)){ showNotification(`⚠️ السيارة ${number} مسجلة دخول بالفعل!`,'warning'); return; }
+    const ts=Date.now();
+    recordsCache.push({ id:'rec_'+ts, name, number, college, notes, inTime:formatTime(ts), outTime:'', timestamp:ts });
+    recordsCache.sort((a,b)=>a.timestamp-b.timestamp);
+    saveRecordsToLocalStorage(); 
+    applyFilters();
     carNumberInput.value=''; nameInput.value=''; collegeInput.value=''; notesInput.value=''; suggestionsWrap.innerHTML='';
-    showNotification('✅ تم تسجيل الدخول بنجاح! (محفوظ محلياً)','success');
+    showNotification('✅ تم تسجيل الدخول بنجاح!','success');
 });
 
-// ====== Logout ======
 recordsBody.addEventListener('click',e=>{
     if(e.target.classList.contains('exit-btn')){
-        const id=e.target.dataset.id; const ts=Date.now(); const outTime=formatTime(ts);
-        const rec=recordsCache.find(r=>r.id===id);
-        if(rec){ rec.outTime=outTime; rec.outTimestamp=ts; saveRecordsToLocalStorage(); applyFilters(); showNotification('✅ تم تسجيل الخروج بنجاح!','success'); }
+        const rec=recordsCache.find(r=>r.id===e.target.dataset.id);
+        if(rec){ rec.outTime=formatTime(Date.now()); rec.outTimestamp=Date.now(); saveRecordsToLocalStorage(); applyFilters(); showNotification('✅ تم تسجيل الخروج بنجاح!','success'); }
     }
 });
 
-// ====== Upload Today Records ======
-async function uploadTodayRecords(){
+// ====== رفع السجلات والمزامنة ======
+uploadBtn.addEventListener('click', async ()=>{
     const today=formatDate(Date.now());
     const todayRecs=recordsCache.filter(r=>formatDate(r.timestamp)===today);
-    if(todayRecs.length===0){ showNotification('⚠️ لا توجد سجلات لليوم الحالي لرفعها','warning'); return; }
+    if(todayRecs.length===0){ showNotification('⚠️ لا توجد سجلات لليوم لرفعها','warning'); return; }
     const obj=todayRecs.reduce((a,r)=>{ a[r.id]=r; return a; },{});
-    uploadBtn.disabled=true; const orig=uploadBtn.textContent; uploadBtn.textContent=`⏳ جارٍ رفع ${todayRecs.length} سجل...`;
+    uploadBtn.disabled=true; uploadBtn.textContent=`⏳ جارٍ رفع ${todayRecs.length} سجل...`;
     try{
-        const datePath=today.replace(/-/g,'');
-        await set(ref(db,`records/${datePath}`),obj);
-        showNotification(`✅ تم رفع ${todayRecs.length} سجل لليوم ${today} بنجاح!`,'success');
-        isOnline=true; updateStatusDisplay();
-    } catch(e){ console.error(e); showNotification('❌ فشل رفع السجلات','error'); isOnline=false; updateStatusDisplay(); }
-    finally{ uploadBtn.disabled=false; uploadBtn.textContent=orig; }
-}
-uploadBtn.addEventListener('click',uploadTodayRecords);
+        await set(ref(db,`records/${today.replace(/-/g,'')}`),obj);
+        showNotification(`✅ تم رفع ${todayRecs.length} سجل بنجاح!`,'success');
+    } catch(e){ showNotification('❌ فشل رفع السجلات','error'); }
+    finally{ uploadBtn.disabled=false; uploadBtn.textContent='⬆️ رفع سجلات اليوم اون لاين'; }
+});
 
-// ====== Init ======
+// *** تم التعديل: دالة المزامنة اللحظية الآن تدعم الحذف ***
+function listenForRealtimeUpdates() {
+    const today = formatDate(Date.now());
+    const datePath = today.replace(/-/g, '');
+    const recordsRef = ref(db, `records/${datePath}`);
+
+    onValue(recordsRef, (snapshot) => {
+        // لا تقم بأي عملية حذف عند أول تحميل للصفحة
+        if (!isInitialSyncDone) {
+            isInitialSyncDone = true;
+            return;
+        }
+
+        let changesMade = false;
+        const todayLocalRecs = recordsCache.filter(r => formatDate(r.timestamp) === today);
+
+        if (snapshot.exists()) {
+            // الحالة 1: هناك بيانات في السحابة
+            const cloudRecords = Object.values(snapshot.val());
+            const cloudRecordIds = cloudRecords.map(r => r.id);
+
+            // حذف السجلات المحلية التي لم تعد موجودة في السحابة
+            const recordsToRemove = todayLocalRecs.filter(localRec => {
+                const isOldEnough = (Date.now() - localRec.timestamp) > 60000; // مر على إنشائه دقيقة
+                return isOldEnough && !cloudRecordIds.includes(localRec.id);
+            });
+
+            if (recordsToRemove.length > 0) {
+                const idsToRemove = recordsToRemove.map(r => r.id);
+                recordsCache = recordsCache.filter(r => !idsToRemove.includes(r.id));
+                changesMade = true;
+            }
+
+            // إضافة أو تحديث السجلات من السحابة
+            cloudRecords.forEach(cloudRec => {
+                const existingRec = recordsCache.find(localRec => localRec.id === cloudRec.id);
+                if (!existingRec) {
+                    recordsCache.push(cloudRec);
+                    changesMade = true;
+                } else if (cloudRec.outTime && !existingRec.outTime) {
+                    existingRec.outTime = cloudRec.outTime;
+                    existingRec.outTimestamp = cloudRec.outTimestamp;
+                    changesMade = true;
+                }
+            });
+
+        } else {
+            // الحالة 2: المسار في السحابة فارغ (تم الحذف)
+            if (todayLocalRecs.length > 0) {
+                recordsCache = recordsCache.filter(r => formatDate(r.timestamp) !== today);
+                changesMade = true;
+            }
+        }
+
+        if (changesMade) {
+            showNotification('🔄 تمت المزامنة مع السحابة', 'info');
+            recordsCache.sort((a, b) => a.timestamp - b.timestamp);
+            saveRecordsToLocalStorage();
+            populateDateFilter();
+            applyFilters();
+        }
+    });
+}
+
+// ====== منطق تسجيل دخول وخروج الأدمن ======
+function setAdminMode(loggedIn) {
+    if (loggedIn) {
+        document.body.classList.add('admin-logged-in');
+        sessionStorage.setItem('isAdmin', 'true');
+    } else {
+        document.body.classList.remove('admin-logged-in');
+        sessionStorage.removeItem('isAdmin');
+    }
+}
+
+adminLoginIcon.addEventListener('click', () => {
+    adminLoginModal.classList.add('show');
+    adminPassInput.focus();
+});
+
+cancelAdminLoginBtn.addEventListener('click', () => {
+    adminLoginModal.classList.remove('show');
+});
+
+submitAdminLoginBtn.addEventListener('click', () => {
+    const user = adminUserInput.value.trim();
+    const pass = adminPassInput.value.trim();
+    if (user === 'admin' && pass === '1234') {
+        setAdminMode(true);
+        adminLoginModal.classList.remove('show');
+        showNotification('✅ تم تسجيل الدخول كمسؤول', 'success');
+        adminPassInput.value = '';
+    } else {
+        showNotification('❌ بيانات الدخول غير صحيحة', 'error');
+    }
+});
+
+adminLogoutBtn.addEventListener('click', () => {
+    setAdminMode(false);
+    showNotification('تم تسجيل الخروج', 'info');
+});
+
+// ====== بدء التشغيل ======
 async function init(){
+    if (sessionStorage.getItem('isAdmin') === 'true') {
+        setAdminMode(true);
+    }
     await fetchCarsData();
     loadRecordsFromLocalStorage();
+    listenForRealtimeUpdates(); 
 }
 init();
 </script>
 </body>
 </html>
+
