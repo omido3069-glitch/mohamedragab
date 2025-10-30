@@ -131,7 +131,7 @@ body.admin-logged-in #adminLogoutBtn { display: block; }
 <div class="footer">تم التصميم بواسطة / محمد رجب</div>
 
 <div class="status-wrap" aria-hidden="true">
-  <span id="status" class="status">✅ جاهز لتسجيل البيانات محلياً</span>
+  <span id="status" class="status">✅ جاهز لتسجيل البيانات</span>
 </div>
 
 <div class="admin-controls">
@@ -182,8 +182,9 @@ body.admin-logged-in #adminLogoutBtn { display: block; }
 </div>
 
 <script type="module">
+// استيراد الدوال اللازمة من Firebase مع إضافة onValue
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 // ====== Firebase Config ======
 const firebaseConfig = {
@@ -218,11 +219,13 @@ const adminPassInput = document.getElementById('adminPass');
 const submitAdminLoginBtn = document.getElementById('submitAdminLogin');
 const cancelAdminLoginBtn = document.getElementById('cancelAdminLogin');
 const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+const statusSpan = document.getElementById('status');
 
 // ====== متغيرات الحالة ======
 let cloudRecords = [];
 let localRecords = [];
 let carsCache = [];
+let isInitialLoad = true; // متغير لتتبع أول تحميل للبيانات
 
 // ====== دوال مساعدة ======
 function showNotification(message, type = 'success') {
@@ -265,12 +268,12 @@ function renderCombinedRecords() {
     
     const filteredRecords = allRecords.filter(r => {
         const dateMatch = !selDate || formatDate(r.timestamp) === selDate;
-        const searchMatch = !sq || r.name.toLowerCase().includes(sq) || r.number.toLowerCase().includes(sq);
+        const searchMatch = !sq || (r.name && r.name.toLowerCase().includes(sq)) || (r.number && r.number.toLowerCase().includes(sq));
         return dateMatch && searchMatch;
     });
 
-    // --- هذا هو السطر الوحيد الذي تم تغييره ---
-    filteredRecords.sort((a, b) => a.timestamp - b.timestamp); // فرز تصاعدي (الأقدم أولاً)
+    // فرز تنازلي (الأحدث أولاً)
+    filteredRecords.sort((a, b) => b.timestamp - a.timestamp);
     
     recordsBody.innerHTML = '';
 
@@ -293,6 +296,10 @@ function renderCombinedRecords() {
 
         const row = recordsBody.insertRow();
         row.dataset.id = r.id;
+        // إضافة علامة للسجلات المحلية
+        if (localRecords.some(local => local.id === r.id)) {
+            row.style.backgroundColor = 'var(--blue-soft)';
+        }
 
         row.insertCell().textContent = r.name;
         row.insertCell().textContent = r.number;
@@ -324,6 +331,7 @@ function populateDateFilter() {
     const allRecords = [...cloudRecords, ...localRecords];
     const dates = [...new Set(allRecords.map(r => formatDate(r.timestamp)))];
     dates.sort((a, b) => new Date(b) - new Date(a));
+    const currentFilter = filterDateInput.value;
     filterDateInput.innerHTML = '<option value="">كل الأيام</option>';
     dates.forEach(date => {
         const option = document.createElement('option');
@@ -331,6 +339,10 @@ function populateDateFilter() {
         option.textContent = date;
         filterDateInput.appendChild(option);
     });
+    // الحفاظ على الفلتر المختار
+    if (dates.includes(currentFilter)) {
+        filterDateInput.value = currentFilter;
+    }
 }
 
 // ====== عرض الاقتراحات ======
@@ -399,7 +411,11 @@ recordsBody.addEventListener('click', e => {
     } else {
         record = cloudRecords.find(r => r.id === recId);
         if (record) {
+            // إنشاء نسخة محدثة بدلاً من تعديل السجل السحابي مباشرة
             const updatedRecord = { ...record, outTime: formatTime(Date.now()), outTimestamp: Date.now() };
+            // حذف السجل القديم من السجلات المحلية إذا كان موجوداً (لتجنب التكرار)
+            localRecords = localRecords.filter(r => r.id !== recId);
+            // إضافة السجل المحدث إلى السجلات المحلية
             localRecords.push(updatedRecord);
         }
     }
@@ -418,7 +434,9 @@ uploadBtn.addEventListener('click', async () => {
 
     const updates = {};
     localRecords.forEach(record => {
-        const datePath = formatDate(record.timestamp).replace(/-/g, '');
+        // التأكد من وجود timestamp
+        const ts = record.timestamp || Date.now();
+        const datePath = formatDate(ts).replace(/-/g, '');
         updates[`records/${datePath}/${record.id}`] = record;
     });
 
@@ -426,12 +444,13 @@ uploadBtn.addEventListener('click', async () => {
         await update(dbRef, updates);
         showNotification(`✅ تم رفع ${localRecords.length} سجل بنجاح!`, 'success');
         
-        cloudRecords.push(...localRecords);
+        // مسح السجلات المحلية بعد رفعها بنجاح
         localRecords = [];
         saveLocalRecords();
         
-        populateDateFilter();
-        renderCombinedRecords();
+        // لا حاجة لإضافة السجلات المحلية إلى السجلات السحابية يدوياً
+        // لأن onValue سيقوم بتحديثها تلقائياً
+        // renderCombinedRecords(); // onValue سيتولى إعادة العرض
     } catch (error) {
         showNotification('❌ فشل رفع السجلات. حاول مرة أخرى.', 'error');
         console.error("Upload failed:", error);
@@ -440,7 +459,37 @@ uploadBtn.addEventListener('click', async () => {
     }
 });
 
-// ====== جلب البيانات من السحابة ======
+// ====== جلب البيانات من السحابة (بشكل لحظي) ======
+function listenToCloudRecords() {
+    const recordsRef = ref(db, 'records');
+    onValue(recordsRef, (snapshot) => {
+        cloudRecords = []; // مسح السجلات القديمة
+        if (snapshot.exists()) {
+            const allDays = snapshot.val();
+            Object.values(allDays).forEach(dayRecords => {
+                cloudRecords.push(...Object.values(dayRecords));
+            });
+            statusSpan.textContent = `🔄 آخر تحديث: ${formatTime(Date.now())} | ${cloudRecords.length} سجل أونلاين`;
+        } else {
+            statusSpan.textContent = "ℹ️ لا توجد سجلات سحابية حتى الآن.";
+        }
+
+        if (isInitialLoad) {
+            showNotification('☁️ تم الاتصال بقاعدة البيانات بنجاح', 'info');
+            isInitialLoad = false;
+        } else {
+            showNotification('🔄 تم تحديث البيانات تلقائياً!', 'info');
+        }
+        
+        populateDateFilter();
+        renderCombinedRecords();
+    }, (error) => {
+        showNotification('❌ فشل الاتصال بقاعدة البيانات', 'error');
+        console.error("Real-time listener failed:", error);
+        statusSpan.textContent = "❌ فشل الاتصال بقاعدة البيانات";
+    });
+}
+
 async function fetchCarsData() {
     try {
         const carsSnapshot = await get(ref(db, 'cars'));
@@ -450,22 +499,6 @@ async function fetchCarsData() {
     } catch (error) {
         console.error("Cars data fetch failed:", error);
         showNotification('❌ فشل تحميل بيانات السيارات', 'error');
-    }
-}
-
-async function loadCloudRecords() {
-    try {
-        const recordsSnapshot = await get(ref(db, 'records'));
-        if (recordsSnapshot.exists()) {
-            const allDays = recordsSnapshot.val();
-            Object.values(allDays).forEach(dayRecords => {
-                cloudRecords.push(...Object.values(dayRecords));
-            });
-        }
-        showNotification('☁️ تم تحميل السجلات السحابية بنجاح', 'info');
-    } catch (error) {
-        showNotification('❌ فشل الاتصال بقاعدة البيانات', 'error');
-        console.error("Cloud records fetch failed:", error);
     }
 }
 
@@ -503,12 +536,14 @@ async function init() {
     }
     loadLocalRecords();
     await fetchCarsData();
-    await loadCloudRecords();
-    populateDateFilter();
-    renderCombinedRecords();
+    // بدء الاستماع للتغيرات اللحظية بدلاً من الجلب مرة واحدة
+    listenToCloudRecords();
+    // لا حاجة لاستدعاء renderCombinedRecords و populateDateFilter هنا
+    // لأن listenToCloudRecords ستقوم بذلك عند أول اتصال
 }
 
 init();
 </script>
 </body>
 </html>
+
