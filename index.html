@@ -1,195 +1,218 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>تسجيل الدخول</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>الموقع تحت الصيانة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Cairo", sans-serif;
+    :root{
+      --bg1: #0f172a; /* dark */
+      --bg2: #0b3b57; /* teal-ish */
+      --accent: #ffd166; /* warm yellow */
+      --card: rgba(255,255,255,0.06);
+      --glass: rgba(255,255,255,0.04);
+      --text: #e6eef8;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: 'Cairo', system-ui, -apple-system, "Segoe UI", Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(255,209,102,0.06), transparent), linear-gradient(135deg,var(--bg1), var(--bg2));
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
 
-    body {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(-45deg, #1e3c72, #2a5298, #00c6ff, #0072ff);
-      background-size: 400% 400%;
-      animation: gradientMove 8s ease infinite;
-      overflow: hidden;
+    .container{
+      width:100%;
+      max-width:980px;
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:28px;
+      align-items:center;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    /* card */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:18px;
+      padding:28px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      backdrop-filter: blur(6px) saturate(120%);
+      border: 1px solid rgba(255,255,255,0.04);
     }
 
-    .login-box {
-      width: 320px;
-      padding: 50px 40px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 25px;
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-      backdrop-filter: blur(12px);
-      text-align: center;
-      color: #fff;
-      transform: translateY(-100vh);
-      animation: slideIn 1.5s ease forwards;
+    .left{display:flex;flex-direction:column;gap:16px}
+    h1{margin:0;font-size:28px;font-weight:800;letter-spacing:0.4px}
+    p.lead{margin:0;color:rgba(230,238,248,0.85);font-weight:400}
+
+    .illustration{
+      display:flex;align-items:center;justify-content:center;padding:20px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
     }
 
-    @keyframes slideIn {
-      0% { transform: translateY(-100vh) rotate(-15deg); opacity: 0; }
-      70% { transform: translateY(30px) rotate(3deg); opacity: 1; }
-      100% { transform: translateY(0) rotate(0); }
-    }
+    /* gear animation */
+    .gear{width:160px;height:160px}
+    .spin{animation:spin 7s linear infinite}
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
-    .login-box h2 {
-      margin-bottom: 30px;
-      font-size: 28px;
-      font-weight: bold;
-      letter-spacing: 1px;
-      animation: textFade 2s ease-in-out;
-    }
+    .meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+    .pill{background:var(--glass);padding:8px 12px;border-radius:999px;font-size:13px;color:var(--text);border:1px solid rgba(255,255,255,0.03)}
 
-    @keyframes textFade {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* right column */
+    .right{display:flex;flex-direction:column;gap:14px}
+    .countdown{display:flex;gap:8px;align-items:center}
+    .countdown .box{background:var(--card);padding:10px 14px;border-radius:10px;min-width:62px;text-align:center}
+    .box span{display:block;font-weight:800;font-size:20px}
+    .box small{display:block;color:rgba(230,238,248,0.6);font-size:12px}
 
-    .btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 30px;
-      background: linear-gradient(45deg, #00c6ff, #0072ff);
-      color: #fff;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.4s;
-      letter-spacing: 1px;
-      animation: pulse 2s infinite;
-    }
+    .subscribe{display:flex;gap:8px;margin-top:8px}
+    .subscribe input{flex:1;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);outline:none}
+    .subscribe button{padding:12px 18px;border-radius:12px;border:none;background:linear-gradient(90deg,var(--accent),#ffb459);font-weight:700;cursor:pointer}
 
-    .btn:hover {
-      background: linear-gradient(45deg, #0072ff, #00c6ff);
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00c6ff;
-    }
+    .features{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+    .feature{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;font-size:14px}
 
-    @keyframes pulse {
-      0% { box-shadow: 0 0 10px #00c6ff; }
-      50% { box-shadow: 0 0 30px #0072ff; }
-      100% { box-shadow: 0 0 10px #00c6ff; }
-    }
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:rgba(230,238,248,0.65);font-size:13px}
+    .social{display:flex;gap:8px}
+    .social a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.02);text-decoration:none;color:var(--text);border:1px solid rgba(255,255,255,0.03)}
 
-    .status {
-      margin-top: 25px;
-      text-align: right;
-      display: none;
-      font-size: 16px;
-      animation: fadeIn 0.6s ease forwards;
+    /* responsive */
+    @media (max-width:880px){
+      .container{grid-template-columns:1fr;max-width:600px}
+      .gear{width:100px;height:100px}
+      body{padding:10px}
+      .card{padding:20px}
     }
-
-    .status div {
-      margin: 8px 0;
-      opacity: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: 0.4s;
+    @media (max-width:420px){
+      body{padding:10px}
+      h1{font-size:20px}
+      .container{gap:12px}
+      .pill{font-size:11px;padding:5px 8px}
+      .countdown .box{min-width:45px;padding:6px}
+      .subscribe{flex-direction:column}
+      .subscribe button, .subscribe input{width:100%}
+      .features{grid-template-columns:1fr}
     }
-
-    .loading::after {
-      content: "⏳";
-      animation: dots 1.5s infinite;
-    }
-
-    @keyframes dots {
-      0% { content: "⏳"; }
-      33% { content: "⏳."; }
-      66% { content: "⏳.."; }
-      100% { content: "⏳..."; }
-    }
-
-    .check {
-      color: #00ff7f;
-      font-size: 18px;
-      opacity: 0;
-      transition: 0.3s;
-    }
-
-    .footer {
-      margin-top: 20px;
-      font-size: 14px;
-      opacity: 0.8;
-      animation: fadeIn 2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      h1{font-size:22px}
+      .container{gap:16px}
+      .pill{font-size:12px;padding:6px 10px}
+      .countdown .box{min-width:52px;padding:8px}
     }
   </style>
 </head>
 <body>
+  <main class="container">
+    <section class="card left">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div>
+          <h1>الموقع حاليًا تحت الصيانة</h1>
+          <p class="lead">نعمل الآن على إطلاق النسخة الجديدة من البرنامج — شكراً لصبركم. سنعود قريبًا بخدمات محسّنة وتجربة أفضل.</p>
 
-  <div class="login-box">
-    <h2>مرحبا بعودتك 👋</h2>
-    <button class="btn" id="loginBtn">دخول</button>
+          <div class="meta" style="margin-top:12px">
+            <div class="pill">حالة: صيانة مجدولة</div>
+            <div class="pill">التقدم: جاري العمل</div>
+            <div class="pill">الدعم: support@example.com</div>
+          </div>
+        </div>
+        <div class="illustration">
+          <!-- SVG gear -->
+          <svg class="gear spin" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="g" x1="0" x2="1">
+                <stop offset="0" stop-color="#ffd166" />
+                <stop offset="1" stop-color="#ff9f43" />
+              </linearGradient>
+            </defs>
+            <circle cx="256" cy="256" r="94" fill="url(#g)" opacity="0.12"></circle>
+            <path d="M487 272v-32l-34-6a193 193 0 0 0-8-20l20-28-22-22-28 20a195 195 0 0 0-20-8l-6-34h-32l-6 34a195 195 0 0 0-20 8l-28-20-22 22 20 28a193 193 0 0 0-8 20l-34 6v32l34 6a193 193 0 0 0 8 20l-20 28 22 22 28-20a195 195 0 0 0 20 8l6 34h32l6-34a195 195 0 0 0 20-8l28 20 22-22-20-28a193 193 0 0 0 8-20l34-6zM256 344a88 88 0 1 1 0-176 88 88 0 0 1 0 176z" fill="url(#g)" />
+          </svg>
+        </div>
+      </div>
 
-    <div class="status" id="status">
-      <div id="step1">🔹 جاري التحقق من الاتصال <span class="check">✅</span></div>
-      <div id="step2">🔹 جاري التحقق من البيانات <span class="check">✅</span></div>
-      <div id="step3">🔹 جاري التحقق من وجود تحديثات <span class="check">✅</span></div>
-    </div>
+      <div style="margin-top:10px">
+        <div class="pill">التحديث القادم: نسخة 2.0</div>
+      </div>
+    </section>
 
-    <div class="footer">© 2025 - تم التصميم بواسطه/محمد رجب🔥</div>
-  </div>
+    <aside class="card right">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="font-size:16px">العودة المتوقعة</strong>
+          <small style="color:rgba(230,238,248,0.6)">التوقيت: توقيت القاهرة</small>
+        </div>
+
+        <div class="countdown" aria-live="polite" style="margin-top:12px">
+          <div class="box"><span id="days">--</span><small>يوم</small></div>
+          <div class="box"><span id="hours">--</span><small>ساعة</small></div>
+          <div class="box"><span id="minutes">--</span><small>دقيقة</small></div>
+          <div class="box"><span id="seconds">--</span><small>ثانية</small></div>
+        </div>
+
+        <div class="subscribe">
+          <input id="email" type="email" placeholder="أدخل بريدك لتصلك التحديثات" aria-label="بريد الكتروني">
+          <button id="subscribe">اشعرني</button>
+        </div>
+
+        <div class="features">
+          <div class="feature">واجهة مستخدم جديدة</div>
+          <div class="feature">تحسين الأداء</div>
+          <div class="feature">دعم أسرع</div>
+          <div class="feature">ميزات أمان مُحسّنة</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>© <span id="year"></span> شركتك</div>
+        <div class="social">
+          <a href="#" aria-label="فيسبوك">fb</a>
+          <a href="#" aria-label="تويتر">tw</a>
+          <a href="#" aria-label="لينكدإن">in</a>
+        </div>
+      </div>
+    </aside>
+  </main>
 
   <script>
-    const btn = document.getElementById('loginBtn');
-    const statusBox = document.getElementById('status');
-    const steps = [
-      { id: 'step1', delay: 3000 },
-      { id: 'step2', delay: 5000 },
-      { id: 'step3', delay: 7000 },
-    ];
+    // -- CONFIG: غيّر التاريخ هنا إلى موعد الإطلاق المتوقع بصيغة YYYY, M-1, D
+    // مثال: new Date(2025, 11, 10) -> 10 ديسمبر 2025 (لاحظ أن الأشهر تبدأ من 0)
+    const launchDate = new Date(2025, 11, 8, 10, 0, 0); // ضبط كمثال
 
-    btn.addEventListener('click', () => {
-      btn.disabled = true;
-      btn.innerText = 'جارٍ التحقق...';
-      statusBox.style.display = 'block';
+    function pad(n){return String(n).padStart(2,'0')}
+    function updateCountdown(){
+      const now = new Date();
+      let diff = Math.max(0, launchDate - now);
+      const s = Math.floor(diff/1000);
+      const days = Math.floor(s / 86400);
+      const hours = Math.floor((s % 86400) / 3600);
+      const minutes = Math.floor((s % 3600) / 60);
+      const seconds = s % 60;
+      document.getElementById('days').textContent = days;
+      document.getElementById('hours').textContent = pad(hours);
+      document.getElementById('minutes').textContent = pad(minutes);
+      document.getElementById('seconds').textContent = pad(seconds);
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 
-      steps.forEach((step, index) => {
-        const el = document.getElementById(step.id);
-        setTimeout(() => {
-          el.style.opacity = 1;
-          el.classList.add('loading');
-        }, 500 * index);
+    // year
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-        setTimeout(() => {
-          el.classList.remove('loading');
-          el.querySelector('.check').style.opacity = 1;
-        }, step.delay);
-      });
-
-      // بعد الانتهاء من الخطوات كلها
-      setTimeout(() => {
-        btn.innerText = 'تم الدخول ✅';
-        btn.style.background = 'linear-gradient(45deg, #00ff7f, #00c853)';
-        btn.style.boxShadow = '0 0 20px #00ff7f';
-      }, 7500);
-
-      // الانتقال التلقائي بعد 8 ثواني إلى صفحة ok.html
-      setTimeout(() => {
-        window.location.href = "ok.html";
-      }, 8000);
+    // subscribe button (demo) — يمكنك استبدال هذا باستدعاء API
+    document.getElementById('subscribe').addEventListener('click', ()=>{
+      const email = document.getElementById('email').value.trim();
+      if(!email || !email.includes('@')){
+        alert('الرجاء إدخال بريد إلكتروني صالح');
+        return;
+      }
+      // مثال: إرسال إلى endpoint أو حفظ محلي
+      alert('شكرًا! سنرسل التحديثات إلى: ' + email);
+      document.getElementById('email').value = '';
     });
   </script>
 </body>
