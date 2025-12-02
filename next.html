@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واجهة الاختيارات التفاعلية</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+ */
+        direction: rtl;
+        padding: 20px;
+        box-sizing: border-box;
+        background: #1a1a2e; /* لون خلفية داكن */
+        position: relative;
+        /* overflow: hidden; تم إزالة هذا السطر للسماح بالتمرير */
+    }
+
+    .content-wrapper {
+        padding-top: 50px; /* إضافة مسافة علوية لتعويض min-height */
+        padding-bottom: 50px; /* إضافة مسافة سفلية */
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* حاوية الأشكال المتحركة */
+    .area {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .circles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .circles li {
+        position: absolute;
+        display: block;
+        list-style: none;
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.15);
+        animation: animate 25s linear infinite;
+        bottom: -150px;
+    }
+
+    .circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; animation-duration: 10s; }
+    .circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+    .circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; animation-duration: 15s; }
+    .circles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+    .circles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; animation-duration: 6s; }
+    .circles li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; animation-duration: 11s; }
+    .circles li:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; animation-duration: 27s; }
+    .circles li:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 20s; }
+    .circles li:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+    .circles li:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
+
+    @keyframes animate {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+        100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+    }
+
+    /* تنسيق الشعار (اللوجو) */
+    .logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 20px; /* تقليل المسافة السفلية */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        animation: float-up-down 3s ease-in-out infinite;
+        border: 5px solid #ff6b81;
+        transition: transform 0.3s ease;
+    }
+
+    @keyframes float-up-down {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* تنسيق النص أسفل الشعار */
+    .info-text {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px; /* زيادة المسافة السفلية */
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .info-text p { margin: 5px 0; font-size: 14px; }
+    .info-text strong { font-size: 16px; color: #f9f9f9; }
+
+    .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 25px;
+        width: 100%;
+        max-width: 800px; /* تم تصغير العرض الأقصى بناءً على طلب المستخدم */
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.95); /* تعديل الشفافية */
+        border-radius: 20px;
+        padding: 30px 15px;
+        text-align: center;
+        box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+        cursor: pointer;
+        text-decoration: none;
+        color: #333;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        perspective: 1000px;
+        animation: float 4s ease-in-out infinite;
+    }
+
+    .card i { font-size: 45px; color: #667eea; margin-bottom: 12px; transition: color 0.3s ease, transform 0.3s ease; }
+    .card h3 { margin: 0; font-size: 18px; font-weight: 600; transition: transform 0.3s ease; }
+
+    .card:hover {
+        transform: rotateY(12deg) rotateX(8deg) scale(1.05);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    }
+
+    .card:hover i { color: #ff6b81; transform: scale(1.2) rotate(10deg); }
+    .card:hover h3 { transform: translateY(-5px); }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+    }
+
+    @media (max-width: 768px) {
+        .card { padding: 25px 10px; }
+        .card i { font-size: 40px; }
+        .card h3 { font-size: 16px; }
+    }
+
+    @media (max-width: 480px) {
+        .container { grid-template-columns: 1fr; gap: 20px; }
+        .card { padding: 20px 10px; }
+        .card i { font-size: 35px; }
+        .card h3 { font-size: 15px; }
+    }
+</style>
+</head>
+<body>
+    <div class="area">
+        <ul class="circles">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+    <div class="content-wrapper">
+        <img src="2.png" alt="شعار الموقع" class="logo">
+        <div class="info-text">
+            <p><strong>انت تستعمل الاصدار الجديد من التطبيق v.2.0</strong></p>
+            <p>تم الانشاء بواسطه/ محمد رجب</p>
+        </div>
+        <div class="container">
+            <a href="cars.html" class="card">
+                <i class="fas fa-car"></i>
+                <h3>سيستم السيارات</h3>
+            </a>
+            <a href="day.html" class="card">
+                <i class="fas fa-calendar-check"></i>
+                <h3>سيستم التسجيل اليومي</h3>
+            </a>
+            <a href="staff.html" class="card">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h3>تسجيل هيئة تدريس</h3>
+            </a>
+            <a href="sall.html" class="card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>شركة سيل للأنظمة الأمنية</h3>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

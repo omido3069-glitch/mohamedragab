@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ar">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>عرض بطاقات أفراد الأمن</title>
+<style>
+:root{
+  --text:#fff;
+  font-family:'Segoe UI',Tahoma,sans-serif;
+}
+html,body{
+  height:100%;
+  margin:0;
+  direction:rtl;
+  overflow-x:hidden;
+  overflow-y:auto;
+  color:var(--text);
+  scroll-behavior:smooth;
+}
+body{
+  background:linear-gradient(270deg,#2c5364,#203a43,#0f2027,#3a1c71,#d76d77,#ffaf7b);
+  background-size:1400% 1400%;
+  animation:gradientShift 30s ease infinite;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+}
+@keyframes gradientShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+/* شاشة البداية */
+#welcome{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+  transition:opacity .6s ease;
+  z-index:20;
+}
+#welcome h1{
+  font-size:30px;
+  margin-bottom:26px;
+  text-shadow:0 0 10px rgba(255,255,255,0.25);
+}
+.welcome-btns{
+  display:flex;gap:20px;flex-wrap:wrap;justify-content:center;
+}
+.welcome-btns button{
+  border:none;border-radius:14px;
+  padding:16px 34px;font-size:18px;cursor:pointer;
+  color:#fff;font-weight:700;transition:all .28s ease;
+  min-width:150px;
+}
+.btn-morning{background:linear-gradient(90deg,#32d6ff,#ffd166);}
+.btn-evening{background:linear-gradient(90deg,#8c7ae6,#9c88ff);}
+.btn-night{background:linear-gradient(90deg,#192a56,#40739e);}
+.welcome-btns button:hover{transform:scale(1.06)}
+
+header{text-align:center;margin-top:28px;z-index:5}
+header h2{margin:0;font-size:24px}
+#cardCount{
+  position:fixed;top:20px;right:20px;
+  background:rgba(0,0,0,0.45);
+  padding:6px 12px;border-radius:8px;font-size:14px;z-index:50;
+}
+#backBtn{
+  position:fixed;top:20px;left:20px;
+  background:rgba(0,0,0,0.45);
+  border:none;color:#fff;font-size:16px;
+  border-radius:8px;padding:8px 12px;cursor:pointer;display:none;z-index:50;
+}
+
+/* شبكة البطاقات */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:18px;width:100%;max-width:1100px;
+  margin:30px auto;padding:0 20px;z-index:5;
+}
+
+/* الكارت */
+.card{
+  background:rgba(255,255,255,0.85);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 8px 26px rgba(0,0,0,0.45);
+  transition:transform .35s,box-shadow .35s;
+  animation:floatAnim 8s ease-in-out infinite;
+  color:#000;
+}
+@keyframes floatAnim{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+.card:nth-child(2n){animation-delay:2s}
+.card:nth-child(3n){animation-delay:4s}
+.card:nth-child(4n){animation-delay:6s}
+
+.photo-wrap{height:220px;overflow:hidden}
+.photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-placeholder{
+  height:100%;display:flex;align-items:center;justify-content:center;
+  color:#555;background:rgba(0,0,0,0.1);
+}
+.card-body{padding:12px;color:#000;}
+.name{font-weight:800;font-size:16px;color:#000;}
+.meta{font-size:13px;color:#111;margin-top:6px;}
+@media (max-width:480px){.photo-wrap{height:180px}.grid{gap:12px}}
+</style>
+</head>
+<body>
+
+<!-- شاشة البداية -->
+<div id="welcome">
+  <h1>اختر الفترة لعرض بطاقات أفراد الأمن</h1>
+  <div class="welcome-btns">
+    <button class="btn-morning" onclick="selectShift('morning')">☀️ صباحي</button>
+    <button class="btn-evening" onclick="selectShift('evening')">🌆 مسائي</button>
+    <button class="btn-night" onclick="selectShift('night')">🌙 ليلي</button>
+  </div>
+</div>
+
+<!-- واجهة العرض -->
+<button id="backBtn" onclick="goBack()">↩️ رجوع</button>
+<div id="cardCount">عدد البطاقات: 0</div>
+<header><h2 id="sectionTitle"></h2></header>
+<section id="cards" class="grid"></section>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUkJTW4FmtBVoMfr7kwSlg2sE3Lt8rCu0",
+  authDomain: "staff-d470d.firebaseapp.com",
+  projectId: "staff-d470d",
+  storageBucket: "staff-d470d.firebasestorage.app",
+  messagingSenderId: "129609661118",
+  appId: "1:129609661118:web:56684db281ecf0111c3cef",
+  measurementId: "G-K1BD8QCS4L"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const welcome = document.getElementById('welcome');
+const backBtn = document.getElementById('backBtn');
+const cardCount = document.getElementById('cardCount');
+const cardsRoot = document.getElementById('cards');
+const sectionTitle = document.getElementById('sectionTitle');
+
+let currentShift = null;
+let listeners = {};
+
+window.selectShift = function(shift){
+  currentShift = shift;
+  welcome.style.opacity = 0;
+  setTimeout(()=> welcome.style.display='none',500);
+  backBtn.style.display='block';
+  const titles = {morning:'☀️ الفترة الصباحية',evening:'🌆 الفترة المسائية',night:'🌙 الفترة الليلية'};
+  sectionTitle.textContent=titles[shift]||'';
+  attachShiftListener(shift);
+}
+
+window.goBack = function(){
+  if(currentShift) detachShiftListener(currentShift);
+  welcome.style.display='flex'; setTimeout(()=>welcome.style.opacity=1,20);
+  backBtn.style.display='none';
+  sectionTitle.textContent=''; cardsRoot.innerHTML='';
+  cardCount.textContent='عدد البطاقات: 0'; currentShift=null;
+}
+
+function attachShiftListener(shift){
+  const nodeRef=ref(db,`security-cards/${shift}`);
+  const unsubscribe=onValue(nodeRef,(snapshot)=>{
+    const val=snapshot.val()||{};
+    const arr=Object.keys(val).map(k=>({key:k,...val[k]}));
+    render(arr);
+  });
+  listeners[shift]={ref:nodeRef,unsubscribe};
+}
+function detachShiftListener(shift){
+  if(listeners[shift]&&typeof listeners[shift].unsubscribe==='function'){
+    listeners[shift].unsubscribe();delete listeners[shift];
+  }
+}
+
+function render(list){
+  cardsRoot.innerHTML='';
+  list.forEach(item=>{
+    const el=document.createElement('article');
+    el.className='card';
+    el.innerHTML=`
+      <div class="photo-wrap">
+        ${item.photoUrl?`<img src="${item.photoUrl}" alt="صورة ${escapeHtml(item.name)}">`:`<div class="photo-placeholder">صورة غير متوفرة</div>`}
+      </div>
+      <div class="card-body">
+        <div class="name">${escapeHtml(item.name)}</div>
+        <div class="meta">تاريخ التعيين: ${escapeHtml(item.hireDate||'-')}</div>
+        <div class="meta">الوظيفة: ${escapeHtml(item.role||'-')}</div>
+        <div class="meta">رقم الهاتف: ${escapeHtml(item.phone||'-')}</div>
+        <div class="meta">رقم البطاقة: ${escapeHtml(item.id||'-')}</div>
+      </div>`;
+    cardsRoot.appendChild(el);
+  });
+  cardCount.textContent=`عدد البطاقات: ${list.length}`;
+}
+function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+</script>
+</body>
+</html>
