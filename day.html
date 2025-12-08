@@ -379,13 +379,26 @@ loginBtn.addEventListener('click', () => {
     const number = carNumberInput.value.trim(), name = nameInput.value.trim(), college = collegeInput.value.trim(), notes = notesInput.value.trim();
     if (!number || !name) { showNotification('من فضلك أدخل رقم السيارة والاسم', 'error'); return; }
     
+    const ts = Date.now();
+    const currentDate = formatDate(ts);
     const allRecords = [...cloudRecords, ...localRecords];
-    if (allRecords.some(r => r.number === number && !r.outTime)) {
-        showNotification(`⚠️ السيارة ${number} مسجلة دخول بالفعل!`, 'warning');
+    
+    // البحث عن سجل دخول نشط (لم يسجل خروج) في نفس اليوم
+    const activeRecordToday = allRecords.find(r => 
+        r.number === number && 
+        !r.outTime && 
+        formatDate(r.timestamp) === currentDate
+    );
+
+    if (activeRecordToday) {
+        showNotification(`⚠️ السيارة ${number} مسجلة دخول بالفعل لهذا اليوم!`, 'warning');
         return;
     }
-
-    const ts = Date.now();
+    
+    // إذا كان هناك سجل نشط من يوم سابق، يتم تجاهله والسماح بالتسجيل الجديد
+    
+    // الآن يتم تسجيل الدخول الجديد
+    // const ts = Date.now(); // تم تعريفها بالفعل في السطر الأول من التعديل
     const newRecord = { id: 'rec_' + ts, name, number, college, notes, inTime: formatTime(ts), outTime: '', timestamp: ts };
     
     localRecords.push(newRecord);
@@ -546,4 +559,3 @@ init();
 </script>
 </body>
 </html>
-
