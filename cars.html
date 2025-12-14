@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1024">
+<title>🚗 نظام إدارة السيارات</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Segoe UI',Tahoma,sans-serif;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  min-height:100vh;padding:20px;
+}
+.container{max-width:1400px;margin:auto;}
+.header{
+  display: flex; /* Using flexbox for alignment */
+  justify-content: center; /* Center main title */
+  align-items: center; /* Vertical alignment */
+  color:white;
+  margin-bottom:40px;
+  position:relative;
+}
+.header h1{font-size:2.3em;margin: 0 20px;} /* Add margin to h1 */
+.header p{
+    position: absolute;
+    bottom: -25px;
+    width: 100%;
+    text-align: center;
+}
+
+/* --- Logout Button Style --- */
+#logoutButton {
+    position: absolute;
+    right: 0; /* Position to the right */
+    top: 50%;
+    transform: translateY(-50%);
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    display: none; /* Hidden by default */
+    transition: background 0.3s;
+}
+#logoutButton:hover {
+    background: #c70000;
+}
+/* --- End Logout Button Style --- */
+
+.main-content{display: block;}
+.form-section{
+  background:white;padding:25px;border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+}
+.form-section.hidden { display: none; }
+.form-section h2{color:#667eea;margin-bottom:15px;border-bottom:3px solid #667eea;padding-bottom:8px;}
+.form-group{margin-bottom:10px;}
+.form-group label{display:block;margin-bottom:5px;color:#333;font-weight:600;}
+.form-group input,.form-group select{
+  width:100%;padding:8px;border:2px solid #e0e0e0;
+  border-radius:8px;font-size:0.9em;
+}
+.button-group{display:flex;gap:10px;margin-top:10px;}
+button{
+  flex:1;padding:10px;border:none;border-radius:8px;font-size:0.9em;
+  font-weight:600;cursor:pointer;transition:0.3s;
+}
+.btn-add{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;}
+.btn-reset{background:#f0f0f0;color:#333;}
+.btn-add:hover{transform:translateY(-2px);}
+.cards-section{
+  background:white;padding:25px;border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+.cards-section h2{color:#667eea;margin-bottom:15px;border-bottom:3px solid #667eea;padding-bottom:8px;}
+.stats-box{
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  color:white;text-align:center;padding:15px;border-radius:12px;margin-bottom:20px;
+}
+.stats-box .number{font-size:1.8em;font-weight:bold;}
+.filter-controls{display:flex;gap:10px;margin-bottom:20px;}
+.filter-controls select,.filter-controls input{
+  padding:8px;border:2px solid #e0e0e0;border-radius:8px;width:100%;font-size:0.9em;
+}
+.college-group{margin-bottom:20px;text-align:right;}
+.college-title{
+  font-weight:bold;color:#444;margin-bottom:8px;font-size:1.05em;
+  border-right:5px solid #667eea;padding-right:8px;display:inline-block;
+}
+.cards-grid{
+  display:flex;flex-wrap:wrap;justify-content:flex-start;gap:15px;
+  animation:fadeIn 0.6s ease;
+}
+@keyframes fadeIn {
+  from {opacity:0;transform:scale(0.9);}
+  to {opacity:1;transform:scale(1);}
+}
+.car-card{
+  width:210px;height:190px;
+  border-radius:12px;padding:10px;color:white;font-size:1em;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  transition:0.3s;display:flex;flex-direction:column;justify-content:center;
+  text-align:right;line-height:1.7;
+}
+.car-card:hover{transform:translateY(-4px);}
+.gradient-1{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);}
+.gradient-2{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);}
+.gradient-3{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);}
+.gradient-4{background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);}
+.gradient-5{background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);}
+.car-icon{font-size:1.8em;margin-bottom:6px;text-align:center;}
+.label{color:#ffec8b;font-weight:bold;}
+.card-actions{display:flex;gap:5px;margin-top:10px;}
+.card-actions.hidden { display: none; }
+.btn-edit,.btn-delete{
+  flex:1;padding:6px;border:none;border-radius:6px;font-weight:600;font-size:0.9em;cursor:pointer;
+}
+.btn-edit{background:white;color:#333;}
+.btn-delete{background:white;color:#333;}
+.btn-edit:hover{background:#667eea;color:white;}
+.btn-delete:hover{background:#ff4444;color:white;}
+input.edit-input{width:100%;padding:5px;border-radius:6px;border:none;margin-bottom:3px;font-size:0.85em;}
+.notification{
+  position:fixed;top:20px;right:20px;padding:10px 18px;border-radius:8px;
+  color:white;font-weight:600;z-index:2000;font-size:0.9em;
+}
+.notification.success{background:linear-gradient(135deg,#4CAF50 0%,#388E3C 100%);}
+.notification.warning{background:linear-gradient(135deg,#ffc107 0%,#ff9800 100%);color:#333;}
+
+#adminLoginIcon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    font-size: 2em;
+    cursor: pointer;
+    color: white;
+    padding: 10px;
+    transition: 0.3s;
+}
+#adminLoginIcon:hover {
+    transform: scale(1.1);
+    color: #ffec8b;
+}
+.login-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: right;
+}
+.close-btn {
+    color: #aaa;
+    float: left;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+.login-form input[type="text"], .login-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+.login-form button {
+    background-color: #667eea;
+    color: white;
+    padding: 10px 15px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+    font-weight: bold;
+}
+.login-form button:hover {
+    opacity: 0.8;
+}
+.remember-me {
+    text-align: right;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<!-- Admin Login Modal -->
+<div id="loginModal" class="login-modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>تسجيل دخول المسؤول</h2>
+        <form id="loginForm" class="login-form">
+            <label for="username">اسم المستخدم:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">كلمة المرور:</label>
+            <input type="password" id="password" name="password" required>
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe" name="rememberMe" checked>
+                <label for="rememberMe">تذكرني دائماً</label>
+            </div>
+            <button type="submit">تسجيل الدخول</button>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <div id="adminLoginIcon" title="تسجيل دخول المسؤول">🔑</div>
+    <h1>🚗 نظام إدارة السيارات</h1>
+    <!-- زر تسجيل الخروج الجديد -->
+    <button id="logoutButton" onclick="logout()">تسجيل الخروج</button>
+    <p>إدارة بيانات السيارات والمالكين</p>
+  </div>
+
+  <div class="main-content">
+    <div class="form-section" id="formSection">
+      <h2>إضافة سيارة جديدة</h2>
+      <form id="carForm">
+        <div class="form-group">
+          <label for="ownerName">الاسم</label>
+          <input type="text" id="ownerName" required>
+        </div>
+        <div class="form-group">
+          <label for="carNumber">رقم السيارة</label>
+          <input type="text" id="carNumber" required>
+        </div>
+        <div class="form-group">
+          <label for="entranceSelect">جهة الدخول</label>
+          <select id="entranceSelect" required>
+            <option value="">-- اختر جهة الدخول --</option>
+            <option value="كلية طب بشري">كلية طب بشري</option>
+            <option value="كلية طب اسنان">كلية طب اسنان</option>
+            <option value="كلية علاج طبيعي">كلية علاج طبيعي</option>
+            <option value="كلية حسابات ومعلومات">كلية حسابات ومعلومات</option>
+            <option value="كلية هندسة">كلية هندسة</option>
+            <option value="كلية علوم">كلية علوم</option>
+            <option value="كلية علوم صحيه">كلية علوم صحية</option>
+            <option value="كلية التجارة">كلية التجارة</option>
+            <option value="كلية الفنون">كلية الفنون</option>
+            <option value="كلية الحقوق">كلية الحقوق</option>
+            <option value="كلية اداب">كلية آداب</option>
+            <option value="يدوي">يدوي</option>
+          </select>
+          <input type="text" id="entranceManual" placeholder="أدخل جهة الدخول يدويًا" style="display:none;margin-top:8px;">
+        </div>
+        <div class="form-group">
+          <label for="phone">رقم الهاتف</label>
+          <input type="tel" id="phone">
+        </div>
+        <div class="button-group">
+          <button type="submit" class="btn-add">إضافة السيارة</button>
+          <button type="reset" class="btn-reset">مسح</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="cards-section">
+      <h2>السيارات المسجلة</h2>
+      <div class="stats-box">
+        <div class="number" id="totalCars">0</div>
+        <div>إجمالي السيارات المسجلة</div>
+      </div>
+      <div class="filter-controls">
+        <select id="filterSelect">
+          <option value="">-- فلتر جهة الدخول (الكل) --</option>
+          <option value="كلية طب بشري">كلية طب بشري</option>
+          <option value="كلية طب اسنان">كلية طب اسنان</option>
+          <option value="كلية علاج طبيعي">كلية علاج طبيعي</option>
+          <option value="كلية حسابات ومعلومات">كلية حسابات ومعلومات</option>
+          <option value="كلية هندسة">كلية هندسة</option>
+          <option value="كلية علوم">كلية علوم</option>
+          <option value="كلية علوم صحيه">كلية علوم صحية</option>
+          <option value="كلية التجارة">كلية التجارة</option>
+          <option value="كلية الفنون">كلية الفنون</option>
+          <option value="كلية الحقوق">كلية الحقوق</option>
+          <option value="كلية اداب">كلية آداب</option>
+          <option value="يدوي">يدوي</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="ابحث عن سيارة أو مالك...">
+      </div>
+      <div id="cardsContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getDatabase, ref, set, get, remove, update } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDBSiTb1m0osdrX7YOv4ADr8x-7TghSqmY",
+  authDomain: "day3069-e27df.firebaseapp.com",
+  databaseURL: "https://day3069-e27df-default-rtdb.firebaseio.com",
+  projectId: "day3069-e27df",
+  storageBucket: "day3069-e27df.firebasestorage.app",
+  messagingSenderId: "110258698429",
+  appId: "1:110258698429:web:fcc4114a83829756329fd4",
+  measurementId: "G-Q3LN0HTXXZ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let cars = [];
+const gradients = ['gradient-1','gradient-2','gradient-3','gradient-4','gradient-5'];
+
+const ADMIN_KEY = 'isAdminLoggedIn';
+let isAdmin = localStorage.getItem(ADMIN_KEY) === 'true';
+
+const loginModal = document.getElementById('loginModal');
+const adminLoginIcon = document.getElementById('adminLoginIcon');
+const closeBtn = document.querySelector('.close-btn');
+const loginForm = document.getElementById('loginForm');
+const formSection = document.getElementById('formSection');
+const rememberMe = document.getElementById('rememberMe');
+const logoutButton = document.getElementById('logoutButton'); // Get logout button
+
+// --- Logout Function ---
+window.logout = function() {
+    isAdmin = false;
+    localStorage.removeItem(ADMIN_KEY); // Clear login state
+    toggleAdminView(); // Update the UI
+    showNotification('تم تسجيل الخروج.', 'warning');
+}
+
+function toggleAdminView() {
+    if (isAdmin) {
+        formSection.classList.remove('hidden');
+        logoutButton.style.display = 'block'; // Show logout button
+    } else {
+        formSection.classList.add('hidden');
+        logoutButton.style.display = 'none'; // Hide logout button
+    }
+    displayCars();
+}
+
+adminLoginIcon.onclick = () => {
+    loginModal.style.display = 'block';
+};
+
+closeBtn.onclick = () => {
+    loginModal.style.display = 'none';
+};
+
+window.onclick = (event) => {
+    if (event.target === loginModal) {
+        loginModal.style.display = 'none';
+    }
+};
+
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username === 'admin' && password === '1234') {
+        isAdmin = true;
+        loginModal.style.display = 'none';
+        showNotification('تم تسجيل دخول المسؤول بنجاح!','success');
+        toggleAdminView();
+
+        if (rememberMe.checked) {
+            localStorage.setItem(ADMIN_KEY, 'true');
+        } else {
+            localStorage.removeItem(ADMIN_KEY);
+        }
+    } else {
+        showNotification('اسم المستخدم أو كلمة المرور غير صحيحة.','warning');
+        isAdmin = false;
+        localStorage.removeItem(ADMIN_KEY);
+    }
+});
+
+async function loadCars(){
+  const snapshot = await get(ref(db,"cars"));
+  cars = snapshot.exists()? Object.values(snapshot.val()):[];
+  toggleAdminView();
+  updateStats(cars.length);
+}
+
+async function saveCar(car){ await set(ref(db,"cars/"+car.id),car); }
+async function deleteCarFromDB(id){ await remove(ref(db,"cars/"+id)); }
+async function updateCarInDB(id,updated){ await update(ref(db,"cars/"+id),updated); }
+
+const carForm=document.getElementById("carForm");
+const filterSelect=document.getElementById("filterSelect");
+const searchInput=document.getElementById("searchInput");
+const entranceSelect=document.getElementById("entranceSelect");
+const entranceManual=document.getElementById("entranceManual");
+const cardsContainer=document.getElementById("cardsContainer");
+const totalCars=document.getElementById("totalCars");
+
+carForm.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const carNumber=document.getElementById("carNumber").value.trim();
+  if(cars.find(c=>c.carNumber===carNumber)){showNotification("هذه السيارة مضافة بالفعل!","warning");return;}
+  let entrance=entranceSelect.value;
+  if(entrance==="يدوي") entrance=entranceManual.value.trim();
+  const newCar={id:Date.now(),ownerName:document.getElementById("ownerName").value,carNumber,entrance,phone:document.getElementById("phone").value};
+  await saveCar(newCar);cars.push(newCar);
+  displayCars();updateStats(cars.length);
+  showNotification("تم إضافة السيارة ✓","success");
+  carForm.reset();entranceManual.style.display="none";
+});
+
+window.deleteCar=async function(id){
+  if (!isAdmin) return;
+  if(confirm("هل أنت متأكد من الحذف؟")){
+    await deleteCarFromDB(id);
+    cars=cars.filter(c=>c.id!==id);
+    displayCars();updateStats(cars.length);
+    showNotification("تم حذف السيارة ✓");
+  }
+}
+
+window.editCar=function(id){
+  if (!isAdmin) return;
+  const card=document.querySelector(`.card-${id}`);
+  const car=cars.find(c=>c.id===id);
+  card.innerHTML=`
+    <input class="edit-input" value="${car.ownerName}" id="editName${id}">
+    <input class="edit-input" value="${car.carNumber}" id="editNumber${id}">
+    <input class="edit-input" value="${car.entrance}" id="editEntrance${id}">
+    <input class="edit-input" value="${car.phone}" id="editPhone${id}">
+    <div class="card-actions">
+      <button class="btn-edit" onclick="saveEdit(${id})">حفظ</button>
+      <button class="btn-delete" onclick="displayCars()">إلغاء</button>
+    </div>`;
+}
+
+window.saveEdit=async function(id){
+  if (!isAdmin) return;
+  const updated={
+    id,
+    ownerName:document.getElementById(`editName${id}`).value,
+    carNumber:document.getElementById(`editNumber${id}`).value,
+    entrance:document.getElementById(`editEntrance${id}`).value,
+    phone:document.getElementById(`editPhone${id}`).value
+  };
+  await updateCarInDB(id,updated);
+  cars=cars.map(c=>c.id===id?updated:c);
+  displayCars();showNotification("تم التحديث ✓","success");
+}
+
+function groupByCollege(list){
+  const groups={};
+  list.forEach(c=>{
+    const key=c.entrance||"أخرى";
+    if(!groups[key])groups[key]=[];
+    groups[key].push(c);
+  });
+  return groups;
+}
+
+function displayCars(list=cars){
+  let s=searchInput.value.toLowerCase();
+  let f=filterSelect.value.toLowerCase();
+  let filtered=list.filter(c=>{
+    const matchSearch=c.ownerName.toLowerCase().includes(s)||c.carNumber.toLowerCase().includes(s)||c.phone.includes(s)||c.entrance.toLowerCase().includes(s);
+    const matchFilter=f===""||c.entrance.toLowerCase()===f;
+    return matchSearch&&matchFilter;
+  });
+  const groups=groupByCollege(filtered);
+  updateStats(filtered.length);
+  cardsContainer.innerHTML="";
+  if(filtered.length===0){cardsContainer.innerHTML="<div class='empty-message'>📭 لا توجد سيارات</div>";return;}
+  const actionsClass = isAdmin ? '' : ' hidden';
+
+  Object.keys(groups).forEach(college=>{
+    const div=document.createElement("div");
+    div.className="college-group";
+    div.innerHTML=`<div class="college-title">${college}</div>
+      <div class="cards-grid">
+        ${groups[college].map((car,i)=>`
+          <div class="car-card ${gradients[i%gradients.length]} card-${car.id}">
+            <div><span class='label'>الاسم:</span> ${car.ownerName}</div>
+            <div><span class='label'>رقم السيارة:</span> ${car.carNumber}</div>
+            <div><span class='label'>جهة الدخول:</span> ${car.entrance}</div>
+            <div><span class='label'>رقم الهاتف:</span> ${car.phone}</div>
+            <div class="card-actions${actionsClass}">
+              <button class="btn-edit" onclick="editCar(${car.id})">تعديل</button>
+              <button class="btn-delete" onclick="deleteCar(${car.id})">حذف</button>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    cardsContainer.appendChild(div);
+  });
+}
+
+function updateStats(num){totalCars.textContent=num;}
+
+entranceSelect.addEventListener("change",()=>{
+  entranceSelect.value==="يدوي"
+    ? entranceManual.style.display="block"
+    : entranceManual.style.display="none";
+});
+filterSelect.addEventListener("change",()=>displayCars());
+searchInput.addEventListener("keyup",()=>displayCars());
+
+function showNotification(msg,type="success"){
+  const n=document.createElement("div");
+  n.className=`notification ${type}`;n.textContent=msg;
+  document.body.appendChild(n);setTimeout(()=>n.remove(),2500);
+}
+window.addEventListener("load",loadCars);
+</script>
+</body>
+</html>
