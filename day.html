@@ -30,7 +30,6 @@ body{
   padding:14px;
 }
 
-/* --- الأنماط العامة --- */
 .title { color: var(--blue-dark); font-size:24px; font-weight:900; text-align:center; margin-top:10px; margin-bottom:4px; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.05);}
 .status-wrap{ width:100%; max-width:520px; overflow:hidden; border-radius:10px; margin-bottom:12px; background:linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05)); border:1px solid rgba(13,71,161,0.06);}
 .status { display:block; white-space:nowrap; padding:8px 12px; font-weight:700; color:var(--black-bold); background: linear-gradient(90deg, rgba(235,246,255,0.6), rgba(255,255,255,0)); transform:translateX(100%); animation: slideRTL 8s linear infinite; font-size:14px; }
@@ -48,7 +47,6 @@ textarea.input { min-height:60px; resize:vertical; padding-top:10px; }
 .btn-secondary:hover { background: var(--blue-soft); }
 
 .suggestions { margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-start; }
-
 .suggestion-card {
     text-align: right;
     padding: 8px 12px;
@@ -62,7 +60,6 @@ textarea.input { min-height:60px; resize:vertical; padding-top:10px; }
     transition: transform .12s ease, box-shadow .12s ease;
 }
 .suggestion-card:hover{ transform:translateY(-4px); box-shadow:0 8px 20px rgba(13,71,161,0.08) }
-
 .suggestion-card .car-num { font-size: 16px; font-weight: 900; color: var(--blue-dark); }
 .suggestion-card .details { font-size: 12px; font-weight: 600; color: #555; }
 
@@ -73,7 +70,6 @@ textarea.input { min-height:60px; resize:vertical; padding-top:10px; }
 
 .table-wrap{ width:100%; max-width:520px; background:#fff; border-radius:12px; overflow:auto; box-shadow:0 8px 20px rgba(13,71,161,0.04); margin-top:10px; }
 table { width:100%; border-collapse:collapse; }
-
 th, td{ padding:4px; text-align:center; border-bottom:1px solid #e0eaf3; font-weight:700; color:var(--black-bold); font-size:9px; white-space: normal; }
 th{ background:var(--accent); color:#fff; font-size:9px; font-weight:800; border-bottom: 2px solid var(--blue-dark); }
 .time-in{ color:var(--green); font-weight: 800; }
@@ -102,10 +98,10 @@ body.admin-logged-in #adminLogoutBtn { display: block; }
 .notification.success { background: #4caf50; color: white; }
 .notification.error { background: #f44336; color: white; }
 .notification.info { background: #2196F3; color: white; }
+.notification.warning { background: #ff9800; color: white; }
 @keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
 .notification { animation: slideIn 0.3s ease-out forwards; }
 .notification.fade-out { transform: translateX(110%); opacity: 0; }
-
 </style>
 </head>
 <body>
@@ -125,10 +121,9 @@ body.admin-logged-in #adminLogoutBtn { display: block; }
     </div>
 </div>
 
-
 <div style="width:100%;max-width:520px;">
 <div class="title">🚗 نظام تسجيل السيارات — جامعة حلوان الأهلية</div>
-<div class="footer">تم التصميم بواسطة / محمد رجب</div>
+<div class="footer" style="text-align:center; font-size:12px; margin-bottom:10px; color:#555;">تم التصميم بواسطة / محمد رجب</div>
 
 <div class="status-wrap" aria-hidden="true">
   <span id="status" class="status">✅ جاهز لتسجيل البيانات</span>
@@ -178,15 +173,12 @@ body.admin-logged-in #adminLogoutBtn { display: block; }
     <tbody id="recordsBody"></tbody>
   </table>
 </div>
-
 </div>
 
 <script type="module">
-// استيراد الدوال اللازمة من Firebase مع إضافة onValue
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// ====== Firebase Config ======
 const firebaseConfig = {
   apiKey: "AIzaSyDBSiTb1m0osdrX7YOv4ADr8x-7TghSqmY",
   authDomain: "day3069-e27df.firebaseapp.com",
@@ -202,7 +194,6 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const dbRef = ref(db);
 
-// ====== عناصر DOM ======
 const carNumberInput = document.getElementById('carNumberInput');
 const nameInput = document.getElementById('nameInput');
 const collegeInput = document.getElementById('collegeInput');
@@ -221,13 +212,11 @@ const cancelAdminLoginBtn = document.getElementById('cancelAdminLogin');
 const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 const statusSpan = document.getElementById('status');
 
-// ====== متغيرات الحالة ======
 let cloudRecords = [];
 let localRecords = [];
 let carsCache = [];
-let isInitialLoad = true; // متغير لتتبع أول تحميل للبيانات
+let isInitialLoad = true;
 
-// ====== دوال مساعدة ======
 function showNotification(message, type = 'success') {
     const n = document.createElement('div');
     n.className = `notification ${type}`;
@@ -242,7 +231,6 @@ function showNotification(message, type = 'success') {
 function formatTime(ts) { const d = new Date(ts); const h = d.getHours(); const m = d.getMinutes(); const ampm = h >= 12 ? 'م' : 'ص'; return `${h % 12 || 12}:${m < 10 ? '0' + m : m} ${ampm}`; }
 function formatDate(ts) { const d = new Date(ts); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 
-// ====== التخزين المحلي ======
 function loadLocalRecords() {
     const stored = localStorage.getItem('localCarRecords');
     localRecords = stored ? JSON.parse(stored) : [];
@@ -260,7 +248,6 @@ function updateUploadButtonState() {
     uploadBtn.disabled = count === 0;
 }
 
-// ====== عرض البيانات المدمجة ======
 function renderCombinedRecords() {
     const allRecords = [...cloudRecords, ...localRecords];
     const selDate = filterDateInput.value;
@@ -272,9 +259,7 @@ function renderCombinedRecords() {
         return dateMatch && searchMatch;
     });
 
-    // فرز تنازلي (الأحدث أولاً)
     filteredRecords.sort((a, b) => b.timestamp - a.timestamp);
-    
     recordsBody.innerHTML = '';
 
     if (filteredRecords.length === 0) {
@@ -296,7 +281,6 @@ function renderCombinedRecords() {
 
         const row = recordsBody.insertRow();
         row.dataset.id = r.id;
-        // إضافة علامة للسجلات المحلية
         if (localRecords.some(local => local.id === r.id)) {
             row.style.backgroundColor = 'var(--blue-soft)';
         }
@@ -339,13 +323,11 @@ function populateDateFilter() {
         option.textContent = date;
         filterDateInput.appendChild(option);
     });
-    // الحفاظ على الفلتر المختار
     if (dates.includes(currentFilter)) {
         filterDateInput.value = currentFilter;
     }
 }
 
-// ====== عرض الاقتراحات ======
 function renderSuggestions(query) {
     suggestionsWrap.innerHTML = '';
     if (query.length < 2 || carsCache.length === 0) return;
@@ -374,14 +356,23 @@ function renderSuggestions(query) {
     });
 }
 
-// ====== تسجيل الدخول والخروج (محلي فقط) ======
+// ====== تسجيل الدخول (تم التعديل ليفحص اليوم الحالي فقط) ======
 loginBtn.addEventListener('click', () => {
     const number = carNumberInput.value.trim(), name = nameInput.value.trim(), college = collegeInput.value.trim(), notes = notesInput.value.trim();
     if (!number || !name) { showNotification('من فضلك أدخل رقم السيارة والاسم', 'error'); return; }
     
+    const todayStr = formatDate(Date.now());
     const allRecords = [...cloudRecords, ...localRecords];
-    if (allRecords.some(r => r.number === number && !r.outTime)) {
-        showNotification(`⚠️ السيارة ${number} مسجلة دخول بالفعل!`, 'warning');
+
+    // الفحص هنا: هل السيارة موجودة "اليوم" ولم تخرج؟
+    const isAlreadyInToday = allRecords.some(r => 
+        r.number === number && 
+        formatDate(r.timestamp) === todayStr && 
+        !r.outTime
+    );
+
+    if (isAlreadyInToday) {
+        showNotification(`⚠️ السيارة ${number} مسجلة دخول بالفعل اليوم!`, 'warning');
         return;
     }
 
@@ -411,11 +402,8 @@ recordsBody.addEventListener('click', e => {
     } else {
         record = cloudRecords.find(r => r.id === recId);
         if (record) {
-            // إنشاء نسخة محدثة بدلاً من تعديل السجل السحابي مباشرة
             const updatedRecord = { ...record, outTime: formatTime(Date.now()), outTimestamp: Date.now() };
-            // حذف السجل القديم من السجلات المحلية إذا كان موجوداً (لتجنب التكرار)
             localRecords = localRecords.filter(r => r.id !== recId);
-            // إضافة السجل المحدث إلى السجلات المحلية
             localRecords.push(updatedRecord);
         }
     }
@@ -425,7 +413,6 @@ recordsBody.addEventListener('click', e => {
     showNotification('✅ تم تسجيل الخروج محلياً!', 'success');
 });
 
-// ====== رفع السجلات أونلاين ======
 uploadBtn.addEventListener('click', async () => {
     if (localRecords.length === 0) return;
 
@@ -434,7 +421,6 @@ uploadBtn.addEventListener('click', async () => {
 
     const updates = {};
     localRecords.forEach(record => {
-        // التأكد من وجود timestamp
         const ts = record.timestamp || Date.now();
         const datePath = formatDate(ts).replace(/-/g, '');
         updates[`records/${datePath}/${record.id}`] = record;
@@ -443,14 +429,8 @@ uploadBtn.addEventListener('click', async () => {
     try {
         await update(dbRef, updates);
         showNotification(`✅ تم رفع ${localRecords.length} سجل بنجاح!`, 'success');
-        
-        // مسح السجلات المحلية بعد رفعها بنجاح
         localRecords = [];
         saveLocalRecords();
-        
-        // لا حاجة لإضافة السجلات المحلية إلى السجلات السحابية يدوياً
-        // لأن onValue سيقوم بتحديثها تلقائياً
-        // renderCombinedRecords(); // onValue سيتولى إعادة العرض
     } catch (error) {
         showNotification('❌ فشل رفع السجلات. حاول مرة أخرى.', 'error');
         console.error("Upload failed:", error);
@@ -459,11 +439,10 @@ uploadBtn.addEventListener('click', async () => {
     }
 });
 
-// ====== جلب البيانات من السحابة (بشكل لحظي) ======
 function listenToCloudRecords() {
     const recordsRef = ref(db, 'records');
     onValue(recordsRef, (snapshot) => {
-        cloudRecords = []; // مسح السجلات القديمة
+        cloudRecords = [];
         if (snapshot.exists()) {
             const allDays = snapshot.val();
             Object.values(allDays).forEach(dayRecords => {
@@ -485,7 +464,6 @@ function listenToCloudRecords() {
         renderCombinedRecords();
     }, (error) => {
         showNotification('❌ فشل الاتصال بقاعدة البيانات', 'error');
-        console.error("Real-time listener failed:", error);
         statusSpan.textContent = "❌ فشل الاتصال بقاعدة البيانات";
     });
 }
@@ -498,11 +476,9 @@ async function fetchCarsData() {
         }
     } catch (error) {
         console.error("Cars data fetch failed:", error);
-        showNotification('❌ فشل تحميل بيانات السيارات', 'error');
     }
 }
 
-// ====== منطق الأدمن ======
 function setAdminMode(loggedIn) {
     document.body.classList.toggle('admin-logged-in', loggedIn);
     sessionStorage.setItem('isAdmin', loggedIn ? 'true' : 'false');
@@ -524,22 +500,17 @@ submitAdminLoginBtn.addEventListener('click', () => {
     }
 });
 
-// ====== مستمعات الأحداث ======
 filterDateInput.addEventListener('change', renderCombinedRecords);
 searchQueryInput.addEventListener('input', renderCombinedRecords);
 carNumberInput.addEventListener('input', (e) => renderSuggestions(e.target.value.trim()));
 
-// ====== بدء التشغيل ======
 async function init() {
     if (sessionStorage.getItem('isAdmin') === 'true') {
         setAdminMode(true);
     }
     loadLocalRecords();
     await fetchCarsData();
-    // بدء الاستماع للتغيرات اللحظية بدلاً من الجلب مرة واحدة
     listenToCloudRecords();
-    // لا حاجة لاستدعاء renderCombinedRecords و populateDateFilter هنا
-    // لأن listenToCloudRecords ستقوم بذلك عند أول اتصال
 }
 
 init();
