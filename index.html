@@ -1,1 +1,332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام بوابة الجامعة الملكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --card-bg: #161616;
+            --gold: #c5a059;
+            --white: #ffffff;
+            --gray: #888888;
+        }
 
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding-bottom: 80px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        header h1 { color: var(--gold); font-size: 1.4rem; margin: 0; }
+        .designer-credit { display: block; font-size: 0.85rem; color: var(--white); margin-top: 5px; }
+
+        /* تنسيق روابط التواصل الاجتماعي */
+        .social-links {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .social-links a {
+            color: var(--gold);
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        .social-links a:hover {
+            transform: scale(1.2);
+            color: var(--white);
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+
+        .top-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 14px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Cairo';
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .mini-counter {
+            text-align: center;
+            background: rgba(197, 160, 89, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            color: var(--gold);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .waving-man { font-size: 1.3rem; color: var(--gold); }
+
+        .car-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-right: 5px solid var(--gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .car-info h3 { margin: 0; font-size: 1.05rem; color: var(--white); }
+        .car-info p { margin: 4px 0; color: var(--gold); font-size: 0.85rem; }
+        .car-info small { color: var(--gray); font-size: 0.75rem; }
+
+        .plate-container {
+            background: #ffffff;
+            color: #000000;
+            border: 1.5px solid #000;
+            border-radius: 5px;
+            min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 2px 2px 0px var(--gold);
+        }
+
+        .plate-header { background: #007bff; height: 4px; width: 100%; }
+        .plate-letters { font-size: 0.85rem; font-weight: 700; padding: 1px 4px; border-bottom: 1px solid #eee; text-align: center; line-height: 1.1; }
+        .plate-numbers { font-size: 0.95rem; font-weight: 800; padding: 1px 4px; text-align: center; line-height: 1.1; color: #000; }
+
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--gold);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--gold);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Cairo';
+            box-sizing: border-box;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>نظام بوابة الجامعة</h1>
+        <span class="designer-credit">تصميم: ا. محمد رجب</span>
+        
+        <div class="social-links">
+            <a href="https://wa.me/2010XXXXXXXX" target="_blank" title="واتساب"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://facebook.com/yourprofile" target="_blank" title="فيسبوك"><i class="fab fa-facebook"></i></a>
+            <a href="https://instagram.com/yourprofile" target="_blank" title="انستجرام"><i class="fab fa-instagram"></i></a>
+            <a href="https://t.me/yourusername" target="_blank" title="تليجرام"><i class="fab fa-telegram"></i></a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="top-bar">
+            <div class="mini-counter">
+                <span class="waving-man"><i class="fas fa-user-check"></i></span>
+                <span>السيارات المسجلة: <span id="carCount">0</span></span>
+            </div>
+            <input type="text" class="search-box" id="searchInput" onkeyup="searchCars()" placeholder="ابحث باسم السائق أو رقم السيارة...">
+        </div>
+        <div id="carsList"></div>
+    </div>
+
+    <div class="fab" onclick="openModal()">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <div class="modal" id="regModal">
+        <div class="modal-content">
+            <h3 style="text-align: center; color: var(--gold);">تسجيل جديد</h3>
+            <input type="text" id="name" placeholder="الاسم الكامل">
+            <input type="text" id="plate" placeholder="رقم السيارة (مثال: س س هـ 184)">
+            <select id="faculty">
+                <option value="" disabled selected>اختر جهة الدخول</option>
+                <option>كلية طب بشري</option>
+                <option>كلية طب الأسنان</option>
+                <option>كلية العلاج الطبيعي</option>
+                <option>كلية الحاسبات والمعلومات</option>
+                <option>كلية الهندسة</option>
+                <option>كلية العلوم</option>
+                <option>كلية العلوم الصحية</option>
+                <option>كلية الاداب</option>
+                <option>كلية التجارة</option>
+                <option>كلية حقوق</option>
+                <option>كلية الفنون</option>
+            </select>
+            <input type="tel" id="phone" placeholder="رقم الهاتف">
+            <button class="btn-submit" onclick="saveCar()">إتمام الحفظ</button>
+            <p onclick="closeModal()" style="text-align:center; color: #888; cursor:pointer; margin-top:20px;">إلغاء</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBSiTb1m0osdrX7YOv4ADr8x-7TghSqmY",
+            authDomain: "day3069-e27df.firebaseapp.com",
+            databaseURL: "https://day3069-e27df-default-rtdb.firebaseio.com",
+            projectId: "day3069-e27df",
+            storageBucket: "day3069-e27df.firebasestorage.app",
+            messagingSenderId: "110258698429",
+            appId: "1:110258698429:web:fcc4114a83829756329fd4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const carsRef = database.ref('cars');
+
+        function openModal() { document.getElementById('regModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('regModal').style.display = 'none'; }
+
+        function formatPlate(text) {
+            if (!text) return { letters: "--", numbers: "000" };
+            const numbers = text.replace(/[^0-9]/g, '') || "000";
+            const letters = text.replace(/[0-9]/g, '').trim() || "--";
+            return { letters, numbers };
+        }
+
+        function saveCar() {
+            const name = document.getElementById('name').value;
+            const plate = document.getElementById('plate').value;
+            const faculty = document.getElementById('faculty').value;
+            const phone = document.getElementById('phone').value || "";
+
+            if(!name || !plate || !faculty) return alert("يرجى ملء البيانات");
+
+            carsRef.push({
+                ownerName: name,
+                carNumber: plate,
+                entrance: faculty,
+                phone: phone
+            }).then(() => {
+                closeModal();
+                document.getElementById('name').value = '';
+                document.getElementById('plate').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('faculty').selectedIndex = 0;
+            });
+        }
+
+        carsRef.on('value', (snapshot) => {
+            const list = document.getElementById('carsList');
+            list.innerHTML = "";
+            let count = 0;
+
+            snapshot.forEach((child) => {
+                const data = child.val();
+                const dName = data.ownerName || data.name || "غير مسجل";
+                const dPlateRaw = data.carNumber || data.plate || "";
+                const dFaculty = data.entrance || data.faculty || "غير محدد";
+                const dPhone = (data.phone && data.phone !== "") ? data.phone : "بدون هاتف";
+
+                const plateInfo = formatPlate(dPlateRaw);
+
+                count++;
+                const card = document.createElement('div');
+                card.className = 'car-card';
+                card.innerHTML = `
+                    <div class="car-info">
+                        <h3>${dName}</h3>
+                        <p>${dFaculty}</p>
+                        <small><i class="fas fa-phone-alt" style="font-size:0.65rem;"></i> ${dPhone}</small>
+                    </div>
+                    <div class="plate-container">
+                        <div class="plate-header"></div>
+                        <div class="plate-letters">${plateInfo.letters}</div>
+                        <div class="plate-numbers">${plateInfo.numbers}</div>
+                    </div>
+                `;
+                list.prepend(card);
+            });
+            document.getElementById('carCount').innerText = count;
+        });
+
+        function searchCars() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('car-card');
+            for (let i = 0; i < cards.length; i++) {
+                let cardText = cards[i].innerText.toLowerCase();
+                cards[i].style.display = cardText.includes(input) ? "" : "none";
+            }
+        }
+    </script>
+</body>
+</html>
